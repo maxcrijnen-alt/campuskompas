@@ -7,6 +7,7 @@ export type CampusEvent =
   | 'data_report_submit'
   | 'qr_entry'
   | 'route_start'
+  | 'route_unavailable'
   | 'route_complete'
   | 'gem_view'
   | 'gem_submit'
@@ -24,5 +25,9 @@ export function track(
   properties: Record<string, string | number | boolean> = {},
 ) {
   // Analytics must never break navigation or receive raw search/message contents.
-  try { tracker(event, properties); } catch { /* Adapter failures are non-fatal. */ }
+  try {
+    tracker(event, properties);
+  } catch {
+    /* Adapter failures are non-fatal. */
+  }
 }

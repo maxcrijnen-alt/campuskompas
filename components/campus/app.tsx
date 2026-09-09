@@ -38,6 +38,7 @@ export function CampusApp({
     [hasOrigin, setHasOrigin] = useState(false),
     [routing, setRouting] = useState(false),
     [route, setRoute] = useState<Route | null>(null),
+    [routeStage, setRouteStage] = useState(0),
     [picking, setPicking] = useState(false),
     [toast, setToast] = useState(''),
     [gems, setGems] = useState<Gem[]>([]),
@@ -51,7 +52,8 @@ export function CampusApp({
       () => createRouteEndpointResolver(data),
       [data],
     ),
-    originEndpoint = from ? endpointResolver.resolveReference(from) : null;
+    originEndpoint = from ? endpointResolver.resolveReference(from) : null,
+    routeOrigin = from ? resolveLocationReference(data, from).location : null;
   useEffect(() => {
     try {
       const lang = localStorage.getItem('ck-locale');
@@ -135,6 +137,7 @@ export function CampusApp({
     setSelected(l);
     setFloor(l.floor_id);
     setRoute(null);
+    setRouteStage(0);
     setRouting(false);
     setResolutionIssue(null);
     const url = new URL(window.location.href);
@@ -212,7 +215,9 @@ export function CampusApp({
         className={
           'page-wrap ' +
           (view === 'map'
-            ? 'map-page ' + (selected ? 'has-selection' : '')
+            ? 'map-page ' +
+              (selected ? 'has-selection ' : '') +
+              (route ? 'route-active ' : '')
             : '')
         }
       >
@@ -252,10 +257,10 @@ export function CampusApp({
                       : 'Startpunt gekozen'}
                 </strong>
                 <span>
-                  {
+                  {routeOrigin?.room_code ||
+                    routeOrigin?.name[locale] ||
                     data.nodes.find((n) => n.id === originEndpoint?.nodeId)
-                      ?.label[locale]
-                  }
+                      ?.label[locale]}
                 </span>
               </div>
             )}
@@ -352,6 +357,8 @@ export function CampusApp({
                           : ''
                       }
                       route={route}
+                      origin={routeOrigin}
+                      activeStage={routeStage}
                       onSelect={select}
                       locale={locale}
                     />
@@ -379,9 +386,11 @@ export function CampusApp({
                         setQrOrigin(false);
                       }}
                       onRoute={setRoute}
+                      onStage={setRouteStage}
                       onStop={() => {
                         setRouting(false);
                         setRoute(null);
+                        setRouteStage(0);
                         setPicking(false);
                         const u = new URL(window.location.href);
                         u.searchParams.delete('route');
@@ -396,6 +405,7 @@ export function CampusApp({
                         setFrom(previousDestination.id);
                         setFloor(origin.floor_id);
                         setRoute(null);
+                        setRouteStage(0);
                         setRouting(true);
                         setHasOrigin(true);
                         setQrOrigin(false);

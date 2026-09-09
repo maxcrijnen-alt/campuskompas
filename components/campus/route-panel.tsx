@@ -7,11 +7,19 @@ import {
   Accessibility,
   Navigation,
   ArrowUpDown,
+  Clock3,
+  Flag,
+  Footprints,
+  MapPin,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import type { CampusData, Locale, Location } from '@/lib/campus/types';
-import { shortestPath, routeStages, type Route } from '@/lib/routing/graph';
+import { shortestPath, type Route } from '@/lib/routing/graph';
 import { createRouteEndpointResolver } from '@/lib/routing/endpoints';
+import {
+  createRouteExperience,
+  routingDebugEnabled,
+} from '@/lib/routing/experience';
 import { resolveLocationReference } from '@/lib/campus/search';
 import { CampusSearch } from './search';
 import { Feedback } from './community';
@@ -27,6 +35,7 @@ export function RoutePanel({
   from,
   setFrom,
   onRoute,
+  onStage,
   onStop,
   onFloor,
   onPick,
@@ -38,6 +47,7 @@ export function RoutePanel({
   from: string;
   setFrom: (id: string) => void;
   onRoute: (r: Route | null) => void;
+  onStage: (stage: number) => void;
   onStop: () => void;
   onFloor: (id: string) => void;
   onPick: () => void;
@@ -69,9 +79,9 @@ export function RoutePanel({
     );
     return matches.length === 1 ? matches[0] : null;
   }, [data, from, originEndpoint.nodeId]);
-  const active = useMemo(
+  const candidateRoute = useMemo(
     () =>
-      attempted && originEndpoint.nodeId && destinationEndpoint.nodeId
+      originEndpoint.nodeId && destinationEndpoint.nodeId
         ? shortestPath(
             data.nodes,
             data.edges,
@@ -80,20 +90,30 @@ export function RoutePanel({
             accessible,
           )
         : null,
-    [
-      attempted,
-      data,
-      originEndpoint.nodeId,
-      destinationEndpoint.nodeId,
-      accessible,
-    ],
+    [data, originEndpoint.nodeId, destinationEndpoint.nodeId, accessible],
   );
-  const stages = useMemo(() => (active ? routeStages(active) : []), [active]),
-    current = Math.min(stage, Math.max(0, stages.length - 1));
+  const experience = useMemo(
+      () =>
+        candidateRoute && originLocation
+          ? createRouteExperience(
+              candidateRoute,
+              data,
+              originLocation,
+              to,
+              locale,
+            )
+          : null,
+      [candidateRoute, originLocation, data, to, locale],
+    ),
+    active = attempted && experience?.visuallyComplete ? candidateRoute : null,
+    stages = experience?.legs ?? [],
+    current = Math.min(stage, Math.max(0, stages.length - 1)),
+    currentStage = stages[current];
   useEffect(() => {
     onRoute(active);
-    if (active && stages[current]) onFloor(stages[current].floor_id);
-  }, [active, current, stages, onRoute, onFloor]);
+    onStage(current);
+    if (active && currentStage) onFloor(currentStage.floorId);
+  }, [active, current, currentStage, onRoute, onStage, onFloor]);
   function updateUrl(nextStage = 0, start = true) {
     const url = new URL(window.location.href);
     const raw = url.searchParams.get('from');
@@ -118,6 +138,11 @@ export function RoutePanel({
     track(accessible ? 'accessible_route_start' : 'route_start', {
       location_id: to.id,
     });
+    if (!candidateRoute || !experience?.visuallyComplete)
+      track('route_unavailable', {
+        location_id: to.id,
+        reason: candidateRoute ? 'missing_map_geometry' : 'no_graph_route',
+      });
   }
   function choose(id: string) {
     setFrom(id);
@@ -125,12 +150,9 @@ export function RoutePanel({
     setFinished(false);
     setStage(0);
   }
-  const stageFloor = data.floors.find(
-      (f) => f.id === stages[current]?.floor_id,
-    ),
-    nextFloor = data.floors.find((f) => f.id === stages[current + 1]?.floor_id);
-  const nextEdge = active?.edges.find(
-    (_, i) => active.nodes[i].id === stages[current]?.nodes.at(-1)?.id,
+  const debugEnabled = routingDebugEnabled(
+    process.env.NODE_ENV,
+    typeof window === 'undefined' ? '' : window.location.search,
   );
   const floorLabel = (level: number) =>
     level === 0
@@ -162,7 +184,7 @@ export function RoutePanel({
         {to.building_id} ·{' '}
         {floorLabel(data.floors.find((f) => f.id === to.floor_id)?.level ?? 0)}
       </p>
-      {!active && !finished && (
+      {!attempted && !finished && (
         <>
           <h3>{en ? 'Where are you now?' : 'Waar ben je nu?'}</h3>
           <div className="entrance-choices">
@@ -213,7 +235,7 @@ export function RoutePanel({
           </small>
         </>
       )}
-      {!finished && (
+      {!attempted && !finished && (
         <label className="toggle-line accessible-control">
           <Switch
             aria-label={en ? 'Accessible route' : 'Toegankelijke route'}
@@ -239,25 +261,78 @@ export function RoutePanel({
           </span>
         </label>
       )}
-      {!active && !finished && (
+      {!attempted && !finished && (
         <button className="primary-button" disabled={!from} onClick={start}>
           <Navigation size={18} />
           {en ? 'Show route' : 'Toon route'}
         </button>
       )}
       {attempted && !active && !finished && (
-        <p className="route-unavailable" role="status">
-          {accessible
-            ? en
-              ? 'No verified accessible route is available. Ask reception for assistance.'
-              : 'Geen geverifieerde toegankelijke route beschikbaar. Vraag de receptie om hulp.'
-            : en
-              ? 'A complete route is not available yet. Your destination is marked on the correct floor. Ask reception for the remaining directions.'
-              : 'Een volledige route is nog niet beschikbaar. Je bestemming staat op de juiste verdieping aangegeven. Vraag de receptie om de verdere looproute.'}
-        </p>
+        <div className="route-unavailable" role="status">
+          <strong>
+            {accessible
+              ? en
+                ? 'No verified accessible route is available.'
+                : 'Geen geverifieerde toegankelijke route beschikbaar.'
+              : en
+                ? 'We cannot make a reliable route for this combination yet.'
+                : 'Voor deze combinatie kunnen we nog geen betrouwbare route maken.'}
+          </strong>
+          <p>
+            {accessible
+              ? en
+                ? 'Ask reception for a checked step-free route.'
+                : 'Vraag de receptie om een gecontroleerde drempelvrije route.'
+              : candidateRoute && !experience?.visuallyComplete
+                ? en
+                  ? 'A technical path exists, but part of its corridor geometry is missing. We do not draw a shortcut through the building.'
+                  : 'Er bestaat technisch een pad, maar een deel van de ganggeometrie ontbreekt. We tekenen geen afsnijding door het gebouw.'
+                : en
+                  ? 'Choose another starting point or ask reception.'
+                  : 'Kies een ander startpunt of vraag de receptie.'}
+          </p>
+          <div className="no-route-actions">
+            <button className="secondary-button" onClick={onStop}>
+              {en ? 'View destination' : 'Bekijk bestemming'}
+            </button>
+            <button
+              className="secondary-button"
+              onClick={() => setAttempted(false)}
+            >
+              {en ? 'Choose another start' : 'Kies ander startpunt'}
+            </button>
+          </div>
+          <Feedback locale={locale} context="route" entityId={to.id} />
+        </div>
       )}
       {active && !finished && (
         <>
+          <div
+            className="route-summary"
+            aria-label={en ? 'Route overview' : 'Routeoverzicht'}
+          >
+            <div className="route-endpoints">
+              <span className="route-endpoint route-endpoint-start">
+                <MapPin size={16} />
+                <small>START</small>
+                <b>
+                  {originLocation?.room_code || originLocation?.name[locale]}
+                </b>
+              </span>
+              <span className="route-endpoint-arrow" aria-hidden="true">
+                →
+              </span>
+              <span className="route-endpoint route-endpoint-destination">
+                <Flag size={16} />
+                <small>{en ? 'DESTINATION' : 'BESTEMMING'}</small>
+                <b>{to.room_code || to.name[locale]}</b>
+              </span>
+            </div>
+            <span className="route-time">
+              <Clock3 size={17} />± {experience!.walkingMinutes}{' '}
+              {en ? 'min walk' : 'min lopen'}
+            </span>
+          </div>
           {!active.verified && (
             <p className="route-beta">
               {en
@@ -267,47 +342,22 @@ export function RoutePanel({
           )}
           <div className="next-step">
             <span className="eyebrow">
-              {en ? 'CURRENT STAGE' : 'HUIDIGE ROUTEFASE'}
+              {en ? 'NOW ON THE MAP' : 'NU OP DE KAART'}
             </span>
             <h3>
-              {stageFloor?.building_id} · {floorLabel(stageFloor?.level ?? 0)}
+              {currentStage?.buildingId} ·{' '}
+              {floorLabel(currentStage?.level ?? 0)}
             </h3>
-            <p>
-              {current === stages.length - 1
-                ? en
-                  ? 'Follow the highlighted corridor towards your destination. Find the room label on the map.'
-                  : 'Volg de gemarkeerde gang richting je bestemming. Zoek het lokaalnummer op de kaart.'
-                : en
-                  ? 'Follow the highlighted part of the route.'
-                  : 'Volg het gemarkeerde deel van de route.'}
-            </p>
-            {nextFloor && (
-              <strong>
-                {nextFloor.building_id !== stageFloor?.building_id
-                  ? en
-                    ? 'Next: leave ' +
-                      stageFloor?.building_id +
-                      ' and go to the ' +
-                      nextFloor.building_id +
-                      ' entrance.'
-                    : 'Hierna: verlaat ' +
-                      stageFloor?.building_id +
-                      ' en ga naar de ingang van ' +
-                      nextFloor.building_id +
-                      '.'
-                  : (nextEdge?.edge_type === 'elevator'
-                      ? en
-                        ? 'Lift'
-                        : 'Lift'
-                      : en
-                        ? 'Stairs'
-                        : 'Trap') +
-                    ' → ' +
-                    floorLabel(nextFloor.level)}
-              </strong>
-            )}
+            <ol className="active-instructions">
+              {currentStage?.instructions.map((instruction, index) => (
+                <li key={instruction}>
+                  <span>{index + 1}</span>
+                  {instruction}
+                </li>
+              ))}
+            </ol>
           </div>
-          <div className="stage-control">
+          <div className="stage-control route-stage-control">
             <button
               aria-label={en ? 'Previous route stage' : 'Vorige routefase'}
               disabled={current === 0}
@@ -319,7 +369,7 @@ export function RoutePanel({
               <ChevronLeft size={18} />
             </button>
             <span>
-              {en ? 'Stage ' : 'Fase '}
+              {en ? 'Part ' : 'Deel '}
               {current + 1} {en ? 'of' : 'van'} {stages.length}
             </span>
             <button
@@ -338,30 +388,91 @@ export function RoutePanel({
             max={stages.length}
             aria-label={en ? 'Route progress' : 'Routevoortgang'}
           />
-          <details className="route-overview">
-            <summary>{en ? 'All stages' : 'Alle routefasen'}</summary>
-            <ol>
-              {stages.map((s, i) => {
-                const f = data.floors.find((f) => f.id === s.floor_id);
-                return (
-                  <li key={i}>
+          <div className="route-overview">
+            <strong>
+              <Footprints size={16} />
+              {en ? 'Whole route' : 'Hele route'}
+            </strong>
+            <ol className="route-overview-list">
+              {experience!.overview.map((item, index) => (
+                <li
+                  key={`${item.kind}-${item.legIndex}-${index}`}
+                  className={`overview-${item.kind}`}
+                >
+                  {item.kind === 'floor' ? (
                     <button
-                      className="text-link"
-                      aria-current={current === i ? 'step' : undefined}
+                      aria-current={
+                        current === item.legIndex ? 'step' : undefined
+                      }
                       onClick={() => {
-                        setStage(i);
-                        updateUrl(i);
+                        setStage(item.legIndex);
+                        updateUrl(item.legIndex);
                       }}
                     >
-                      {i + 1}. {f?.building_id} · {floorLabel(f?.level ?? 0)}
+                      {item.label}
                     </button>
-                  </li>
-                );
-              })}
+                  ) : (
+                    <span>{item.label}</span>
+                  )}
+                </li>
+              ))}
             </ol>
-          </details>
+          </div>
+          {debugEnabled && (
+            <details className="routing-debug" open>
+              <summary>Routing debug</summary>
+              <dl>
+                <div>
+                  <dt>From</dt>
+                  <dd>
+                    {originEndpoint.locationId ?? from} →{' '}
+                    {originEndpoint.nodeId}
+                  </dd>
+                </div>
+                <div>
+                  <dt>To</dt>
+                  <dd>
+                    {destinationEndpoint.locationId} →{' '}
+                    {destinationEndpoint.nodeId}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Resolution</dt>
+                  <dd>
+                    {originEndpoint.resolutionType} /{' '}
+                    {destinationEndpoint.resolutionType}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Component</dt>
+                  <dd>
+                    {originEndpoint.nodeId
+                      ? resolver.graph.componentByNode.get(
+                          originEndpoint.nodeId,
+                        )
+                      : 'none'}
+                  </dd>
+                </div>
+              </dl>
+              <pre>
+                {JSON.stringify(
+                  {
+                    stage: current,
+                    floor: currentStage?.floorId,
+                    routeNodes: active.nodes.map((node) => node.id),
+                    edgeTypes: active.edges.map((edge) => edge.edge_type),
+                    visibleEdgeIds: currentStage?.mapSegments.map(
+                      (segment) => segment.edgeId,
+                    ),
+                  },
+                  null,
+                  2,
+                )}
+              </pre>
+            </details>
+          )}
           <button
-            className="secondary-button"
+            className="secondary-button route-finish"
             onClick={() => {
               setFinished(true);
               onRoute(null);
