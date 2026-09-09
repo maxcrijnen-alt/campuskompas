@@ -16,6 +16,7 @@
     "test": "vitest run --config vitest.config.ts",
     "test:e2e": "playwright test",
     "routing:audit": "tsx scripts/routing-audit.ts",
+    "routing:regression": "tsx scripts/routing-regression.ts",
     "seed": "tsx scripts/seed.ts",
     "seed:check": "tsx scripts/seed.ts --check"
   },

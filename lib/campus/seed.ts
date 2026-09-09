@@ -144,6 +144,7 @@ for (const f of floors) {
     ['stairs', 125, 280, 'staircase'],
     ['entry', 375, 495, 'main_entrance'],
   ] as const) {
+    if (suffix === 'entry' && f.level !== 0) continue;
     nodes.push({
       id: `${f.id}-${suffix}`,
       building_id: f.building_id,

@@ -2,41 +2,48 @@
 
 Last updated: 2026-09-09
 
-## Completed phase
+## Completed phases
 
-**Phase 1 — Audit & routing architecture** is complete.
+**Phase 1 — Audit & routing architecture** and **Phase 2 — Endpoint coverage & graph repair** are complete.
 
-- Production data was audited directly against Supabase project `campuskompas`.
-- Routing now uses one central endpoint resolver for start and destination locations.
-- Direct mappings are accepted only when the node exists, matches the location floor/building, belongs to the main component, and can reach and be reached from that component.
-- A reusable `pnpm routing:audit` command reports graph and endpoint health and exits non-zero for critical endpoint or graph errors.
-- No database migration was needed: Phase 1 introduced no structural database change and the required foreign keys and indexes already exist.
+- Routing uses one central endpoint resolver for start and destination locations.
+- All approved locations retain validated direct mappings; no inferred or fuzzy routing was introduced.
+- The six unused upper-floor legacy entry nodes were confirmed to have no location, QR, or edge references and were removed through a guarded migration.
+- The seed graph now creates entrance nodes only on the ground floor, so a later seed cannot recreate the removed nodes.
+- `pnpm routing:audit` verifies endpoint and graph health against Supabase and exits non-zero on critical failures.
+- `pnpm routing:regression` checks every approved endpoint, deterministic route samples, and the Phase 2 critical route pairs against Supabase.
 
-## Verified production baseline
+## Verified production metrics
 
-- 606 locations; all 606 approved.
-- 576 rooms; all 576 public and linked to a location.
-- 520 route nodes and 535 route edges.
+- 606 approved locations and 576 public rooms.
+- 514 route nodes and 535 route edges.
 - 606 direct endpoint mappings; 0 inferred; 0 `needs_review`; 0 unavailable.
-- 100% routing endpoint coverage for approved locations and public rooms.
-- 0 invalid node references, floor/building mismatches, invalid edges, or public locations outside the main component.
-- 7 weakly connected components: `[514, 1, 1, 1, 1, 1, 1]`.
-- The six isolated nodes are unused legacy seed entries: `R8-1-entry`, `R8-2-entry`, `R8-3-entry`, `R10-1-entry`, `R10-2-entry`, and `R10-3-entry`.
-- All 535 edges are bidirectional, so all 514 nodes in the main component have two-way reachability.
-- iShop (`0.26`) resolves directly to `loc-ishop`; F3.025 resolves directly to `plan-R10-3-29_96-47_066`.
-- One canonical room-code collision remains for Phase 3: R10 `C0.102` and R8 `C0.1.02` both normalize to `C0102`.
+- 100% endpoint coverage; 0 invalid node references, floor/building mismatches, invalid edges, or locations outside the main component.
+- 1 connected component of 514 nodes; 0 isolated nodes and 0 nodes unreachable in either direction within the component.
+- Migration `remove_isolated_legacy_entry_nodes` is applied in Supabase; local file: `20260909162718_remove_isolated_legacy_entry_nodes.sql`.
+
+## Phase 2 regressions
+
+- All-location check: 606/606 passed.
+- Deterministic route sample: 48/48 passed.
+- Critical normal routes: 7/7 passed, including iShop → F3.025, library → F3.025, both buildings, both directions, entrances to high floors, same-floor, and multi-floor routes.
+- iShop → F3.025 uses the outdoor connection and has four floor/building transitions.
+- Accessible mode was checked for all seven critical pairs. All seven correctly remain unavailable because the graph's accessibility evidence is unverified; no accessible route is claimed and no stair edge is accepted.
+- The legacy `loc-ishop` node reference still resolves directly.
 
 ## Verification
 
+- Targeted routing tests: pass, 49 passed.
 - `pnpm routing:audit`: pass, 0 critical issues.
-- Targeted endpoint/graph tests: pass, 9 passed.
-- `pnpm test`: pass, 48 passed and 1 live test skipped without test-account variables.
+- `pnpm routing:regression`: pass, 0 critical issues.
+- `pnpm seed:check`: pass, 181 records validated.
+- `pnpm test`: pass, 52 passed and 1 live test skipped without test-account variables.
 - `pnpm lint`: pass.
 - `pnpm typecheck`: pass.
 - `pnpm build`: pass.
 
 ## Next active phase
 
-**Phase 2 — Endpoint coverage & graph repair**
+**Phase 3 — Search normalization & destination resolution**
 
-No blocking dependency. Phase 2 should classify and remove or archive the six unused isolated entry nodes through a migration, then add the required all-location and critical-pair regression checks without changing the verified 100% endpoint coverage.
+No blocking dependency. Phase 3 still needs to resolve the known canonical room-code collision where R10 `C0.102` and R8 `C0.1.02` both normalize to `C0102`. Accessibility verification remains for its later dedicated phase.
