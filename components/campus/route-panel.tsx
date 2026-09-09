@@ -6,12 +6,14 @@ import {
   X,
   Accessibility,
   Navigation,
+  ArrowUpDown,
 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import type { CampusData, Locale, Location } from '@/lib/campus/types';
 import { shortestPath, routeStages, type Route } from '@/lib/routing/graph';
 import { createRouteEndpointResolver } from '@/lib/routing/endpoints';
-import { Picker } from './picker';
+import { resolveLocationReference } from '@/lib/campus/search';
+import { CampusSearch } from './search';
 import { Feedback } from './community';
 import { track } from '@/lib/campus/analytics';
 const param = (key: string) =>
@@ -28,6 +30,7 @@ export function RoutePanel({
   onStop,
   onFloor,
   onPick,
+  onSwap,
 }: {
   data: CampusData;
   to: Location;
@@ -38,6 +41,7 @@ export function RoutePanel({
   onStop: () => void;
   onFloor: (id: string) => void;
   onPick: () => void;
+  onSwap: (origin: Location) => void;
 }) {
   const en = locale === 'en',
     [accessible, setAccessible] = useState(() => param('accessible') === '1'),
@@ -57,6 +61,14 @@ export function RoutePanel({
     () => resolver.resolveLocation(to),
     [resolver, to],
   );
+  const originLocation = useMemo(() => {
+    const resolved = resolveLocationReference(data, from).location;
+    if (resolved) return resolved;
+    const matches = data.locations.filter(
+      (location) => location.node_id === originEndpoint.nodeId,
+    );
+    return matches.length === 1 ? matches[0] : null;
+  }, [data, from, originEndpoint.nodeId]);
   const active = useMemo(
     () =>
       attempted && originEndpoint.nodeId && destinationEndpoint.nodeId
@@ -82,18 +94,6 @@ export function RoutePanel({
     onRoute(active);
     if (active && stages[current]) onFloor(stages[current].floor_id);
   }, [active, current, stages, onRoute, onFloor]);
-  const options = useMemo(
-    () =>
-      data.locations
-        .filter(
-          (l) => l.status === 'approved' && resolver.resolveLocation(l).nodeId,
-        )
-        .map((l) => ({
-          value: l.id,
-          label: l.name[locale] + ' · ' + l.building_id,
-        })),
-    [data, locale, resolver],
-  );
   function updateUrl(nextStage = 0, start = true) {
     const url = new URL(window.location.href);
     const raw = url.searchParams.get('from');
@@ -183,12 +183,26 @@ export function RoutePanel({
               );
             })}
           </div>
-          <Picker
-            label={en ? 'Search current location' : 'Zoek huidige locatie'}
-            value={from}
-            onChange={choose}
-            options={options}
+          <CampusSearch
+            key={`${originLocation?.id ?? 'none'}-${locale}`}
+            data={data}
+            locale={locale}
+            compact
+            selected={originLocation}
+            inputLabel={en ? 'Search current location' : 'Zoek huidige locatie'}
+            placeholder={
+              en ? 'Room, iShop, library...' : 'Lokaal, iShop, bibliotheek...'
+            }
+            onSelect={(location) => choose(location.id)}
           />
+          <button
+            className="secondary-button route-swap"
+            disabled={!originLocation}
+            onClick={() => originLocation && onSwap(originLocation)}
+          >
+            <ArrowUpDown size={17} />
+            {en ? 'Swap start and destination' : 'Wissel start en bestemming'}
+          </button>
           <button className="text-link" onClick={onPick}>
             {en ? 'Choose starting point on map' : 'Kies startpunt op kaart'} →
           </button>

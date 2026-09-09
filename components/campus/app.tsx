@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Compass, Search } from 'lucide-react';
 import type { CampusData, Locale, Location, Gem } from '@/lib/campus/types';
 import { brand } from '@/lib/campus/brand';
-import { normalizeRoomCode } from '@/lib/routing/normalization';
+import { resolveLocationReference } from '@/lib/campus/search';
 import type { Route } from '@/lib/routing/graph';
 import { createRouteEndpointResolver } from '@/lib/routing/endpoints';
 import { CampusMap } from './map';
@@ -42,7 +42,9 @@ export function CampusApp({
     [toast, setToast] = useState(''),
     [gems, setGems] = useState<Gem[]>([]),
     [globalSearch, setGlobalSearch] = useState(false),
-    [missing, setMissing] = useState(false);
+    [resolutionIssue, setResolutionIssue] = useState<
+      'missing' | 'ambiguous' | null
+    >(null);
   const en = locale === 'en',
     floor = data.floors.find((f) => f.id === floorId);
   const endpointResolver = useMemo(
@@ -58,42 +60,43 @@ export function CampusApp({
     const params = new URLSearchParams(window.location.search),
       target = initialTarget ?? params.get('to');
     if (target) {
-      const l = data.locations.find(
-        (l) =>
-          normalizeRoomCode(l.id) === normalizeRoomCode(target) ||
-          normalizeRoomCode(l.id) ===
-            normalizeRoomCode(target.replace(/^loc-/, '')) ||
-          (l.room_code &&
-            normalizeRoomCode(l.room_code) === normalizeRoomCode(target)),
-      );
-      if (l) {
-        setSelected(l);
-        setFloor(l.floor_id);
+      const targetResolution = resolveLocationReference(data, target);
+      if (targetResolution.location) {
+        setSelected(targetResolution.location);
+        setFloor(targetResolution.location.floor_id);
+        setResolutionIssue(null);
         if (params.get('navigate') === '1') setRouting(true);
-      } else setMissing(true);
+      } else
+        setResolutionIssue(
+          targetResolution.status === 'ambiguous' ? 'ambiguous' : 'missing',
+        );
     }
-    let origin = params.get('from');
-    if (origin?.startsWith('qr:'))
-      origin =
+    const rawOrigin = params.get('from');
+    let origin = rawOrigin;
+    if (rawOrigin?.startsWith('qr:')) {
+      const qrNode =
         data.qr.find((q) => q.code === origin?.slice(3) && q.active)
           ?.route_node_id ?? null;
-    const locationOrigin = data.locations.find(
-        (location) =>
-          location.id === origin ||
-          location.id === origin?.replace(/^loc-/, ''),
-      ),
+      const qrLocations = data.locations.filter(
+        (location) => location.node_id === qrNode,
+      );
+      origin = qrLocations.length === 1 ? qrLocations[0].id : qrNode;
+    }
+    const locationOrigin = origin
+        ? resolveLocationReference(data, origin).location
+        : null,
       endpoint = origin
         ? endpointResolver.resolveReference(locationOrigin?.id ?? origin)
         : null;
     if (endpoint?.nodeId) {
-      setQrOrigin(params.get('from')?.startsWith('qr:') ?? false);
-      if (params.get('from')?.startsWith('qr:'))
+      setQrOrigin(rawOrigin?.startsWith('qr:') ?? false);
+      if (rawOrigin?.startsWith('qr:'))
         track('qr_entry', { building: endpoint.buildingId ?? 'unknown' });
       setFrom(locationOrigin?.id ?? origin!);
       setHasOrigin(true);
       if (!target && endpoint.floorId) setFloor(endpoint.floorId);
       if (target) setRouting(true);
-    } else if (params.has('from'))
+    } else if (rawOrigin)
       setToast('QR/startpunt niet herkend · Starting point not found');
     if (connected)
       fetch('/api/gems')
@@ -133,7 +136,7 @@ export function CampusApp({
     setFloor(l.floor_id);
     setRoute(null);
     setRouting(false);
-    setMissing(false);
+    setResolutionIssue(null);
     const url = new URL(window.location.href);
     url.searchParams.set('to', l.id);
     url.searchParams.delete('route');
@@ -256,11 +259,15 @@ export function CampusApp({
                 </span>
               </div>
             )}
-            {missing && (
+            {resolutionIssue && (
               <div className="notice" role="status">
-                {en
-                  ? 'This location was not found. Search for another room or ask reception.'
-                  : 'Deze locatie is niet gevonden. Zoek een ander lokaal of vraag de receptie.'}
+                {resolutionIssue === 'ambiguous'
+                  ? en
+                    ? 'This room code matches multiple locations. Add R8 or R10, or select the correct result.'
+                    : 'Deze lokaalcode hoort bij meerdere locaties. Voeg R8 of R10 toe of kies het juiste resultaat.'
+                  : en
+                    ? 'This location was not found. Search for another room or ask reception.'
+                    : 'Deze locatie is niet gevonden. Zoek een ander lokaal of vraag de receptie.'}
               </div>
             )}
             <div className="workspace">
@@ -383,6 +390,23 @@ export function CampusApp({
                       }}
                       onFloor={setFloor}
                       onPick={() => setPicking(true)}
+                      onSwap={(origin) => {
+                        const previousDestination = selected;
+                        setSelected(origin);
+                        setFrom(previousDestination.id);
+                        setFloor(origin.floor_id);
+                        setRoute(null);
+                        setRouting(true);
+                        setHasOrigin(true);
+                        setQrOrigin(false);
+                        setPicking(false);
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('from', previousDestination.id);
+                        url.searchParams.set('to', origin.id);
+                        url.searchParams.delete('route');
+                        url.searchParams.delete('stage');
+                        window.history.replaceState(null, '', url);
+                      }}
                     />
                   ) : (
                     <LocationPanel
