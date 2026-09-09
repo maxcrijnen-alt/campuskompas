@@ -255,8 +255,8 @@ export function RoutePanel({
             {en ? 'Accessible route' : 'Toegankelijke route'}
             <small>
               {en
-                ? 'Only verified step-free connections'
-                : 'Alleen gecontroleerde drempelvrije verbindingen'}
+                ? 'Avoids stairs; unverified sections are clearly marked'
+                : 'Vermijdt trappen; onbevestigde delen worden duidelijk gemeld'}
             </small>
           </span>
         </label>
@@ -272,8 +272,8 @@ export function RoutePanel({
           <strong>
             {accessible
               ? en
-                ? 'No verified accessible route is available.'
-                : 'Geen geverifieerde toegankelijke route beschikbaar.'
+                ? 'No step-free candidate route is available.'
+                : 'Geen mogelijke trapvrije route beschikbaar.'
               : en
                 ? 'We cannot make a reliable route for this combination yet.'
                 : 'Voor deze combinatie kunnen we nog geen betrouwbare route maken.'}
@@ -281,8 +281,8 @@ export function RoutePanel({
           <p>
             {accessible
               ? en
-                ? 'Ask reception for a checked step-free route.'
-                : 'Vraag de receptie om een gecontroleerde drempelvrije route.'
+                ? 'The current graph cannot provide a route without stairs or confirmed barriers. Ask reception for help.'
+                : 'De huidige kaart kan geen route zonder trappen of bevestigde barrières maken. Vraag de receptie om hulp.'
               : candidateRoute && !experience?.visuallyComplete
                 ? en
                   ? 'A technical path exists, but part of its corridor geometry is missing. We do not draw a shortcut through the building.'
@@ -338,6 +338,17 @@ export function RoutePanel({
               {en
                 ? 'Plan-based preview · campus check still needed'
                 : 'Kaartindicatie · controle op campus nog nodig'}
+            </p>
+          )}
+          {accessible && (
+            <p className={active.accessibility === 'confirmed' ? 'route-accessibility-confirmed' : 'route-accessibility-warning'} role="status">
+              {active.accessibility === 'confirmed'
+                ? en
+                  ? 'This route is confirmed accessible.'
+                  : 'Deze route is bevestigd toegankelijk.'
+                : en
+                  ? 'This route avoids stairs, but accessibility of some sections has not yet been verified.'
+                  : 'Deze route vermijdt trappen, maar de toegankelijkheid van delen is nog niet geverifieerd.'}
             </p>
           )}
           <div className="next-step">

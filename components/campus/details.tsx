@@ -4,6 +4,7 @@ import {X,Share2,Navigation,ChevronDown,Accessibility} from 'lucide-react';
 import type {CampusData,Location,Locale} from '@/lib/campus/types';
 import {OpeningHours} from './opening-hours';
 import {ReportButton,Feedback} from './community';
+import {accessibilityState} from '@/lib/routing/accessibility';
 export function LocationPanel({location:l,data,locale,onClose,onRoute,onToast}:{location:Location;data:CampusData;locale:Locale;onClose:()=>void;onRoute:()=>void;onToast:(s:string)=>void}){
  const en=locale==='en',[expanded,setExpanded]=useState(false),heading=useRef<HTMLHeadingElement>(null);
  const category=data.categories.find(c=>c.id===l.category_id),floor=data.floors.find(f=>f.id===l.floor_id),source=data.sources.find(s=>s.id===l.source_id),node=data.nodes.find(n=>n.id===l.node_id);
@@ -15,7 +16,7 @@ export function LocationPanel({location:l,data,locale,onClose,onRoute,onToast}:{
  <p className="location-meta">{l.building_id} · {floor?.level===0?(en?'Ground floor':'Begane grond'):(en?'Floor ':'Verdieping ')+floor?.level}{l.room_code&&/^[A-Z]/.test(l.room_code)?' · Zone '+l.room_code[0]:''}</p>
  <div className="location-cta"><button className="primary-button" onClick={onRoute}><Navigation size={18}/>{en?'Route here':'Route hierheen'}</button><button className="secondary-button" onClick={()=>void share()} aria-label={en?'Share location':'Deel locatie'}><Share2 size={18}/><span>{en?'Share':'Delen'}</span></button></div>
  <div className={'sheet-content '+(expanded?'expanded':'')}>
- {l.category_id!=='room'&&<>{l.description[locale]&&<p>{l.description[locale]}</p>}<OpeningHours hours={data.hours.find(h=>h.id===l.hours_id)} locale={locale}/><p className="form-note"><Accessibility size={14}/>{node?.accessibility_status==='verified'&&node.accessible?(en?'Step-free access verified.':'Drempelvrije toegang gecontroleerd.'):(en?'Step-free access not yet confirmed.':'Drempelvrije toegang nog niet bevestigd.')}</p></>}
+ {l.category_id!=='room'&&<>{l.description[locale]&&<p>{l.description[locale]}</p>}<OpeningHours hours={data.hours.find(h=>h.id===l.hours_id)} locale={locale}/>{node&&<p className="form-note"><Accessibility size={14}/>{accessibilityState(node)==='accessible'?(en?'Step-free access verified.':'Drempelvrije toegang gecontroleerd.'):accessibilityState(node)==='inaccessible'?(en?'This endpoint is confirmed not step-free.':'Dit routepunt is bevestigd niet drempelvrij.'):(en?'Step-free access has not yet been verified.':'Drempelvrije toegang is nog niet geverifieerd.')}</p>}</>}
  <ReportButton locale={locale} entityId={l.id}/><Feedback key={l.id} locale={locale} entityId={l.id}/>
  <details className="location-source"><summary>{en?'Source and data information':'Bron en gegevens'}</summary>{source&&<a className="text-link" href={source.url+(l.source_page?'#page='+l.source_page:'')} target="_blank" rel="noreferrer">{source.title} ↗</a>}<p>{en?'Location on the published plan; current use still needs campus confirmation.':'Locatie op de gepubliceerde kaart; actueel gebruik moet nog door de campus worden bevestigd.'}</p>{source&&<small>{en?'Source checked':'Bron gecontroleerd'}: {source.verified_at}</small>}</details>
  </div>

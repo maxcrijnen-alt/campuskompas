@@ -55,7 +55,7 @@ describe('Phase 2 routing regression coverage', () => {
     expect(report.sampledRouteFailures).toEqual([]);
   });
 
-  it('routes every critical normal pair and rejects unverified accessible routes', () => {
+  it('routes every critical normal pair and keeps wheelchair candidates stair-free', () => {
     const report = checkRoutingRegressions(seed, seedCriticalPairs);
     expect(report.criticalPairFailures).toEqual([]);
     expect(report.criticalPairResults).toHaveLength(seedCriticalPairs.length);
@@ -63,7 +63,7 @@ describe('Phase 2 routing regression coverage', () => {
       report.criticalPairResults.every(
         (result) =>
           result.normal === 'available' &&
-          result.accessible === 'unavailable-unverified',
+          result.accessible === 'available-with-unknowns',
       ),
     ).toBe(true);
   });

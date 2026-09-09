@@ -96,10 +96,17 @@ describe('routing', () => {
     expect(instructions(r, 'en').some((s) => s.includes('Outside'))).toBe(true);
     expect(instructions(r, 'nl').some((s) => s.includes('Buiten'))).toBe(true);
   });
-  it('never claims an unverified accessible route', () =>
-    expect(
-      shortestPath(seed.nodes, seed.edges, 'R10-0-entry', 'loc-F3025', true),
-    ).toBeNull());
+  it('allows unknown step-free segments without claiming confirmation', () => {
+    const route = shortestPath(
+      seed.nodes,
+      seed.edges,
+      'R10-0-entry',
+      'loc-F3025',
+      true,
+    );
+    expect(route?.accessibility).toBe('partially_unknown');
+    expect(route?.edges.some((edge) => edge.edge_type === 'stairs')).toBe(false);
+  });
   it('uses lifts and avoids all stairs for verified accessible graph', () => {
     const nodes = seed.nodes.map((n) => ({
         ...n,
@@ -112,6 +119,7 @@ describe('routing', () => {
     const r = shortestPath(nodes, edges, 'R10-0-entry', 'loc-F3025', true)!;
     expect(r.edges.some((e) => e.edge_type === 'elevator')).toBe(true);
     expect(r.edges.some((e) => e.edge_type === 'stairs')).toBe(false);
+    expect(r.accessibility).toBe('confirmed');
   });
   it('disconnected graph and missing endpoints', () => {
     expect(shortestPath(seed.nodes, [], 'R8-0-entry', 'loc-F3025')).toBeNull();
@@ -219,6 +227,16 @@ describe('public input validation', () => {
       imageType(new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10, 0, 0, 0, 0])),
     ).toBe('image/png');
   });
+  it('accepts a proposed place without a routing endpoint', () =>
+    expect(
+      gemSchema.safeParse({
+        ...g,
+        location_mode: 'proposed',
+        location_id: '',
+        proposed_location_name: 'Nieuwe studienis',
+        proposed_location_description: 'Naast de grote trap op de begane grond.',
+      }).success,
+    ).toBe(true));
   it('does not accept accessible stairs', () =>
     expect(
       adminSchemas.route_edges.safeParse({

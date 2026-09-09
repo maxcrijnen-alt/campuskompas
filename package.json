@@ -18,6 +18,7 @@
     "routing:audit": "tsx scripts/routing-audit.ts",
     "routing:regression": "tsx scripts/routing-regression.ts",
     "routing:experience-audit": "tsx scripts/route-experience-audit.ts",
+    "routing:audit-accessibility": "tsx scripts/accessibility-audit.ts",
     "search:audit": "tsx scripts/search-audit.ts",
     "seed": "tsx scripts/seed.ts",
     "seed:check": "tsx scripts/seed.ts --check"

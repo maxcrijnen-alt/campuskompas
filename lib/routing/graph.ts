@@ -1,10 +1,17 @@
 import type { RouteNode, RouteEdge } from '../campus/types';
+import {
+  wheelchairEdgeAllowed,
+  wheelchairNodeAllowed,
+  wheelchairRouteConfidence,
+  type WheelchairRouteConfidence,
+} from './accessibility';
 export type Route = {
   nodes: RouteNode[];
   edges: RouteEdge[];
   weight: number;
   verified: boolean;
   transitions: number;
+  accessibility: WheelchairRouteConfidence | 'not-requested';
 };
 export function shortestPath(
   nodes: RouteNode[],
@@ -15,11 +22,7 @@ export function shortestPath(
 ): Route | null {
   const allowed = new Map(
     nodes
-      .filter(
-        (n) =>
-          !accessible ||
-          (n.accessible && n.accessibility_status === 'verified'),
-      )
+      .filter((n) => !accessible || wheelchairNodeAllowed(n))
       .map((n) => [n.id, n]),
   );
   if (!allowed.has(from) || !allowed.has(to)) return null;
@@ -30,10 +33,7 @@ export function shortestPath(
     if (
       !allowed.has(e.from_node_id) ||
       !allowed.has(e.to_node_id) ||
-      (accessible &&
-        (!e.accessible ||
-          e.edge_type === 'stairs' ||
-          e.accessibility_status !== 'verified'))
+      (accessible && !wheelchairEdgeAllowed(e))
     )
       continue;
     for (const [a, b] of [
@@ -90,6 +90,9 @@ export function shortestPath(
     transitions: routeEdges.filter(
       (_, i) => path[i].floor_id !== path[i + 1].floor_id,
     ).length,
+    accessibility: accessible
+      ? wheelchairRouteConfidence(path, routeEdges)
+      : 'not-requested',
   };
 }
 export function routeStages(route: Route) {

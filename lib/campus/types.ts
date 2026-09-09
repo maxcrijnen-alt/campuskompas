@@ -43,6 +43,8 @@ export type Location = {
   verification_status: Verification;
   source_id: string;
   hours_id?: string;
+  routing_status?: 'direct' | 'inferred' | 'needs_review' | 'unavailable';
+  endpoint_source?: 'existing_mapping' | 'manual' | 'inferred' | null;
 };
 export type RouteNode = {
   map_x?: number | null;
@@ -85,7 +87,20 @@ export type Gem = {
   title: string;
   description: string;
   category: string;
-  location_id: string;
+  location_id: string | null;
+  location_review_status?:
+    | 'linked'
+    | 'proposed'
+    | 'needs_review'
+    | 'approved'
+    | 'rejected';
+  proposed_location_name?: string | null;
+  proposed_building_id?: string | null;
+  proposed_floor_id?: string | null;
+  proposed_room_zone?: string | null;
+  proposed_location_description?: string | null;
+  proposed_location_source_url?: string | null;
+  proposed_location_notes?: string | null;
   status: 'pending' | 'approved' | 'rejected' | 'archived';
   featured: boolean;
   photo_path: string | null;

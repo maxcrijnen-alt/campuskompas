@@ -1,6 +1,9 @@
 import { requireAdmin } from '@/lib/server/supabase';
 import { failure, json, readJson, sameOrigin } from '@/lib/server/http';
 import { adminSchemas, type AdminTable } from '@/lib/campus/validation';
+import type { Location } from '@/lib/campus/types';
+import { createRouteEndpointResolver } from '@/lib/routing/endpoints';
+import { loadRoutingData, validateCanonicalLocation } from '@/lib/server/routing-data';
 function tableName(name: string): AdminTable {
   if (!Object.hasOwn(adminSchemas, name)) throw new Error('INVALID_INPUT');
   return name as AdminTable;
@@ -43,13 +46,52 @@ export async function POST(
       if(error||!data)throw Error('INVALID_INPUT');
       return json({ok:true});
     }
+    let record = result.data as Record<string, unknown>;
+    if (table === 'locations') {
+      const location = result.data as Location;
+      if (location.node_id) {
+        const routing = await loadRoutingData(db);
+        const endpoint = createRouteEndpointResolver(routing).resolveLocation(location);
+        if (!endpoint.nodeId) throw new Error('INVALID_INPUT');
+        const previous = routing.locations.find((entry) => entry.id === location.id);
+        record = {
+          ...record,
+          routing_status: 'direct',
+          endpoint_source:
+            previous?.node_id === location.node_id && previous.endpoint_source
+              ? previous.endpoint_source
+              : 'manual',
+        };
+      } else {
+        record = { ...record, routing_status: 'needs_review', endpoint_source: null };
+      }
+    }
+    if (table === 'hidden_gems') {
+      if (typeof record.location_id === 'string') {
+        if (!(await validateCanonicalLocation(db, record.location_id)))
+          throw new Error('INVALID_INPUT');
+        record = {
+          ...record,
+          location_review_status: 'approved',
+          proposed_location_name: null,
+          proposed_building_id: null,
+          proposed_floor_id: null,
+          proposed_room_zone: null,
+          proposed_location_description: null,
+          proposed_location_source_url: null,
+          proposed_location_notes: null,
+        };
+      } else if (!record.proposed_location_name) {
+        throw new Error('INVALID_INPUT');
+      }
+    }
     const { error } =
       table === 'hidden_gems'
         ? await db
             .from(table)
-            .update(result.data as Record<string, unknown>)
+            .update(record)
             .eq('id', 'id' in result.data ? result.data.id : '')
-        : await db.from(table).upsert(result.data as Record<string, unknown>);
+        : await db.from(table).upsert(record);
     if (error) throw new Error('INVALID_INPUT');
     return json({ ok: true });
   } catch (e) {

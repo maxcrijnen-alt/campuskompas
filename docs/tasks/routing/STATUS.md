@@ -4,7 +4,7 @@ Last updated: 2026-09-09
 
 ## Completed phases
 
-**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, and **Phase 4 — Route experience** are complete.
+**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, **Phase 4 — Route experience**, and **Phase 5 — Accessibility, admin & Hidden Gems / BRÛZE** are complete.
 
 - Routing uses one central endpoint resolver for start and destination locations.
 - From and To now use the same endpoint-validated location universe and the same search/result component.
@@ -17,6 +17,9 @@ Last updated: 2026-09-09
 - `?debugRouting=1` exposes endpoint, component, node, edge, floor, and segment details in development only.
 - All eight official R8/R10 floor-plan assets were regenerated as valid, unaltered WebP page renders from the documented NHL Stenden guide. The four existing assets had invalid image data and four floors were missing.
 - The `route_visual_endpoints` migration directly maps iShop and Bibliotheek to their nearest traced R8 corridor endpoints. No nodes or edges were added, removed, or edited, and accessibility semantics remain unchanged.
+- Accessibility now has explicit `accessible`, `inaccessible`, and `unknown` semantics. Wheelchair routing always excludes stairs and confirmed inaccessible records, may use unknown records, and never describes an unknown route as confirmed.
+- Hidden Gem submissions can select the central routeable location universe or propose a place without creating a location or route endpoint. Only a valid canonical link enables map and route actions.
+- Admin now exposes stored routing status, endpoint source, same-floor endpoint selection, location verification controls, gem-location linking, and a live routing/accessibility health summary.
 
 ## Verified production metrics
 
@@ -46,24 +49,36 @@ Last updated: 2026-09-09
 - R8_MAIN ↔ R10_MAIN: 2 floor legs and 1 explicit outdoor transition; no invented outdoor polyline.
 - Browser acceptance passed for iShop → F3.025 on desktop and 320 px mobile, same-floor routing, stage/floor coupling, destination state, canonical stage URLs, development debug output, and the missing-geometry no-route state.
 
+## Phase 5 accessibility and moderation metrics
+
+- Accessibility data state: 514/514 nodes unknown; 535/535 edges unknown; 0 confirmed accessible and 0 confirmed inaccessible. Unknown values are verification work and do not count as audit errors.
+- Edge inventory: 515 corridors, 9 elevators, 9 stairs, and 2 outdoor edges. All are currently unverified; stairs are nevertheless always excluded from wheelchair routing.
+- Stair-free candidate graph: 514 nodes, 526 non-stair edges, 4 components, largest component 237 nodes.
+- 305/606 approved locations are connected to the main stair-free candidate component; 301/606 are outside it. Confirmed accessible locations: 0/606. Physical verification required: 305 candidate locations plus the 301 locations lacking a connected candidate path.
+- R8_MAIN → R8-301 and R8-002 → R8-301 work as stair-free candidates with unknown-data warnings. R10_MAIN → F3.025 and iShop → F3.025 correctly return no wheelchair route because the stored graph has no non-stair connection from the relevant R10 plan corridors to the existing lift chain.
+- Normal routing remains 606/606 direct endpoints, one 514-node component, and 100% endpoint coverage.
+- The approved Bruze gem remains published, but its inaccurate `R10_MAIN` link was removed. Current official information places Café BRÛZE at Rengerslaan 1; no canonical location was created because its exact plan position, entrance, floor context, endpoint, and accessibility are not verified. The gem is now a `needs_review` location proposal and exposes no false map or route action.
+- The Phase 5 migration added constrained location routing metadata, nullable canonical gem links, structured proposal fields, foreign keys and indexes. Existing RLS remains enforced; public clients still see approved content only and cannot moderate it.
+
 ## Verification
 
-- Phase 4 experience plus Phase 2–3 targeted regressions: pass, 32 passed.
+- Phase 5 accessibility, normalization, routing, validation, and experience unit/integration suite: pass, 86/86.
 - Phase 4 required-pair experience audit: pass, 9/9 routes and 0 critical issues.
 - pnpm search:audit: pass, 606/606 From and To, 0 critical issues.
 - pnpm routing:audit: pass, 0 critical issues.
 - pnpm routing:regression: pass, 606/606 endpoints, 48/48 sampled routes, 7/7 critical pairs.
+- pnpm routing:audit-accessibility: pass, 0 graph/data contradictions; unknown verification reported separately.
 - Route browser acceptance: pass, 5/5 targeted checks on desktop and mobile.
 - Official-plan browser verification: pass, 8/8 floor images load at 1489 × 1489 and fit at 320 px.
 - pnpm seed:check: pass, 181 records validated.
-- pnpm test: pass, 80 passed and 1 live admin-write test skipped without test-account variables.
-- pnpm test:e2e: pass, 10 passed and 2 admin-only tests skipped without test-account variables.
+- pnpm test:e2e: pass, 15/15 against the real Supabase project, including admin, Storage, moderation, proposal, BRÛZE, mobile, map, opening-hours, and wheelchair behavior.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.
+- Supabase migration and post-migration queries: pass. Security advisor found no Phase 5 schema error; existing informational no-policy findings protect intentionally private/deny-all tables. Leaked-password protection remains a project setting to enable separately.
 
 ## Next active phase
 
-**Phase 5 — Accessibility routing**
+**Phase 5.5 / Phase 6 — not started**
 
-No code blocker has been identified. Physical on-campus validation of entrances, transitions, corridor traces, destination doors, and walking-time assumptions remains operational follow-up. Accessibility routing and verified step-free connections remain reserved for Phase 5.
+No code blocker has been identified. Physical on-campus validation is required before any route or location can be marked confirmed accessible. The R10 lift-to-plan connections and Café BRÛZE map position/entrance are the main verification priorities.

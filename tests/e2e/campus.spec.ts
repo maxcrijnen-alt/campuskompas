@@ -18,7 +18,7 @@ test('find a room, route across floors, accessible failure, English and QR deep 
   await page.getByRole('switch', { name: 'Toegankelijke route' }).click();
   await page.getByRole('button', { name: 'Toon route' }).click();
   await expect(
-    page.getByText(/Geen geverifieerde toegankelijke route/),
+    page.getByText(/Geen mogelijke trapvrije route/),
   ).toBeVisible();
   await page.getByRole('button', { name: 'Kies ander startpunt' }).click();
   await page.getByRole('switch', { name: 'Toegankelijke route' }).click();
@@ -57,6 +57,12 @@ test('same-floor route stays simple and route debug is development-only', async 
   ).toBeDisabled();
   await expect(page.getByText('Routing debug')).toBeVisible();
   expect(await page.locator('.route-path-active').count()).toBeGreaterThan(0);
+});
+test('wheelchair route uses unknown lift data with an honest warning', async ({ page }) => {
+  await page.goto('/map?from=R8-002&to=R8-301&accessible=1&route=active');
+  await expect(page.getByText(/vermijdt trappen, maar de toegankelijkheid/)).toBeVisible();
+  await expect(page.locator('.route-path-active')).not.toHaveCount(0);
+  await expect(page.getByText(/bevestigd toegankelijk/)).toHaveCount(0);
 });
 test('mobile route keeps the current map segment and controls usable at 320px', async ({
   page,
@@ -169,6 +175,42 @@ test('public cannot enter admin data or mutate protected resources', async ({
   });
   expect(signup.error).not.toBeNull();
 });
+test('new Hidden Gem place stays a non-routeable proposal for moderation', async ({ page }) => {
+  const title = 'QA proposed gem ' + Date.now();
+  let gemId: string | undefined;
+  try {
+    await page.goto('/gems');
+    await page.getByRole('button', { name: 'Deel een Hidden Gem' }).click();
+    await page.getByLabel('Titel', { exact: true }).fill(title);
+    await page.getByLabel('Beschrijving').fill('Tijdelijk voorstel om de moderatiestroom te controleren.');
+    await page.getByLabel('Stel een nieuwe plek voor').check();
+    await page.getByLabel('Naam van de plek').fill('QA onbekende studienis');
+    await page.getByLabel('Hoe kan een beheerder de plek vinden?').fill('Naast een herkenbaar informatiebord; exacte verdieping onbekend.');
+    await page.waitForTimeout(3200);
+    await page.getByRole('button', { name: 'Verstuur mijn ontdekking' }).click();
+    await expect(page.locator('.toast[role="status"]')).toContainText('Je tip wordt eerst even gecontroleerd');
+    const { data, error } = await serviceDb().from('hidden_gems').select('*').eq('title', title).single();
+    expect(error).toBeNull();
+    gemId = data!.id;
+    expect(data).toMatchObject({
+      location_id: null,
+      location_review_status: 'proposed',
+      proposed_location_name: 'QA onbekende studienis',
+      status: 'pending',
+    });
+  } finally {
+    if (gemId) await serviceDb().from('hidden_gems').delete().eq('id', gemId);
+  }
+});
+
+test('BRÛZE keeps its approved content without a false route link', async ({ page }) => {
+  await page.goto('/gems');
+  const card = page.locator('article').filter({ hasText: /Bruze/i });
+  await expect(card).toBeVisible();
+  await expect(card.getByText('Deze plek wacht nog op kaart- en routecontrole.')).toBeVisible();
+  await expect(card.getByRole('link', { name: /Route hierheen/ })).toHaveCount(0);
+  await expect(card.getByRole('link', { name: /Bekijk kaart/ })).toHaveCount(0);
+});
 test('real Supabase submission, photo moderation, publishing and deduplicated likes', async ({
   page,
   browser,
@@ -183,18 +225,16 @@ test('real Supabase submission, photo moderation, publishing and deduplicated li
     await page
       .getByLabel('Beschrijving')
       .fill('Temporary integration test for moderated campus submissions.');
-    await page.getByRole('combobox', { name: 'Locatie', exact: true }).click();
-    await page
-      .getByRole('option', { name: 'Bibliotheek', exact: true })
-      .click();
+    await page.getByRole('textbox', { name: 'Zoek een campuslocatie' }).fill('bibliotheek');
+    await page.getByRole('button', { name: /Bibliotheek.*R8/i }).click();
     await page
       .getByLabel('Foto (optioneel, max. 3 MB)')
-      .setInputFiles('public/icon-192.png');
+      .setInputFiles('public/maps/r8-0.webp');
     await page.waitForTimeout(3200);
     await page
       .getByRole('button', { name: 'Verstuur mijn ontdekking' })
       .click();
-    await expect(page.getByRole('status')).toContainText(
+    await expect(page.locator('.toast[role="status"]')).toContainText(
       'Je tip wordt eerst even gecontroleerd',
     );
     const { data, error } = await serviceDb()
@@ -268,6 +308,16 @@ test('admin can edit data, produce QR and inspect maps; landing screenshot', asy
   await expect(
     page.getByRole('heading', { name: 'Kaarteditor / Map editor' }),
   ).toBeVisible();
+  await page.goto('/admin');
+  await expect(page.getByRole('heading', { name: 'Routing health' })).toBeVisible();
+  await expect(page.getByText('100%')).toBeVisible();
+  await page.goto('/admin/locations');
+  await expect(page.getByRole('columnheader', { name: 'Endpoint-node' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Nieuw / New' })).toBeVisible();
+  await page.goto('/admin/gems');
+  const bruze = page.locator('article').filter({ hasText: /Bruze/i });
+  await expect(bruze.getByText('Café BRÛZE')).toBeVisible();
+  await expect(bruze.getByText(/Exacte kaartpositie/)).toBeVisible();
   await page.goto('/admin/qr');
   await page.getByRole('button', { name: 'QR export' }).first().click();
   await expect(page.getByRole('link', { name: 'Download PNG' })).toBeVisible();

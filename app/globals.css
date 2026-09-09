@@ -890,6 +890,7 @@ button:active {
   justify-content: space-between;
   align-items: center;
 }
+.gem-route-actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.location-mode{border:1px solid var(--line);border-radius:12px;padding:12px;margin:14px 0;display:grid;gap:8px}.location-mode legend{font-weight:700;padding:0 6px}.location-mode label{display:flex;gap:8px;align-items:center}.proposed-location-fields{padding:12px;background:#f5f0e7;border-radius:12px}.gem-location-proposal{background:#f5f0e7;border-radius:10px;padding:10px;margin:10px 0}.route-accessibility-warning,.route-accessibility-confirmed{padding:10px 12px;border-radius:10px;font-size:13px}.route-accessibility-warning{background:#fff4d6;color:#60480c}.route-accessibility-confirmed{background:#e4f4ea;color:#155c48}.admin-routing-health{margin:24px 0}.admin-table select.field-input{min-width:220px}
 .like-button {
   display: flex;
   align-items: center;

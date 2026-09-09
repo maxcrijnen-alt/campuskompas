@@ -13,8 +13,10 @@ import type { CampusData, Locale, Gem } from '@/lib/campus/types';
 import { gemCategories, gemSchema, photoLimit } from '@/lib/campus/validation';
 import { Picker } from './picker';
 import { CampusMap } from './map';
+import { CampusSearch } from './search';
 import { Icon } from './icon';
 import {track} from '@/lib/campus/analytics';
+import { createRouteEndpointResolver } from '@/lib/routing/endpoints';
 const labels = {
   nl: [
     'Rust',
@@ -62,7 +64,8 @@ export function GemsPage({
     [context,setContext]=useState({building:'',floor:''}),
     [busy, setBusy] = useState<string | null>(null),
     [liked, setLiked] = useState<string[]>([]),
-    en = locale === 'en';
+    en = locale === 'en',
+    resolver = createRouteEndpointResolver(data);
   useEffect(()=>{try{setContext({building:sessionStorage.getItem('ck-building')??'',floor:sessionStorage.getItem('ck-floor')??''});const ids=JSON.parse(localStorage.getItem('ck-liked')??'[]');if(Array.isArray(ids))setLiked(ids.filter(x=>typeof x==='string').slice(-1000));}catch{}if(slug)track('gem_view');},[slug]);
   const near=(g:Gem)=>{const l=data.locations.find(l=>l.id===g.location_id);return l?.floor_id===context.floor?2:l?.building_id===context.building?1:0;};
   const shown = gems.filter(
@@ -141,6 +144,9 @@ export function GemsPage({
       <div className="card-grid">
         {shown.map((g) => {
           const location = data.locations.find((l) => l.id === g.location_id);
+          const routeable = location
+            ? resolver.resolveLocation(location).nodeId !== null
+            : false;
           return (
             <article className="gem-card" key={g.id}>
               {g.photo_path && (
@@ -174,8 +180,19 @@ export function GemsPage({
               </h2>
               <p>{g.description}</p>
               <small className="muted">
-                {location?.name[locale]} · {location?.building_id} · {en?'Floor':'Verdieping'} {data.floors.find(f=>f.id===location?.floor_id)?.level}
+                {location
+                  ? `${location.name[locale]} · ${location.building_id} · ${en ? 'Floor' : 'Verdieping'} ${data.floors.find((f) => f.id === location.floor_id)?.level}`
+                  : [g.proposed_location_name, g.proposed_room_zone]
+                      .filter(Boolean)
+                      .join(' · ')}
               </small>
+              {!routeable && (
+                <p className="form-note" role="status">
+                  {en
+                    ? 'This place is awaiting map and route verification.'
+                    : 'Deze plek wacht nog op kaart- en routecontrole.'}
+                </p>
+              )}
               <div className="gem-card-footer">
                 <button
                   className="like-button"
@@ -190,10 +207,17 @@ export function GemsPage({
                   />
                   {g.likes}
                 </button>
-                <Link className="text-link" href={'/map?to=' + g.location_id}>
-                  {en ? 'View on map' : 'Bekijk op kaart'}
-                  <ArrowUpRight size={16} />
-                </Link>
+                {routeable && location && (
+                  <span className="gem-route-actions">
+                    <Link className="text-link" href={'/map?to=' + location.id}>
+                      {en ? 'View map' : 'Bekijk kaart'}
+                    </Link>
+                    <Link className="text-link" href={'/map?to=' + location.id + '&navigate=1'}>
+                      {en ? 'Route here' : 'Route hierheen'}
+                      <ArrowUpRight size={16} />
+                    </Link>
+                  </span>
+                )}
               </div>
             </article>
           );
@@ -265,23 +289,28 @@ function GemForm({
   connected: boolean;
   onDone: () => void;
 }) {
-  const [building, setBuilding] = useState(data.buildings[0]?.id ?? ''),
-    [floor, setFloor] = useState(data.floors[0]?.id ?? ''),
-    [location, setLocation] = useState(''),
+  const [mode, setMode] = useState<'existing' | 'proposed'>('existing'),
+    [building, setBuilding] = useState(''),
+    [floor, setFloor] = useState(''),
+    [location, setLocation] = useState<CampusData['locations'][number] | null>(null),
     [category, setCategory] = useState('study'),
     [started] = useState(Date.now),
     [error, setError] = useState(''),
     [busy, setBusy] = useState(false),
     [showMap, setShowMap] = useState(false),
     en = locale === 'en';
-  const places = data.locations.filter((l) => l.floor_id === floor),
-    currentFloor = data.floors.find((f) => f.id === floor);
+  const currentFloor = data.floors.find((f) => f.id === location?.floor_id);
   async function submit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setError('');
     const form = new FormData(event.currentTarget);
     form.set('category', category);
-    form.set('location_id', location);
+    form.set('location_mode', mode);
+    form.set('location_id', mode === 'existing' ? (location?.id ?? '') : '');
+    if (mode === 'proposed') {
+      form.set('proposed_building_id', building);
+      form.set('proposed_floor_id', floor);
+    }
     form.set('started_at', String(started));
     const parsed = gemSchema.safeParse({
       ...Object.fromEntries([...form.entries()].filter(([k]) => k !== 'photo')),
@@ -290,8 +319,8 @@ function GemForm({
     if (!parsed.success) {
       setError(
         en
-          ? 'Use a title of 5–90 characters, a description of 15–1200 characters and select a location.'
-          : 'Gebruik een titel van 5–90 tekens, een beschrijving van 15–1200 tekens en kies een locatie.',
+          ? 'Check the title, description and location information.'
+          : 'Controleer de titel, beschrijving en locatiegegevens.',
       );
       return;
     }
@@ -361,59 +390,63 @@ function GemForm({
           label: labels[locale][i],
         }))}
       />
-      <div className="form-grid">
-        <Picker
-          label={en ? 'Building' : 'Gebouw'}
-          value={building}
-          onChange={(b) => {
-            setBuilding(b);
-            setFloor(data.floors.find((f) => f.building_id === b)!.id);
-            setLocation('');
-          }}
-          options={data.buildings.map((b) => ({ value: b.id, label: b.name }))}
-        />
-        <Picker
-          label={en ? 'Floor' : 'Verdieping'}
-          value={floor}
-          onChange={(f) => {
-            setFloor(f);
-            setLocation('');
-          }}
-          options={data.floors
-            .filter((f) => f.building_id === building)
-            .map((f) => ({ value: f.id, label: String(f.level) }))}
-        />
-      </div>
-      <Picker
-        label={en ? 'Location' : 'Locatie'}
-        value={location}
-        onChange={setLocation}
-        options={places.map((l) => ({ value: l.id, label: l.name[locale] }))}
-      />
-      {!places.length && (
-        <p className="form-note">
-          {en
-            ? 'There are no registered locations on this floor yet.'
-            : 'Op deze verdieping zijn nog geen locaties geregistreerd.'}
-        </p>
-      )}
-      <button
-        type="button"
-        className="text-link"
-        onClick={() => setShowMap(!showMap)}
-      >
-        {en ? 'Choose location on map' : 'Locatie kiezen op kaart'}
-      </button>
-      {showMap && currentFloor && (
-        <CampusMap
-          data={data}
-          floor={currentFloor}
-          selected={data.locations.find((l) => l.id === location) ?? null}
-          from=""
-          route={null}
-          onSelect={(l) => setLocation(l.id)}
-          locale={locale}
-        />
+      <fieldset className="location-mode">
+        <legend>{en ? 'Where is it?' : 'Waar is de plek?'}</legend>
+        <label><input type="radio" checked={mode === 'existing'} onChange={() => setMode('existing')} /> {en ? 'Choose a known campus location' : 'Kies een bekende campuslocatie'}</label>
+        <label><input type="radio" checked={mode === 'proposed'} onChange={() => setMode('proposed')} /> {en ? 'Propose a new place' : 'Stel een nieuwe plek voor'}</label>
+      </fieldset>
+      {mode === 'existing' ? (
+        <>
+          <CampusSearch
+            data={data}
+            locale={locale}
+            compact
+            selected={location}
+            inputLabel={en ? 'Search a campus location' : 'Zoek een campuslocatie'}
+            placeholder={en ? 'Room, café, library…' : 'Lokaal, café, bibliotheek…'}
+            onSelect={setLocation}
+          />
+          {location && (
+            <button type="button" className="text-link" onClick={() => setShowMap(!showMap)}>
+              {en ? 'Check on map' : 'Controleer op kaart'}
+            </button>
+          )}
+          {showMap && currentFloor && location && (
+            <CampusMap data={data} floor={currentFloor} selected={location} from="" route={null} onSelect={setLocation} locale={locale} />
+          )}
+        </>
+      ) : (
+        <div className="proposed-location-fields">
+          <label className="field-label">
+            {en ? 'Place name' : 'Naam van de plek'}
+            <input className="field-input" name="proposed_location_name" required maxLength={120} />
+          </label>
+          <div className="form-grid">
+            <label className="field-label">
+              {en ? 'Building (if known)' : 'Gebouw (indien bekend)'}
+              <select className="field-input" value={building} onChange={(event) => { setBuilding(event.target.value); setFloor(''); }}>
+                <option value="">{en ? 'Unknown' : 'Onbekend'}</option>
+                {data.buildings.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
+              </select>
+            </label>
+            <label className="field-label">
+              {en ? 'Floor (if known)' : 'Verdieping (indien bekend)'}
+              <select className="field-input" value={floor} onChange={(event) => setFloor(event.target.value)} disabled={!building}>
+                <option value="">{en ? 'Unknown' : 'Onbekend'}</option>
+                {data.floors.filter((entry) => entry.building_id === building).map((entry) => <option key={entry.id} value={entry.id}>{entry.level}</option>)}
+              </select>
+            </label>
+          </div>
+          <label className="field-label">
+            {en ? 'Room or zone (if known)' : 'Lokaal of zone (indien bekend)'}
+            <input className="field-input" name="proposed_room_zone" maxLength={120} />
+          </label>
+          <label className="field-label">
+            {en ? 'How can a moderator find it?' : 'Hoe kan een beheerder de plek vinden?'}
+            <textarea className="field-input" name="proposed_location_description" maxLength={600} rows={3} />
+          </label>
+          <p className="form-note">{en ? 'A proposal is reviewed before it can appear on the map or be used for routing.' : 'Een voorstel wordt gecontroleerd voordat het op de kaart of in een route kan verschijnen.'}</p>
+        </div>
       )}
       <label className="field-label">
         {en ? 'Photo (optional, max. 3 MB)' : 'Foto (optioneel, max. 3 MB)'}

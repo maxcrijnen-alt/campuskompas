@@ -1,6 +1,7 @@
 import type { CampusData } from '../campus/types';
 import { createRouteEndpointResolver } from './endpoints';
 import { shortestPath } from './graph';
+import { accessibilityState } from './accessibility';
 
 export type CriticalRoutePair = {
   id: string;
@@ -117,12 +118,10 @@ export function checkRoutingRegressions(
       accessibleRoute &&
       (accessibleRoute.edges.some((edge) => edge.edge_type === 'stairs') ||
         accessibleRoute.nodes.some(
-          (node) =>
-            !node.accessible || node.accessibility_status !== 'verified',
+          (node) => accessibilityState(node) === 'inaccessible',
         ) ||
         accessibleRoute.edges.some(
-          (edge) =>
-            !edge.accessible || edge.accessibility_status !== 'verified',
+          (edge) => accessibilityState(edge) === 'inaccessible',
         ))
     )
       failures.push('unsafe-accessible-route');
@@ -131,7 +130,11 @@ export function checkRoutingRegressions(
       from: pair.from,
       to: pair.to,
       normal: route ? 'available' : 'unavailable',
-      accessible: accessibleRoute ? 'verified' : 'unavailable-unverified',
+      accessible: accessibleRoute
+        ? accessibleRoute.accessibility === 'confirmed'
+          ? 'confirmed'
+          : 'available-with-unknowns'
+        : 'unavailable',
       transitions: route?.transitions ?? null,
       outdoor:
         route?.edges.some((edge) => edge.edge_type === 'outdoor') ?? false,

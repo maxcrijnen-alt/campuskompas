@@ -20,14 +20,36 @@ export const gemCategories = [
   'group',
   'other',
 ] as const;
+const optionalText = (max: number) =>
+  z.preprocess(
+    (value) =>
+      value === null || (typeof value === 'string' && value.trim() === '')
+        ? undefined
+        : value,
+    z.string().trim().max(max).optional(),
+  );
 export const gemSchema = z
   .object({
     title: z.string().trim().min(5).max(90),
     description: z.string().trim().min(15).max(1200),
     category: z.enum(gemCategories),
-    location_id: id,
+    location_mode: z.enum(['existing', 'proposed']).default('existing'),
+    location_id: optionalText(100).pipe(id.optional()),
+    proposed_location_name: optionalText(120),
+    proposed_building_id: optionalText(100).pipe(id.optional()),
+    proposed_floor_id: optionalText(100).pipe(id.optional()),
+    proposed_room_zone: optionalText(120),
+    proposed_location_description: optionalText(600),
     website: z.string().max(0),
     started_at: z.number().positive(),
+  })
+  .superRefine((value, context) => {
+    if (value.location_mode === 'existing' && !value.location_id)
+      context.addIssue({ code: 'custom', path: ['location_id'], message: 'Select a location' });
+    if (value.location_mode === 'proposed' && !value.proposed_location_name)
+      context.addIssue({ code: 'custom', path: ['proposed_location_name'], message: 'Name the proposed location' });
+    if (value.proposed_floor_id && !value.proposed_building_id)
+      context.addIssue({ code: 'custom', path: ['proposed_building_id'], message: 'Building is required for a floor' });
   })
   .strict();
 export const photoLimit = 3 * 1024 * 1024;
@@ -137,6 +159,8 @@ export const adminSchemas = {
     verification_status: verification,
     source_id: id,
     hours_id: id.nullable().optional(),
+    routing_status: z.enum(['direct', 'inferred', 'needs_review', 'unavailable']),
+    endpoint_source: z.enum(['existing_mapping', 'manual', 'inferred']).nullable(),
   }),
   rooms: z.object({
     id,
@@ -193,7 +217,15 @@ export const adminSchemas = {
     title: z.string().min(5).max(90),
     description: z.string().min(15).max(1200),
     category: z.enum(gemCategories),
-    location_id: id,
+    location_id: id.nullable(),
+    location_review_status: z.enum(['linked','proposed','needs_review','approved','rejected']),
+    proposed_location_name: z.string().min(2).max(120).nullable().optional(),
+    proposed_building_id: id.nullable().optional(),
+    proposed_floor_id: id.nullable().optional(),
+    proposed_room_zone: z.string().max(120).nullable().optional(),
+    proposed_location_description: z.string().max(600).nullable().optional(),
+    proposed_location_source_url: z.url().startsWith('https://').nullable().optional(),
+    proposed_location_notes: z.string().max(2000).nullable().optional(),
     status: z.enum(['pending', 'approved', 'rejected', 'archived']),
     featured: z.boolean(),
   }),
