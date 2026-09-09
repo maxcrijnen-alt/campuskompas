@@ -1,0 +1,122 @@
+export type Locale = 'nl' | 'en';
+export type Text = Record<Locale, string>;
+export type Verification = 'verified' | 'needs_review' | 'unverified';
+export type Building = { id: string; name: string; address: string };
+export type Shape = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  label?: string;
+  kind: 'room' | 'hall' | 'outside';
+};
+export type Floor = {
+  id: string;
+  building_id: string;
+  level: number;
+  verification_status: Verification;
+  geometry: Shape[];
+};
+export type Category = {
+  id: string;
+  name: Text;
+  icon: string;
+  aliases: string[];
+};
+export type Location = {
+  map_x?: number | null;
+  map_y?: number | null;
+  source_page?: number | null;
+  verification_notes?: string;
+  id: string;
+  name: Text;
+  description: Text;
+  building_id: string;
+  floor_id: string;
+  category_id: string;
+  room_code?: string;
+  aliases: string[];
+  node_id: string | null;
+  x: number;
+  y: number;
+  status: string;
+  verification_status: Verification;
+  source_id: string;
+  hours_id?: string;
+};
+export type RouteNode = {
+  map_x?: number | null;
+  map_y?: number | null;
+  id: string;
+  building_id: string;
+  floor_id: string;
+  x: number;
+  y: number;
+  node_type: string;
+  label: Text;
+  accessible: boolean;
+  accessibility_status: Verification;
+  verification_status: Verification;
+};
+export type RouteEdge = {
+  map_path?: [number, number][] | null;
+  source_id?: string | null;
+  id: string;
+  from_node_id: string;
+  to_node_id: string;
+  weight: number;
+  edge_type: 'corridor' | 'stairs' | 'elevator' | 'outdoor';
+  accessible: boolean;
+  accessibility_status: Verification;
+  verification_status: Verification;
+  bidirectional: boolean;
+};
+export type Tip = {
+  id: string;
+  title: Text;
+  body: Text;
+  icon: string;
+  published: boolean;
+};
+export type Gem = {
+  created_at?: string;
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  location_id: string;
+  status: 'pending' | 'approved' | 'rejected' | 'archived';
+  featured: boolean;
+  photo_path: string | null;
+  likes: number;
+  demo?: boolean;
+};
+export type Hours = {
+  id: string;
+  weekly: Record<string, [string, string][] | null>;
+  exceptions: Record<string, [string, string][] | null>;
+  verified_at: string;
+  verification_status: Verification;
+  exceptions_reviewed_through: string | null;
+  source_url: string;
+};
+export type Source = {
+  id: string;
+  title: string;
+  url: string;
+  verified_at: string;
+  verification_status: Verification;
+};
+export type CampusData = {
+  buildings: Building[];
+  floors: Floor[];
+  locations: Location[];
+  categories: Category[];
+  nodes: RouteNode[];
+  edges: RouteEdge[];
+  tips: Tip[];
+  hours: Hours[];
+  sources: Source[];
+  qr: { code: string; route_node_id: string; label: string; active: boolean }[];
+};

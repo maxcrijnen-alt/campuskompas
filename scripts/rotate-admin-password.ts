@@ -1,0 +1,11 @@
+import {writeFileSync} from 'node:fs';
+import {randomBytes} from 'node:crypto';
+import {loadTestEnv} from './test-env';
+import {serviceDb,publicDb} from '../lib/server/supabase';
+loadTestEnv();
+const password=randomBytes(24).toString('base64url')+'aA1!';
+const {error}=await serviceDb().auth.admin.updateUserById(process.env.TEST_ADMIN_ID!,{password});if(error)throw Error(error.message);
+const check=await publicDb().auth.signInWithPassword({email:process.env.TEST_ADMIN_EMAIL!,password});if(check.error)throw Error('New credential verification failed');
+writeFileSync('admin-access.txt',`CampusKompas administrator\nEmail: ${process.env.TEST_ADMIN_EMAIL}\nPassword: ${password}\nLocal login: http://127.0.0.1:3000/admin\nPrivate hosted login: https://campuskompas-leeuwarden.gritty-flint-1559.chatgpt.site/admin\n\nKeep this file private. No email was sent.\n`);
+writeFileSync('.env.test.local',`TEST_ADMIN_EMAIL=${process.env.TEST_ADMIN_EMAIL}\nTEST_ADMIN_PASSWORD=${password}\nTEST_ADMIN_ID=${process.env.TEST_ADMIN_ID}\n`);
+console.log('Administrator credential rotated and sign-in verified. Private access file updated.');

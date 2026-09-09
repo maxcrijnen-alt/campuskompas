@@ -1,0 +1,14 @@
+.env*
+admin-access.txt
+work
+outputs
+test-results
+playwright-report
+.openai
+dist
+.wrangler
+.vinext
+supabase
+tests
+scripts/*
+!scripts/vercel-build.mjs

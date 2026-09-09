@@ -1,0 +1,4610 @@
+[
+  {
+    "code": "A0011",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 34.47,
+    "map_y": 72.295,
+    "source_page": 22
+  },
+  {
+    "code": "A0014",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 34.47,
+    "map_y": 70.419,
+    "source_page": 22
+  },
+  {
+    "code": "A0017",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 34.508,
+    "map_y": 67.792,
+    "source_page": 22
+  },
+  {
+    "code": "A0032",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 37.232,
+    "map_y": 62.976,
+    "source_page": 22
+  },
+  {
+    "code": "A0038",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 37.449,
+    "map_y": 60.777,
+    "source_page": 22
+  },
+  {
+    "code": "A0040",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 35.658,
+    "map_y": 59.51,
+    "source_page": 22
+  },
+  {
+    "code": "A0042",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 34.909,
+    "map_y": 56.955,
+    "source_page": 22
+  },
+  {
+    "code": "A0044",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 35.641,
+    "map_y": 55.089,
+    "source_page": 22
+  },
+  {
+    "code": "A0048",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 40.063,
+    "map_y": 51.967,
+    "source_page": 22
+  },
+  {
+    "code": "A0049",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 42.951,
+    "map_y": 53.15,
+    "source_page": 22
+  },
+  {
+    "code": "A0058",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 51.291,
+    "map_y": 53.761,
+    "source_page": 22
+  },
+  {
+    "code": "A0068",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 57.019,
+    "map_y": 57.25,
+    "source_page": 22
+  },
+  {
+    "code": "A0073",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 53.997,
+    "map_y": 58.84,
+    "source_page": 22
+  },
+  {
+    "code": "A0078",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 56.701,
+    "map_y": 59.203,
+    "source_page": 22
+  },
+  {
+    "code": "A0079",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 59.792,
+    "map_y": 57.979,
+    "source_page": 22
+  },
+  {
+    "code": "A0093",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 55.805,
+    "map_y": 63.206,
+    "source_page": 22
+  },
+  {
+    "code": "A0112",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 50.075,
+    "map_y": 77.077,
+    "source_page": 22
+  },
+  {
+    "code": "B0001",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 14.011,
+    "map_y": 79.417,
+    "source_page": 22
+  },
+  {
+    "code": "B0004",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 40.46,
+    "map_y": 77.675,
+    "source_page": 22
+  },
+  {
+    "code": "B0022",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 27.942,
+    "map_y": 77.328,
+    "source_page": 22
+  },
+  {
+    "code": "B0028",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 30.232,
+    "map_y": 79.957,
+    "source_page": 22
+  },
+  {
+    "code": "B0032",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 26.035,
+    "map_y": 78.989,
+    "source_page": 22
+  },
+  {
+    "code": "B0040",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 16.671,
+    "map_y": 75.276,
+    "source_page": 22
+  },
+  {
+    "code": "B0047",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 20.535,
+    "map_y": 71.284,
+    "source_page": 22
+  },
+  {
+    "code": "B0056",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 20.433,
+    "map_y": 75.076,
+    "source_page": 22
+  },
+  {
+    "code": "B0060",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 25.991,
+    "map_y": 73.938,
+    "source_page": 22
+  },
+  {
+    "code": "B0061",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 31.686,
+    "map_y": 72.464,
+    "source_page": 22
+  },
+  {
+    "code": "B0063",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 29.779,
+    "map_y": 67.837,
+    "source_page": 22
+  },
+  {
+    "code": "B0068",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 22.56,
+    "map_y": 62.783,
+    "source_page": 22
+  },
+  {
+    "code": "B0071",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 18.1,
+    "map_y": 61.362,
+    "source_page": 22
+  },
+  {
+    "code": "B0075",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 18.1,
+    "map_y": 57.567,
+    "source_page": 22
+  },
+  {
+    "code": "B0080",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 23.151,
+    "map_y": 54.257,
+    "source_page": 22
+  },
+  {
+    "code": "B0086",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 27.866,
+    "map_y": 57.749,
+    "source_page": 22
+  },
+  {
+    "code": "B0089",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 27.957,
+    "map_y": 61.318,
+    "source_page": 22
+  },
+  {
+    "code": "C0004",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 65.627,
+    "map_y": 56.716,
+    "source_page": 22
+  },
+  {
+    "code": "C0005",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 66.353,
+    "map_y": 58.312,
+    "source_page": 22
+  },
+  {
+    "code": "C0006",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 70.215,
+    "map_y": 57.379,
+    "source_page": 22
+  },
+  {
+    "code": "C0013",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 69.08,
+    "map_y": 54.583,
+    "source_page": 22
+  },
+  {
+    "code": "C0023",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 69.08,
+    "map_y": 51.39,
+    "source_page": 22
+  },
+  {
+    "code": "C0030",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 71.147,
+    "map_y": 48.125,
+    "source_page": 22
+  },
+  {
+    "code": "C0034",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 71.461,
+    "map_y": 46.272,
+    "source_page": 22
+  },
+  {
+    "code": "C0035",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 73.99,
+    "map_y": 46.272,
+    "source_page": 22
+  },
+  {
+    "code": "C0044",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 81.683,
+    "map_y": 48.65,
+    "source_page": 22
+  },
+  {
+    "code": "C0049",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 79.334,
+    "map_y": 50.936,
+    "source_page": 22
+  },
+  {
+    "code": "C0059",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 76.478,
+    "map_y": 53.857,
+    "source_page": 22
+  },
+  {
+    "code": "C0074",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 76.722,
+    "map_y": 59.486,
+    "source_page": 22
+  },
+  {
+    "code": "C0081",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 85.33,
+    "map_y": 62.114,
+    "source_page": 22
+  },
+  {
+    "code": "C0087",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 81.682,
+    "map_y": 64.922,
+    "source_page": 22
+  },
+  {
+    "code": "C0092",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 79.609,
+    "map_y": 70.519,
+    "source_page": 22
+  },
+  {
+    "code": "C0100",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 76.502,
+    "map_y": 67.668,
+    "source_page": 22
+  },
+  {
+    "code": "C0102",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 76.957,
+    "map_y": 64.986,
+    "source_page": 22
+  },
+  {
+    "code": "C0113",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 71.056,
+    "map_y": 63.294,
+    "source_page": 22
+  },
+  {
+    "code": "C0114",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 68.231,
+    "map_y": 64.056,
+    "source_page": 22
+  },
+  {
+    "code": "C0120",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 68.231,
+    "map_y": 67.681,
+    "source_page": 22
+  },
+  {
+    "code": "C0127",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 65.64,
+    "map_y": 73.411,
+    "source_page": 22
+  },
+  {
+    "code": "C0134",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 59.608,
+    "map_y": 68.861,
+    "source_page": 22
+  },
+  {
+    "code": "C0137",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 57.016,
+    "map_y": 66.852,
+    "source_page": 22
+  },
+  {
+    "code": "C0141",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 62.529,
+    "map_y": 65.845,
+    "source_page": 22
+  },
+  {
+    "code": "C0148",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 64.594,
+    "map_y": 67.989,
+    "source_page": 22
+  },
+  {
+    "code": "C0152",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 62.689,
+    "map_y": 63.115,
+    "source_page": 22
+  },
+  {
+    "code": "D0001",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 50.178,
+    "map_y": 85.128,
+    "source_page": 22
+  },
+  {
+    "code": "D0020",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 56.959,
+    "map_y": 84.779,
+    "source_page": 22
+  },
+  {
+    "code": "D0023",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 59.114,
+    "map_y": 82.611,
+    "source_page": 22
+  },
+  {
+    "code": "D0039",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 56.46,
+    "map_y": 88.961,
+    "source_page": 22
+  },
+  {
+    "code": "E0006",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 12.971,
+    "map_y": 74.777,
+    "source_page": 22
+  },
+  {
+    "code": "F0004",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 36.904,
+    "map_y": 43.703,
+    "source_page": 22
+  },
+  {
+    "code": "F0011",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 40.052,
+    "map_y": 49.347,
+    "source_page": 22
+  },
+  {
+    "code": "F0018",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 42.894,
+    "map_y": 47.793,
+    "source_page": 22
+  },
+  {
+    "code": "F0021",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 43.407,
+    "map_y": 43.49,
+    "source_page": 22
+  },
+  {
+    "code": "F0028",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 50.458,
+    "map_y": 43.512,
+    "source_page": 22
+  },
+  {
+    "code": "G0028",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 76.531,
+    "map_y": 38.27,
+    "source_page": 22
+  },
+  {
+    "code": "G0032",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 76.748,
+    "map_y": 43.04,
+    "source_page": 22
+  },
+  {
+    "code": "H0006",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 91.917,
+    "map_y": 57.921,
+    "source_page": 22
+  },
+  {
+    "code": "H0009",
+    "building_id": "R10",
+    "floor_id": "R10-0",
+    "map_x": 92.326,
+    "map_y": 67.366,
+    "source_page": 22
+  },
+  {
+    "code": "A1007",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 39.096,
+    "map_y": 73.024,
+    "source_page": 23
+  },
+  {
+    "code": "A1018",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 41.89,
+    "map_y": 73.932,
+    "source_page": 23
+  },
+  {
+    "code": "A1019",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 44.087,
+    "map_y": 67.662,
+    "source_page": 23
+  },
+  {
+    "code": "A1025",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 44.007,
+    "map_y": 60.222,
+    "source_page": 23
+  },
+  {
+    "code": "A1034",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 39.072,
+    "map_y": 68.308,
+    "source_page": 23
+  },
+  {
+    "code": "A1040",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 36.247,
+    "map_y": 66.834,
+    "source_page": 23
+  },
+  {
+    "code": "A1045",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 36.247,
+    "map_y": 69.352,
+    "source_page": 23
+  },
+  {
+    "code": "A1049",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 36.546,
+    "map_y": 62.191,
+    "source_page": 23
+  },
+  {
+    "code": "A1060",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 39.187,
+    "map_y": 52.252,
+    "source_page": 23
+  },
+  {
+    "code": "A1067",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 44.753,
+    "map_y": 54.298,
+    "source_page": 23
+  },
+  {
+    "code": "A1071",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 44.745,
+    "map_y": 51.333,
+    "source_page": 23
+  },
+  {
+    "code": "A1081",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 49.394,
+    "map_y": 57.681,
+    "source_page": 23
+  },
+  {
+    "code": "A1085",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 48.002,
+    "map_y": 71.289,
+    "source_page": 23
+  },
+  {
+    "code": "B1003",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 33.215,
+    "map_y": 79.843,
+    "source_page": 23
+  },
+  {
+    "code": "B1007",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 30.037,
+    "map_y": 79.845,
+    "source_page": 23
+  },
+  {
+    "code": "B1010",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 26.677,
+    "map_y": 79.845,
+    "source_page": 23
+  },
+  {
+    "code": "B1013",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 23.835,
+    "map_y": 79.845,
+    "source_page": 23
+  },
+  {
+    "code": "B1016",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 21.279,
+    "map_y": 79.03,
+    "source_page": 23
+  },
+  {
+    "code": "B1019",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 18.551,
+    "map_y": 79.665,
+    "source_page": 23
+  },
+  {
+    "code": "B1022",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 16.437,
+    "map_y": 76.227,
+    "source_page": 23
+  },
+  {
+    "code": "B1025",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 16.437,
+    "map_y": 73.416,
+    "source_page": 23
+  },
+  {
+    "code": "B1029",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 19.32,
+    "map_y": 70.618,
+    "source_page": 23
+  },
+  {
+    "code": "B1032",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 22.133,
+    "map_y": 70.64,
+    "source_page": 23
+  },
+  {
+    "code": "B1036",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 24.893,
+    "map_y": 73.416,
+    "source_page": 23
+  },
+  {
+    "code": "B1051",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 25.164,
+    "map_y": 76.67,
+    "source_page": 23
+  },
+  {
+    "code": "B1060",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 31.608,
+    "map_y": 76.219,
+    "source_page": 23
+  },
+  {
+    "code": "B1062",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 30.575,
+    "map_y": 73.981,
+    "source_page": 23
+  },
+  {
+    "code": "B1065",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 33.021,
+    "map_y": 72.975,
+    "source_page": 23
+  },
+  {
+    "code": "B1070",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 30.575,
+    "map_y": 71.256,
+    "source_page": 23
+  },
+  {
+    "code": "B1078",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 36.145,
+    "map_y": 71.243,
+    "source_page": 23
+  },
+  {
+    "code": "B1081",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 36.145,
+    "map_y": 73.97,
+    "source_page": 23
+  },
+  {
+    "code": "C1001",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 48.706,
+    "map_y": 63.433,
+    "source_page": 23
+  },
+  {
+    "code": "C1003",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 50.934,
+    "map_y": 63.433,
+    "source_page": 23
+  },
+  {
+    "code": "C1005",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 53.346,
+    "map_y": 63.433,
+    "source_page": 23
+  },
+  {
+    "code": "C1014",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 66.53,
+    "map_y": 65.244,
+    "source_page": 23
+  },
+  {
+    "code": "C1015",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 66.53,
+    "map_y": 67.955,
+    "source_page": 23
+  },
+  {
+    "code": "C1020",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 64.787,
+    "map_y": 70.585,
+    "source_page": 23
+  },
+  {
+    "code": "C1021",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 64.653,
+    "map_y": 73.564,
+    "source_page": 23
+  },
+  {
+    "code": "C1030",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 62.055,
+    "map_y": 67.2,
+    "source_page": 23
+  },
+  {
+    "code": "C1031",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 58.068,
+    "map_y": 66.373,
+    "source_page": 23
+  },
+  {
+    "code": "C1038",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 53.142,
+    "map_y": 70.456,
+    "source_page": 23
+  },
+  {
+    "code": "C1039",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 50.391,
+    "map_y": 70.456,
+    "source_page": 23
+  },
+  {
+    "code": "C1043",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 49.261,
+    "map_y": 67.743,
+    "source_page": 23
+  },
+  {
+    "code": "C1048",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 53.225,
+    "map_y": 59.431,
+    "source_page": 23
+  },
+  {
+    "code": "C1051",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 53.868,
+    "map_y": 56.615,
+    "source_page": 23
+  },
+  {
+    "code": "C1060",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 64.141,
+    "map_y": 57.248,
+    "source_page": 23
+  },
+  {
+    "code": "C1061",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 66.104,
+    "map_y": 57.248,
+    "source_page": 23
+  },
+  {
+    "code": "C1069",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 68.642,
+    "map_y": 54.393,
+    "source_page": 23
+  },
+  {
+    "code": "C1079",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 72.954,
+    "map_y": 57.821,
+    "source_page": 23
+  },
+  {
+    "code": "C1081",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 72.954,
+    "map_y": 59.651,
+    "source_page": 23
+  },
+  {
+    "code": "C1088",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 78.234,
+    "map_y": 59.651,
+    "source_page": 23
+  },
+  {
+    "code": "C1089",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 81.756,
+    "map_y": 63.383,
+    "source_page": 23
+  },
+  {
+    "code": "C1098",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 78.082,
+    "map_y": 62.566,
+    "source_page": 23
+  },
+  {
+    "code": "C1100",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 76.707,
+    "map_y": 62.775,
+    "source_page": 23
+  },
+  {
+    "code": "C1101",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 73.022,
+    "map_y": 62.238,
+    "source_page": 23
+  },
+  {
+    "code": "C1102",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 75.386,
+    "map_y": 62.566,
+    "source_page": 23
+  },
+  {
+    "code": "D1001",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 51.845,
+    "map_y": 82.277,
+    "source_page": 23
+  },
+  {
+    "code": "D1002",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 55.147,
+    "map_y": 82.004,
+    "source_page": 23
+  },
+  {
+    "code": "D1003",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 48.247,
+    "map_y": 82.549,
+    "source_page": 23
+  },
+  {
+    "code": "D1017",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 55.147,
+    "map_y": 84.702,
+    "source_page": 23
+  },
+  {
+    "code": "D1020",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 48.137,
+    "map_y": 85.281,
+    "source_page": 23
+  },
+  {
+    "code": "F1001",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 33.438,
+    "map_y": 48.489,
+    "source_page": 23
+  },
+  {
+    "code": "F1004",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 36.225,
+    "map_y": 43.777,
+    "source_page": 23
+  },
+  {
+    "code": "F1007",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 39.268,
+    "map_y": 43.4,
+    "source_page": 23
+  },
+  {
+    "code": "F1021",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 42.114,
+    "map_y": 43.031,
+    "source_page": 23
+  },
+  {
+    "code": "F1025",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 44.965,
+    "map_y": 42.684,
+    "source_page": 23
+  },
+  {
+    "code": "F1028",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 49.251,
+    "map_y": 42.126,
+    "source_page": 23
+  },
+  {
+    "code": "G1001",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 73.22,
+    "map_y": 43.257,
+    "source_page": 23
+  },
+  {
+    "code": "G1007",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 77.319,
+    "map_y": 40.391,
+    "source_page": 23
+  },
+  {
+    "code": "H1001",
+    "building_id": "R10",
+    "floor_id": "R10-1",
+    "map_x": 87.319,
+    "map_y": 58.648,
+    "source_page": 23
+  },
+  {
+    "code": "A2001",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 44.789,
+    "map_y": 75.841,
+    "source_page": 24
+  },
+  {
+    "code": "B2002",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 39.157,
+    "map_y": 78.316,
+    "source_page": 24
+  },
+  {
+    "code": "B2004",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 30.233,
+    "map_y": 76.131,
+    "source_page": 24
+  },
+  {
+    "code": "B2014",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 25.843,
+    "map_y": 76.102,
+    "source_page": 24
+  },
+  {
+    "code": "B2024",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 22.381,
+    "map_y": 76.101,
+    "source_page": 24
+  },
+  {
+    "code": "B2030",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 19.578,
+    "map_y": 76.101,
+    "source_page": 24
+  },
+  {
+    "code": "B2036",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 42.027,
+    "map_y": 78.297,
+    "source_page": 24
+  },
+  {
+    "code": "B2041",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 39.157,
+    "map_y": 76.024,
+    "source_page": 24
+  },
+  {
+    "code": "B2044",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 33.674,
+    "map_y": 72.918,
+    "source_page": 24
+  },
+  {
+    "code": "B2049",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 33.678,
+    "map_y": 70.965,
+    "source_page": 24
+  },
+  {
+    "code": "B2059",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 39.167,
+    "map_y": 69.844,
+    "source_page": 24
+  },
+  {
+    "code": "C2001",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 44.858,
+    "map_y": 67.307,
+    "source_page": 24
+  },
+  {
+    "code": "C2008",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 52.695,
+    "map_y": 69.947,
+    "source_page": 24
+  },
+  {
+    "code": "C2028",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 47.986,
+    "map_y": 64.536,
+    "source_page": 24
+  },
+  {
+    "code": "C2029",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 50.435,
+    "map_y": 62.995,
+    "source_page": 24
+  },
+  {
+    "code": "C2036",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 50.435,
+    "map_y": 58.569,
+    "source_page": 24
+  },
+  {
+    "code": "C2037",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 53.14,
+    "map_y": 56.129,
+    "source_page": 24
+  },
+  {
+    "code": "C2043",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 55.886,
+    "map_y": 56.129,
+    "source_page": 24
+  },
+  {
+    "code": "C2047",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 58.972,
+    "map_y": 58.866,
+    "source_page": 24
+  },
+  {
+    "code": "C2050",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 55.018,
+    "map_y": 61.858,
+    "source_page": 24
+  },
+  {
+    "code": "C2061",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 60.014,
+    "map_y": 64.786,
+    "source_page": 24
+  },
+  {
+    "code": "C2072",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 64.78,
+    "map_y": 62.47,
+    "source_page": 24
+  },
+  {
+    "code": "C2073",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 67.383,
+    "map_y": 65.922,
+    "source_page": 24
+  },
+  {
+    "code": "C2079",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 67.383,
+    "map_y": 68.22,
+    "source_page": 24
+  },
+  {
+    "code": "C2080",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 64.184,
+    "map_y": 68.22,
+    "source_page": 24
+  },
+  {
+    "code": "C2081",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 64.402,
+    "map_y": 70.913,
+    "source_page": 24
+  },
+  {
+    "code": "C2088",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 60.871,
+    "map_y": 68.22,
+    "source_page": 24
+  },
+  {
+    "code": "C2091",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 58.516,
+    "map_y": 68.22,
+    "source_page": 24
+  },
+  {
+    "code": "D2007",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 65.993,
+    "map_y": 90.996,
+    "source_page": 24
+  },
+  {
+    "code": "D2015",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 61.566,
+    "map_y": 90.427,
+    "source_page": 24
+  },
+  {
+    "code": "D2026",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 55.777,
+    "map_y": 89.822,
+    "source_page": 24
+  },
+  {
+    "code": "D2027",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 50.044,
+    "map_y": 89.629,
+    "source_page": 24
+  },
+  {
+    "code": "D2030",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 46.842,
+    "map_y": 88.351,
+    "source_page": 24
+  },
+  {
+    "code": "D2035",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 44.086,
+    "map_y": 88.257,
+    "source_page": 24
+  },
+  {
+    "code": "D2036",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 41.334,
+    "map_y": 88.121,
+    "source_page": 24
+  },
+  {
+    "code": "D2044",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 37.453,
+    "map_y": 83.953,
+    "source_page": 24
+  },
+  {
+    "code": "D2064",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 34.938,
+    "map_y": 89.556,
+    "source_page": 24
+  },
+  {
+    "code": "D2065",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 32.17,
+    "map_y": 88.815,
+    "source_page": 24
+  },
+  {
+    "code": "D2072",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 28.912,
+    "map_y": 90.145,
+    "source_page": 24
+  },
+  {
+    "code": "D2076",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 25.299,
+    "map_y": 90.031,
+    "source_page": 24
+  },
+  {
+    "code": "D2082",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 21.684,
+    "map_y": 88.508,
+    "source_page": 24
+  },
+  {
+    "code": "D2084",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 17.459,
+    "map_y": 88.34,
+    "source_page": 24
+  },
+  {
+    "code": "D2089",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 13.437,
+    "map_y": 88.038,
+    "source_page": 24
+  },
+  {
+    "code": "E2003",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 12.478,
+    "map_y": 85.974,
+    "source_page": 24
+  },
+  {
+    "code": "E2005",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 12.091,
+    "map_y": 83.321,
+    "source_page": 24
+  },
+  {
+    "code": "E2008",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 12.121,
+    "map_y": 79.446,
+    "source_page": 24
+  },
+  {
+    "code": "E2009",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 12.016,
+    "map_y": 78.4,
+    "source_page": 24
+  },
+  {
+    "code": "E2013",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 11.647,
+    "map_y": 75.727,
+    "source_page": 24
+  },
+  {
+    "code": "E2023",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 11.251,
+    "map_y": 71.818,
+    "source_page": 24
+  },
+  {
+    "code": "E2024",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 10.667,
+    "map_y": 67.508,
+    "source_page": 24
+  },
+  {
+    "code": "E2025",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 9.641,
+    "map_y": 64.883,
+    "source_page": 24
+  },
+  {
+    "code": "E2028",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 11.593,
+    "map_y": 63.326,
+    "source_page": 24
+  },
+  {
+    "code": "E2032",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 9.23,
+    "map_y": 61.234,
+    "source_page": 24
+  },
+  {
+    "code": "E2046",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 8.489,
+    "map_y": 55.366,
+    "source_page": 24
+  },
+  {
+    "code": "E2051",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 7.868,
+    "map_y": 51.553,
+    "source_page": 24
+  },
+  {
+    "code": "E2052",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 7.644,
+    "map_y": 50.104,
+    "source_page": 24
+  },
+  {
+    "code": "E2053",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 7.277,
+    "map_y": 47.1,
+    "source_page": 24
+  },
+  {
+    "code": "E2058",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 10.113,
+    "map_y": 45.408,
+    "source_page": 24
+  },
+  {
+    "code": "F2004",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 12.989,
+    "map_y": 45.017,
+    "source_page": 24
+  },
+  {
+    "code": "F2005",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 15.795,
+    "map_y": 44.597,
+    "source_page": 24
+  },
+  {
+    "code": "F2013",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 18.541,
+    "map_y": 44.304,
+    "source_page": 24
+  },
+  {
+    "code": "F2014",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 21.279,
+    "map_y": 43.948,
+    "source_page": 24
+  },
+  {
+    "code": "F2120",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 23.995,
+    "map_y": 43.539,
+    "source_page": 24
+  },
+  {
+    "code": "F2122",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 26.755,
+    "map_y": 43.177,
+    "source_page": 24
+  },
+  {
+    "code": "F2136",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 29.307,
+    "map_y": 42.793,
+    "source_page": 24
+  },
+  {
+    "code": "F2137",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 32.063,
+    "map_y": 42.466,
+    "source_page": 24
+  },
+  {
+    "code": "F2144",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 35.904,
+    "map_y": 42.006,
+    "source_page": 24
+  },
+  {
+    "code": "F2151",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 43.53,
+    "map_y": 43.53,
+    "source_page": 24
+  },
+  {
+    "code": "F2153",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 41.277,
+    "map_y": 41.371,
+    "source_page": 24
+  },
+  {
+    "code": "F2156",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 45.655,
+    "map_y": 43.267,
+    "source_page": 24
+  },
+  {
+    "code": "F2159",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 45.542,
+    "map_y": 40.695,
+    "source_page": 24
+  },
+  {
+    "code": "F2160",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 48.317,
+    "map_y": 40.356,
+    "source_page": 24
+  },
+  {
+    "code": "G2005",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 52.497,
+    "map_y": 41.004,
+    "source_page": 24
+  },
+  {
+    "code": "G2007",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 56.206,
+    "map_y": 40.054,
+    "source_page": 24
+  },
+  {
+    "code": "G2016",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 58.954,
+    "map_y": 39.712,
+    "source_page": 24
+  },
+  {
+    "code": "G2017",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 61.381,
+    "map_y": 39.364,
+    "source_page": 24
+  },
+  {
+    "code": "G2021",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 63.661,
+    "map_y": 38.397,
+    "source_page": 24
+  },
+  {
+    "code": "G2031",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 67.455,
+    "map_y": 38.509,
+    "source_page": 24
+  },
+  {
+    "code": "G2032",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 69.999,
+    "map_y": 42.673,
+    "source_page": 24
+  },
+  {
+    "code": "G2041",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 70.3,
+    "map_y": 38.103,
+    "source_page": 24
+  },
+  {
+    "code": "G2043",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 73.697,
+    "map_y": 37.016,
+    "source_page": 24
+  },
+  {
+    "code": "G2049",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 77.634,
+    "map_y": 37.514,
+    "source_page": 24
+  },
+  {
+    "code": "G2053",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 81.341,
+    "map_y": 36.999,
+    "source_page": 24
+  },
+  {
+    "code": "H2001",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 84.802,
+    "map_y": 38.205,
+    "source_page": 24
+  },
+  {
+    "code": "H2004",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 85.198,
+    "map_y": 35.986,
+    "source_page": 24
+  },
+  {
+    "code": "H2008",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 88.326,
+    "map_y": 36.448,
+    "source_page": 24
+  },
+  {
+    "code": "H2010",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 88.795,
+    "map_y": 40.127,
+    "source_page": 24
+  },
+  {
+    "code": "H2015",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 89.13,
+    "map_y": 42.339,
+    "source_page": 24
+  },
+  {
+    "code": "H2024",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 89.786,
+    "map_y": 47.168,
+    "source_page": 24
+  },
+  {
+    "code": "H2028",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 90.257,
+    "map_y": 51.199,
+    "source_page": 24
+  },
+  {
+    "code": "H2031",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 91.646,
+    "map_y": 61.771,
+    "source_page": 24
+  },
+  {
+    "code": "H2045",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 91.576,
+    "map_y": 63.686,
+    "source_page": 24
+  },
+  {
+    "code": "H2046",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 92.346,
+    "map_y": 67.146,
+    "source_page": 24
+  },
+  {
+    "code": "H2048",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 87.101,
+    "map_y": 62.45,
+    "source_page": 24
+  },
+  {
+    "code": "H2052",
+    "building_id": "R10",
+    "floor_id": "R10-2",
+    "map_x": 93.07,
+    "map_y": 72.434,
+    "source_page": 24
+  },
+  {
+    "code": "D3012",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 67.746,
+    "map_y": 89.528,
+    "source_page": 25
+  },
+  {
+    "code": "D3013",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 62.716,
+    "map_y": 92.046,
+    "source_page": 25
+  },
+  {
+    "code": "D3017",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 58.129,
+    "map_y": 91.836,
+    "source_page": 25
+  },
+  {
+    "code": "D3023",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 54.944,
+    "map_y": 92.174,
+    "source_page": 25
+  },
+  {
+    "code": "D3024",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 52.286,
+    "map_y": 90.697,
+    "source_page": 25
+  },
+  {
+    "code": "D3030",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 49.643,
+    "map_y": 90.662,
+    "source_page": 25
+  },
+  {
+    "code": "D3031",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 46.972,
+    "map_y": 90.552,
+    "source_page": 25
+  },
+  {
+    "code": "D3039",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 44.092,
+    "map_y": 90.446,
+    "source_page": 25
+  },
+  {
+    "code": "D3040",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 40.818,
+    "map_y": 90.323,
+    "source_page": 25
+  },
+  {
+    "code": "D3049",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 35.892,
+    "map_y": 90.09,
+    "source_page": 25
+  },
+  {
+    "code": "D3054",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 31.395,
+    "map_y": 89.901,
+    "source_page": 25
+  },
+  {
+    "code": "D3062",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 27.87,
+    "map_y": 89.769,
+    "source_page": 25
+  },
+  {
+    "code": "D3068",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 22.904,
+    "map_y": 89.549,
+    "source_page": 25
+  },
+  {
+    "code": "D3072",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 16.768,
+    "map_y": 90.811,
+    "source_page": 25
+  },
+  {
+    "code": "D3079",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 17.923,
+    "map_y": 86.209,
+    "source_page": 25
+  },
+  {
+    "code": "D3087",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 13.285,
+    "map_y": 88.453,
+    "source_page": 25
+  },
+  {
+    "code": "E3002",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 12.594,
+    "map_y": 83.06,
+    "source_page": 25
+  },
+  {
+    "code": "E3006",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 12.195,
+    "map_y": 79.872,
+    "source_page": 25
+  },
+  {
+    "code": "E3019",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 11.145,
+    "map_y": 77.05,
+    "source_page": 25
+  },
+  {
+    "code": "E3020",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 10.823,
+    "map_y": 74.342,
+    "source_page": 25
+  },
+  {
+    "code": "E3021",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 10.592,
+    "map_y": 72.407,
+    "source_page": 25
+  },
+  {
+    "code": "E3029",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 10.183,
+    "map_y": 69.793,
+    "source_page": 25
+  },
+  {
+    "code": "E3038",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 9.89,
+    "map_y": 66.855,
+    "source_page": 25
+  },
+  {
+    "code": "E3042",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 9.304,
+    "map_y": 62.872,
+    "source_page": 25
+  },
+  {
+    "code": "E3056",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 7.888,
+    "map_y": 53.55,
+    "source_page": 25
+  },
+  {
+    "code": "E3063",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 7.57,
+    "map_y": 50.718,
+    "source_page": 25
+  },
+  {
+    "code": "E3064",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 7.069,
+    "map_y": 47.139,
+    "source_page": 25
+  },
+  {
+    "code": "E3068",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 9.956,
+    "map_y": 46.747,
+    "source_page": 25
+  },
+  {
+    "code": "F3004",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 12.95,
+    "map_y": 46.363,
+    "source_page": 25
+  },
+  {
+    "code": "F3005",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 16.695,
+    "map_y": 45.864,
+    "source_page": 25
+  },
+  {
+    "code": "F3015",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 20.492,
+    "map_y": 45.296,
+    "source_page": 25
+  },
+  {
+    "code": "F3016",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 23.248,
+    "map_y": 44.996,
+    "source_page": 25
+  },
+  {
+    "code": "F3024",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 26.056,
+    "map_y": 44.616,
+    "source_page": 25
+  },
+  {
+    "code": "F3025",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 29.551,
+    "map_y": 44.146,
+    "source_page": 25
+  },
+  {
+    "code": "F3034",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 36.119,
+    "map_y": 44.241,
+    "source_page": 25
+  },
+  {
+    "code": "F3047",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 43.985,
+    "map_y": 42.162,
+    "source_page": 25
+  },
+  {
+    "code": "F3055",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 46.816,
+    "map_y": 41.779,
+    "source_page": 25
+  },
+  {
+    "code": "F3056",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 49.479,
+    "map_y": 41.406,
+    "source_page": 25
+  },
+  {
+    "code": "G3005",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 52.392,
+    "map_y": 40.944,
+    "source_page": 25
+  },
+  {
+    "code": "G3006",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 55.745,
+    "map_y": 40.495,
+    "source_page": 25
+  },
+  {
+    "code": "G3013",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 59.297,
+    "map_y": 40.071,
+    "source_page": 25
+  },
+  {
+    "code": "G3014",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 62.201,
+    "map_y": 39.607,
+    "source_page": 25
+  },
+  {
+    "code": "G3025",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 64.986,
+    "map_y": 39.217,
+    "source_page": 25
+  },
+  {
+    "code": "G3033",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 71.2,
+    "map_y": 39.151,
+    "source_page": 25
+  },
+  {
+    "code": "G3038",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 74.096,
+    "map_y": 38.009,
+    "source_page": 25
+  },
+  {
+    "code": "G3039",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 78.84,
+    "map_y": 38.098,
+    "source_page": 25
+  },
+  {
+    "code": "G3044",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 82.272,
+    "map_y": 37.634,
+    "source_page": 25
+  },
+  {
+    "code": "H3003",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 87.48,
+    "map_y": 37.287,
+    "source_page": 25
+  },
+  {
+    "code": "H3008",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 88.192,
+    "map_y": 42.564,
+    "source_page": 25
+  },
+  {
+    "code": "H3020",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 88.935,
+    "map_y": 48.062,
+    "source_page": 25
+  },
+  {
+    "code": "H3021",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 89.857,
+    "map_y": 50.869,
+    "source_page": 25
+  },
+  {
+    "code": "H3028",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 90.255,
+    "map_y": 53.545,
+    "source_page": 25
+  },
+  {
+    "code": "H3035",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 90.719,
+    "map_y": 57.011,
+    "source_page": 25
+  },
+  {
+    "code": "H3042",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 91.215,
+    "map_y": 61.295,
+    "source_page": 25
+  },
+  {
+    "code": "H3043",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 91.736,
+    "map_y": 64.704,
+    "source_page": 25
+  },
+  {
+    "code": "H3048",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 91.993,
+    "map_y": 66.949,
+    "source_page": 25
+  },
+  {
+    "code": "H3803",
+    "building_id": "R10",
+    "floor_id": "R10-3",
+    "map_x": 87.48,
+    "map_y": 39.799,
+    "source_page": 25
+  },
+  {
+    "code": "0.02",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 28.031,
+    "map_y": 36.485,
+    "source_page": 18
+  },
+  {
+    "code": "0.04",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 28.658,
+    "map_y": 33.691,
+    "source_page": 18
+  },
+  {
+    "code": "0.09",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 72.25,
+    "map_y": 82.938,
+    "source_page": 18
+  },
+  {
+    "code": "0.10",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 73.543,
+    "map_y": 82.938,
+    "source_page": 18
+  },
+  {
+    "code": "0.11",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 74.942,
+    "map_y": 82.251,
+    "source_page": 18
+  },
+  {
+    "code": "0.14",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 23.737,
+    "map_y": 31.287,
+    "source_page": 18
+  },
+  {
+    "code": "0.15",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 33.702,
+    "map_y": 40.116,
+    "source_page": 18
+  },
+  {
+    "code": "0.16",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 33.681,
+    "map_y": 40.999,
+    "source_page": 18
+  },
+  {
+    "code": "0.17",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 33.791,
+    "map_y": 42.62,
+    "source_page": 18
+  },
+  {
+    "code": "0.18",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 21.619,
+    "map_y": 34.801,
+    "source_page": 18
+  },
+  {
+    "code": "0.20",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 17.936,
+    "map_y": 27.735,
+    "source_page": 18
+  },
+  {
+    "code": "0.21",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 16.277,
+    "map_y": 27.735,
+    "source_page": 18
+  },
+  {
+    "code": "0.23",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 12.185,
+    "map_y": 27.735,
+    "source_page": 18
+  },
+  {
+    "code": "0.24",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 10.522,
+    "map_y": 27.735,
+    "source_page": 18
+  },
+  {
+    "code": "0.25",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 8.953,
+    "map_y": 32.014,
+    "source_page": 18
+  },
+  {
+    "code": "0.26",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 9.437,
+    "map_y": 43.125,
+    "source_page": 18
+  },
+  {
+    "code": "0.27",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 13.481,
+    "map_y": 43.125,
+    "source_page": 18
+  },
+  {
+    "code": "0.28",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 20.612,
+    "map_y": 41.184,
+    "source_page": 18
+  },
+  {
+    "code": "0.30",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 27.624,
+    "map_y": 41.469,
+    "source_page": 18
+  },
+  {
+    "code": "0.33",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 17.968,
+    "map_y": 40.717,
+    "source_page": 18
+  },
+  {
+    "code": "0.34",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 16.701,
+    "map_y": 40.717,
+    "source_page": 18
+  },
+  {
+    "code": "0.36",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 15.985,
+    "map_y": 45.063,
+    "source_page": 18
+  },
+  {
+    "code": "0.39",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 19.363,
+    "map_y": 45.063,
+    "source_page": 18
+  },
+  {
+    "code": "0.40",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 21.898,
+    "map_y": 44.582,
+    "source_page": 18
+  },
+  {
+    "code": "0.41",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 24.629,
+    "map_y": 47.379,
+    "source_page": 18
+  },
+  {
+    "code": "0.43",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 27.39,
+    "map_y": 47.8,
+    "source_page": 18
+  },
+  {
+    "code": "0.44",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 27.39,
+    "map_y": 50.562,
+    "source_page": 18
+  },
+  {
+    "code": "0.45",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 24.304,
+    "map_y": 50.562,
+    "source_page": 18
+  },
+  {
+    "code": "0.47",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 28.495,
+    "map_y": 64.521,
+    "source_page": 18
+  },
+  {
+    "code": "0.48",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 23.281,
+    "map_y": 67.392,
+    "source_page": 18
+  },
+  {
+    "code": "0.49",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 23.281,
+    "map_y": 64.833,
+    "source_page": 18
+  },
+  {
+    "code": "0.50",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 23.281,
+    "map_y": 62.115,
+    "source_page": 18
+  },
+  {
+    "code": "0.51",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 23.281,
+    "map_y": 59.598,
+    "source_page": 18
+  },
+  {
+    "code": "0.52",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 28.495,
+    "map_y": 59.69,
+    "source_page": 18
+  },
+  {
+    "code": "0.54",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 23.281,
+    "map_y": 71.425,
+    "source_page": 18
+  },
+  {
+    "code": "0.55",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 27.073,
+    "map_y": 74.301,
+    "source_page": 18
+  },
+  {
+    "code": "0.56",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 27.075,
+    "map_y": 79.285,
+    "source_page": 18
+  },
+  {
+    "code": "0.59",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 29.843,
+    "map_y": 82.005,
+    "source_page": 18
+  },
+  {
+    "code": "0.61",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 32.263,
+    "map_y": 69.39,
+    "source_page": 18
+  },
+  {
+    "code": "0.62",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 33.661,
+    "map_y": 69.39,
+    "source_page": 18
+  },
+  {
+    "code": "0.63",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 41.834,
+    "map_y": 74.163,
+    "source_page": 18
+  },
+  {
+    "code": "0.64",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 38.277,
+    "map_y": 69.145,
+    "source_page": 18
+  },
+  {
+    "code": "0.66",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 43.021,
+    "map_y": 65.483,
+    "source_page": 18
+  },
+  {
+    "code": "0.67",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 45.665,
+    "map_y": 61.688,
+    "source_page": 18
+  },
+  {
+    "code": "0.67a",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 48.446,
+    "map_y": 60.502,
+    "source_page": 18
+  },
+  {
+    "code": "0.68",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 49.718,
+    "map_y": 65.75,
+    "source_page": 18
+  },
+  {
+    "code": "0.68b",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 50.114,
+    "map_y": 62.147,
+    "source_page": 18
+  },
+  {
+    "code": "0.69",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 51.543,
+    "map_y": 67.696,
+    "source_page": 18
+  },
+  {
+    "code": "0.69a",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 52.153,
+    "map_y": 64.089,
+    "source_page": 18
+  },
+  {
+    "code": "0.70",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 54.151,
+    "map_y": 70.078,
+    "source_page": 18
+  },
+  {
+    "code": "0.75",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 44.176,
+    "map_y": 77.245,
+    "source_page": 18
+  },
+  {
+    "code": "0.76",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 42.108,
+    "map_y": 77.245,
+    "source_page": 18
+  },
+  {
+    "code": "0.77",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 38.839,
+    "map_y": 75.955,
+    "source_page": 18
+  },
+  {
+    "code": "0.79",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 39.945,
+    "map_y": 81.179,
+    "source_page": 18
+  },
+  {
+    "code": "0.81",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 36.875,
+    "map_y": 82.005,
+    "source_page": 18
+  },
+  {
+    "code": "A0.04",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 35.046,
+    "map_y": 65.133,
+    "source_page": 18
+  },
+  {
+    "code": "A0.10",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 32.036,
+    "map_y": 40.267,
+    "source_page": 18
+  },
+  {
+    "code": "A0.12",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 32.456,
+    "map_y": 38.589,
+    "source_page": 18
+  },
+  {
+    "code": "A0.13",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 32.462,
+    "map_y": 36.002,
+    "source_page": 18
+  },
+  {
+    "code": "A0.14",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 35.046,
+    "map_y": 35.269,
+    "source_page": 18
+  },
+  {
+    "code": "A0.19",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 34.575,
+    "map_y": 49.416,
+    "source_page": 18
+  },
+  {
+    "code": "B0.01",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 75.263,
+    "map_y": 87.835,
+    "source_page": 18
+  },
+  {
+    "code": "B0.07",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 75.263,
+    "map_y": 85.004,
+    "source_page": 18
+  },
+  {
+    "code": "B0.08",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 72.862,
+    "map_y": 84.736,
+    "source_page": 18
+  },
+  {
+    "code": "B0.13",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 77.99,
+    "map_y": 81.1,
+    "source_page": 18
+  },
+  {
+    "code": "B0.18",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 82.925,
+    "map_y": 84.679,
+    "source_page": 18
+  },
+  {
+    "code": "B0.19",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 80.773,
+    "map_y": 85.005,
+    "source_page": 18
+  },
+  {
+    "code": "B0.22",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 80.634,
+    "map_y": 86.374,
+    "source_page": 18
+  },
+  {
+    "code": "B0.23",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 80.634,
+    "map_y": 90.444,
+    "source_page": 18
+  },
+  {
+    "code": "C0.1.02",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 88.71,
+    "map_y": 76.947,
+    "source_page": 18
+  },
+  {
+    "code": "C0.1.03",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 88.71,
+    "map_y": 74.385,
+    "source_page": 18
+  },
+  {
+    "code": "C0.1.04",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 84.944,
+    "map_y": 75.452,
+    "source_page": 18
+  },
+  {
+    "code": "C0.1.05",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 79.017,
+    "map_y": 73.897,
+    "source_page": 18
+  },
+  {
+    "code": "C0.1.06",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 74.329,
+    "map_y": 75.452,
+    "source_page": 18
+  },
+  {
+    "code": "C0.2.20",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 86.683,
+    "map_y": 89.332,
+    "source_page": 18
+  },
+  {
+    "code": "C0.2.21",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 88.961,
+    "map_y": 88.519,
+    "source_page": 18
+  },
+  {
+    "code": "H0.01",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 42.936,
+    "map_y": 93.24,
+    "source_page": 18
+  },
+  {
+    "code": "H0.02",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 46.71,
+    "map_y": 90.383,
+    "source_page": 18
+  },
+  {
+    "code": "H0.03",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 42.936,
+    "map_y": 91.899,
+    "source_page": 18
+  },
+  {
+    "code": "H0.04",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 46.71,
+    "map_y": 87.251,
+    "source_page": 18
+  },
+  {
+    "code": "H0.05",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 42.936,
+    "map_y": 90.53,
+    "source_page": 18
+  },
+  {
+    "code": "H0.06",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 46.71,
+    "map_y": 84.391,
+    "source_page": 18
+  },
+  {
+    "code": "H0.07",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 42.936,
+    "map_y": 89.264,
+    "source_page": 18
+  },
+  {
+    "code": "H0.09",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 42.567,
+    "map_y": 87.251,
+    "source_page": 18
+  },
+  {
+    "code": "H0.11",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 42.567,
+    "map_y": 84.598,
+    "source_page": 18
+  },
+  {
+    "code": "H0.15",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 51.996,
+    "map_y": 86.478,
+    "source_page": 18
+  },
+  {
+    "code": "H0.16",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 52.406,
+    "map_y": 93.262,
+    "source_page": 18
+  },
+  {
+    "code": "H0.17",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 52.406,
+    "map_y": 91.979,
+    "source_page": 18
+  },
+  {
+    "code": "H0.25",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 56.035,
+    "map_y": 86.373,
+    "source_page": 18
+  },
+  {
+    "code": "H0.29",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 60.592,
+    "map_y": 94.03,
+    "source_page": 18
+  },
+  {
+    "code": "H0.34",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 66.137,
+    "map_y": 93.375,
+    "source_page": 18
+  },
+  {
+    "code": "H0.39a",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 66.845,
+    "map_y": 82.813,
+    "source_page": 18
+  },
+  {
+    "code": "H0.48",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 61.627,
+    "map_y": 83.447,
+    "source_page": 18
+  },
+  {
+    "code": "H0.50",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 60.974,
+    "map_y": 79.187,
+    "source_page": 18
+  },
+  {
+    "code": "H0.56",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 54.746,
+    "map_y": 82.281,
+    "source_page": 18
+  },
+  {
+    "code": "H0.57",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 51.996,
+    "map_y": 83.953,
+    "source_page": 18
+  },
+  {
+    "code": "H0.61",
+    "building_id": "R8",
+    "floor_id": "R8-0",
+    "map_x": 49.271,
+    "map_y": 83.953,
+    "source_page": 18
+  },
+  {
+    "code": "1.01",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.234,
+    "map_y": 50.836,
+    "source_page": 19
+  },
+  {
+    "code": "1.02",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.234,
+    "map_y": 49.489,
+    "source_page": 19
+  },
+  {
+    "code": "1.03",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.501,
+    "map_y": 47.664,
+    "source_page": 19
+  },
+  {
+    "code": "1.04",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.501,
+    "map_y": 44.637,
+    "source_page": 19
+  },
+  {
+    "code": "1.13",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.949,
+    "map_y": 39.566,
+    "source_page": 19
+  },
+  {
+    "code": "1.14",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.949,
+    "map_y": 38.077,
+    "source_page": 19
+  },
+  {
+    "code": "1.14a",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 25.478,
+    "map_y": 30.867,
+    "source_page": 19
+  },
+  {
+    "code": "1.15",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.175,
+    "map_y": 27.194,
+    "source_page": 19
+  },
+  {
+    "code": "1.16",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 22.1,
+    "map_y": 27.194,
+    "source_page": 19
+  },
+  {
+    "code": "1.17",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 20.383,
+    "map_y": 27.194,
+    "source_page": 19
+  },
+  {
+    "code": "1.18",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 18.713,
+    "map_y": 27.194,
+    "source_page": 19
+  },
+  {
+    "code": "1.19",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 17.044,
+    "map_y": 27.194,
+    "source_page": 19
+  },
+  {
+    "code": "1.20",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 15.375,
+    "map_y": 27.194,
+    "source_page": 19
+  },
+  {
+    "code": "1.21",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 8.198,
+    "map_y": 33.555,
+    "source_page": 19
+  },
+  {
+    "code": "1.21a",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 11.372,
+    "map_y": 27.614,
+    "source_page": 19
+  },
+  {
+    "code": "1.24",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 19.262,
+    "map_y": 40.435,
+    "source_page": 19
+  },
+  {
+    "code": "1.27",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 16.026,
+    "map_y": 40.435,
+    "source_page": 19
+  },
+  {
+    "code": "1.28",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 14.362,
+    "map_y": 40.435,
+    "source_page": 19
+  },
+  {
+    "code": "1.29",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 10.01,
+    "map_y": 40.443,
+    "source_page": 19
+  },
+  {
+    "code": "1.31",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 7.69,
+    "map_y": 44.446,
+    "source_page": 19
+  },
+  {
+    "code": "1.32",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 10.443,
+    "map_y": 44.446,
+    "source_page": 19
+  },
+  {
+    "code": "1.33",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 12.439,
+    "map_y": 45.5,
+    "source_page": 19
+  },
+  {
+    "code": "1.34",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 13.794,
+    "map_y": 45.5,
+    "source_page": 19
+  },
+  {
+    "code": "1.35",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 15.747,
+    "map_y": 44.446,
+    "source_page": 19
+  },
+  {
+    "code": "1.36",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 18.37,
+    "map_y": 44.446,
+    "source_page": 19
+  },
+  {
+    "code": "1.37",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 20.882,
+    "map_y": 44.446,
+    "source_page": 19
+  },
+  {
+    "code": "1.38",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.662,
+    "map_y": 46.272,
+    "source_page": 19
+  },
+  {
+    "code": "1.39",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.662,
+    "map_y": 47.984,
+    "source_page": 19
+  },
+  {
+    "code": "1.40",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.923,
+    "map_y": 49.635,
+    "source_page": 19
+  },
+  {
+    "code": "1.41",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.923,
+    "map_y": 50.972,
+    "source_page": 19
+  },
+  {
+    "code": "1.42",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.236,
+    "map_y": 59.015,
+    "source_page": 19
+  },
+  {
+    "code": "1.46",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.629,
+    "map_y": 62.954,
+    "source_page": 19
+  },
+  {
+    "code": "1.47",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 27.598,
+    "map_y": 71.454,
+    "source_page": 19
+  },
+  {
+    "code": "1.48",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 24.193,
+    "map_y": 81.682,
+    "source_page": 19
+  },
+  {
+    "code": "1.49",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.587,
+    "map_y": 78.693,
+    "source_page": 19
+  },
+  {
+    "code": "1.50",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.559,
+    "map_y": 73.403,
+    "source_page": 19
+  },
+  {
+    "code": "1.51",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.525,
+    "map_y": 70.692,
+    "source_page": 19
+  },
+  {
+    "code": "1.52",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.662,
+    "map_y": 67.373,
+    "source_page": 19
+  },
+  {
+    "code": "1.53",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.525,
+    "map_y": 62.422,
+    "source_page": 19
+  },
+  {
+    "code": "1.56",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.844,
+    "map_y": 60.188,
+    "source_page": 19
+  },
+  {
+    "code": "1.57",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 23.844,
+    "map_y": 58.92,
+    "source_page": 19
+  },
+  {
+    "code": "1.58",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 30.183,
+    "map_y": 67.747,
+    "source_page": 19
+  },
+  {
+    "code": "1.60",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 34.937,
+    "map_y": 62.689,
+    "source_page": 19
+  },
+  {
+    "code": "1.61",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 33.328,
+    "map_y": 66.785,
+    "source_page": 19
+  },
+  {
+    "code": "1.62",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.0,
+    "map_y": 66.785,
+    "source_page": 19
+  },
+  {
+    "code": "1.65",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 30.191,
+    "map_y": 70.999,
+    "source_page": 19
+  },
+  {
+    "code": "1.70",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 37.245,
+    "map_y": 74.969,
+    "source_page": 19
+  },
+  {
+    "code": "1.75",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 39.131,
+    "map_y": 78.165,
+    "source_page": 19
+  },
+  {
+    "code": "1.78",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 32.689,
+    "map_y": 76.023,
+    "source_page": 19
+  },
+  {
+    "code": "1.79",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 32.705,
+    "map_y": 72.788,
+    "source_page": 19
+  },
+  {
+    "code": "1.85",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 42.354,
+    "map_y": 93.038,
+    "source_page": 19
+  },
+  {
+    "code": "A1.01",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 29.871,
+    "map_y": 38.811,
+    "source_page": 19
+  },
+  {
+    "code": "A1.02",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 31.939,
+    "map_y": 38.811,
+    "source_page": 19
+  },
+  {
+    "code": "A1.03",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 34.572,
+    "map_y": 35.158,
+    "source_page": 19
+  },
+  {
+    "code": "A1.04",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 38.448,
+    "source_page": 19
+  },
+  {
+    "code": "A1.05",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 39.74,
+    "source_page": 19
+  },
+  {
+    "code": "A1.06",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 40.716,
+    "source_page": 19
+  },
+  {
+    "code": "A1.07",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 29.974,
+    "map_y": 42.802,
+    "source_page": 19
+  },
+  {
+    "code": "A1.09",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 47.772,
+    "source_page": 19
+  },
+  {
+    "code": "A1.10",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 49.336,
+    "source_page": 19
+  },
+  {
+    "code": "A1.11",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 50.613,
+    "source_page": 19
+  },
+  {
+    "code": "A1.12",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 52.273,
+    "source_page": 19
+  },
+  {
+    "code": "A1.13",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 32.937,
+    "map_y": 53.634,
+    "source_page": 19
+  },
+  {
+    "code": "A1.14",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 53.911,
+    "source_page": 19
+  },
+  {
+    "code": "A1.15",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 35.338,
+    "map_y": 55.601,
+    "source_page": 19
+  },
+  {
+    "code": "A1.16",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 34.813,
+    "map_y": 57.424,
+    "source_page": 19
+  },
+  {
+    "code": "A1.17",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 32.798,
+    "map_y": 57.424,
+    "source_page": 19
+  },
+  {
+    "code": "A1.20",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 29.064,
+    "map_y": 57.445,
+    "source_page": 19
+  },
+  {
+    "code": "A1.24",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 31.063,
+    "map_y": 53.709,
+    "source_page": 19
+  },
+  {
+    "code": "B1.01",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 75.251,
+    "map_y": 85.144,
+    "source_page": 19
+  },
+  {
+    "code": "B1.06",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 80.458,
+    "map_y": 84.997,
+    "source_page": 19
+  },
+  {
+    "code": "B1.07",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 80.459,
+    "map_y": 86.361,
+    "source_page": 19
+  },
+  {
+    "code": "B1.08",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 80.459,
+    "map_y": 87.751,
+    "source_page": 19
+  },
+  {
+    "code": "B1.10",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 80.459,
+    "map_y": 90.284,
+    "source_page": 19
+  },
+  {
+    "code": "B1.12",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 77.711,
+    "map_y": 91.045,
+    "source_page": 19
+  },
+  {
+    "code": "C1.3.01",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 72.363,
+    "map_y": 73.939,
+    "source_page": 19
+  },
+  {
+    "code": "C1.3.49",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 86.216,
+    "map_y": 73.697,
+    "source_page": 19
+  },
+  {
+    "code": "C1.3.50",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 88.78,
+    "map_y": 74.033,
+    "source_page": 19
+  },
+  {
+    "code": "C1.36",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 77.606,
+    "map_y": 82.142,
+    "source_page": 19
+  },
+  {
+    "code": "C1.4.02",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 86.16,
+    "map_y": 80.084,
+    "source_page": 19
+  },
+  {
+    "code": "C1.4.03",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 88.773,
+    "map_y": 79.288,
+    "source_page": 19
+  },
+  {
+    "code": "C1.4.04",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 88.778,
+    "map_y": 83.729,
+    "source_page": 19
+  },
+  {
+    "code": "C1.4.05",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 88.818,
+    "map_y": 88.456,
+    "source_page": 19
+  },
+  {
+    "code": "C1.4.06",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 86.543,
+    "map_y": 89.798,
+    "source_page": 19
+  },
+  {
+    "code": "H1.01",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 12.322,
+    "map_y": 71.242,
+    "source_page": 19
+  },
+  {
+    "code": "H1.02",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 10.868,
+    "map_y": 71.242,
+    "source_page": 19
+  },
+  {
+    "code": "H1.03",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 9.455,
+    "map_y": 70.345,
+    "source_page": 19
+  },
+  {
+    "code": "H1.04",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 8.001,
+    "map_y": 70.345,
+    "source_page": 19
+  },
+  {
+    "code": "H1.05",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 7.198,
+    "map_y": 66.336,
+    "source_page": 19
+  },
+  {
+    "code": "H1.06",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 10.852,
+    "map_y": 67.296,
+    "source_page": 19
+  },
+  {
+    "code": "H1.07",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 7.198,
+    "map_y": 64.923,
+    "source_page": 19
+  },
+  {
+    "code": "H1.08",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 10.971,
+    "map_y": 65.976,
+    "source_page": 19
+  },
+  {
+    "code": "H1.09",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 8.064,
+    "map_y": 63.556,
+    "source_page": 19
+  },
+  {
+    "code": "H1.10",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 11.717,
+    "map_y": 64.558,
+    "source_page": 19
+  },
+  {
+    "code": "H1.11",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 8.064,
+    "map_y": 62.03,
+    "source_page": 19
+  },
+  {
+    "code": "H1.12",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 11.717,
+    "map_y": 63.053,
+    "source_page": 19
+  },
+  {
+    "code": "H1.14",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 8.994,
+    "map_y": 60.707,
+    "source_page": 19
+  },
+  {
+    "code": "H1.15",
+    "building_id": "R8",
+    "floor_id": "R8-1",
+    "map_x": 8.994,
+    "map_y": 59.279,
+    "source_page": 19
+  },
+  {
+    "code": "2.02",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 27.412,
+    "map_y": 50.464,
+    "source_page": 20
+  },
+  {
+    "code": "2.03",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 27.716,
+    "map_y": 47.624,
+    "source_page": 20
+  },
+  {
+    "code": "2.08",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 32.152,
+    "map_y": 42.728,
+    "source_page": 20
+  },
+  {
+    "code": "2.09",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 32.081,
+    "map_y": 37.801,
+    "source_page": 20
+  },
+  {
+    "code": "2.11",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 30.376,
+    "map_y": 41.045,
+    "source_page": 20
+  },
+  {
+    "code": "2.28",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 19.745,
+    "map_y": 41.211,
+    "source_page": 20
+  },
+  {
+    "code": "2.29",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 15.231,
+    "map_y": 41.211,
+    "source_page": 20
+  },
+  {
+    "code": "2.30",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 12.138,
+    "map_y": 40.355,
+    "source_page": 20
+  },
+  {
+    "code": "2.31",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 10.466,
+    "map_y": 40.355,
+    "source_page": 20
+  },
+  {
+    "code": "2.32",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 8.799,
+    "map_y": 40.355,
+    "source_page": 20
+  },
+  {
+    "code": "2.33",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 8.258,
+    "map_y": 45.009,
+    "source_page": 20
+  },
+  {
+    "code": "2.34",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 11.55,
+    "map_y": 45.009,
+    "source_page": 20
+  },
+  {
+    "code": "2.35",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 15.299,
+    "map_y": 45.009,
+    "source_page": 20
+  },
+  {
+    "code": "2.36",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 18.678,
+    "map_y": 45.009,
+    "source_page": 20
+  },
+  {
+    "code": "2.37",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 21.31,
+    "map_y": 45.009,
+    "source_page": 20
+  },
+  {
+    "code": "2.38",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 23.852,
+    "map_y": 47.225,
+    "source_page": 20
+  },
+  {
+    "code": "2.39",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.21,
+    "map_y": 49.737,
+    "source_page": 20
+  },
+  {
+    "code": "2.40",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.21,
+    "map_y": 51.01,
+    "source_page": 20
+  },
+  {
+    "code": "2.41",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 27.481,
+    "map_y": 59.523,
+    "source_page": 20
+  },
+  {
+    "code": "2.43",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 27.481,
+    "map_y": 61.532,
+    "source_page": 20
+  },
+  {
+    "code": "2.44",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 27.481,
+    "map_y": 62.911,
+    "source_page": 20
+  },
+  {
+    "code": "2.47",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 27.901,
+    "map_y": 71.386,
+    "source_page": 20
+  },
+  {
+    "code": "2.48",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.474,
+    "map_y": 81.582,
+    "source_page": 20
+  },
+  {
+    "code": "2.49",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 23.825,
+    "map_y": 78.644,
+    "source_page": 20
+  },
+  {
+    "code": "2.50",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 23.825,
+    "map_y": 73.297,
+    "source_page": 20
+  },
+  {
+    "code": "2.51",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 23.825,
+    "map_y": 70.777,
+    "source_page": 20
+  },
+  {
+    "code": "2.53",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 23.825,
+    "map_y": 67.319,
+    "source_page": 20
+  },
+  {
+    "code": "2.54",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.083,
+    "map_y": 65.444,
+    "source_page": 20
+  },
+  {
+    "code": "2.55",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.083,
+    "map_y": 64.154,
+    "source_page": 20
+  },
+  {
+    "code": "2.56",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.083,
+    "map_y": 62.803,
+    "source_page": 20
+  },
+  {
+    "code": "2.57",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.083,
+    "map_y": 61.532,
+    "source_page": 20
+  },
+  {
+    "code": "2.58",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.083,
+    "map_y": 60.175,
+    "source_page": 20
+  },
+  {
+    "code": "2.59",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 24.083,
+    "map_y": 58.906,
+    "source_page": 20
+  },
+  {
+    "code": "2.62",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 32.981,
+    "map_y": 67.426,
+    "source_page": 20
+  },
+  {
+    "code": "2.64",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 35.231,
+    "map_y": 67.106,
+    "source_page": 20
+  },
+  {
+    "code": "2.65",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 37.379,
+    "map_y": 67.426,
+    "source_page": 20
+  },
+  {
+    "code": "2.66",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 37.379,
+    "map_y": 69.513,
+    "source_page": 20
+  },
+  {
+    "code": "2.75",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 32.918,
+    "map_y": 78.375,
+    "source_page": 20
+  },
+  {
+    "code": "2.84",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 32.918,
+    "map_y": 72.038,
+    "source_page": 20
+  },
+  {
+    "code": "2.85",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 45.931,
+    "map_y": 82.942,
+    "source_page": 20
+  },
+  {
+    "code": "A2.01",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 34.727,
+    "map_y": 35.182,
+    "source_page": 20
+  },
+  {
+    "code": "A2.02",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 35.06,
+    "map_y": 39.189,
+    "source_page": 20
+  },
+  {
+    "code": "A2.04",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 35.477,
+    "map_y": 46.848,
+    "source_page": 20
+  },
+  {
+    "code": "A2.05",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 32.152,
+    "map_y": 44.351,
+    "source_page": 20
+  },
+  {
+    "code": "A2.07",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 32.152,
+    "map_y": 49.659,
+    "source_page": 20
+  },
+  {
+    "code": "A2.08",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 35.477,
+    "map_y": 50.749,
+    "source_page": 20
+  },
+  {
+    "code": "A2.09",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 35.477,
+    "map_y": 52.064,
+    "source_page": 20
+  },
+  {
+    "code": "A2.11",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 35.061,
+    "map_y": 60.292,
+    "source_page": 20
+  },
+  {
+    "code": "A2.14",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 30.078,
+    "map_y": 55.065,
+    "source_page": 20
+  },
+  {
+    "code": "A2.15",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 30.078,
+    "map_y": 52.19,
+    "source_page": 20
+  },
+  {
+    "code": "H2.01",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 12.694,
+    "map_y": 71.624,
+    "source_page": 20
+  },
+  {
+    "code": "H2.02",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 11.241,
+    "map_y": 71.624,
+    "source_page": 20
+  },
+  {
+    "code": "H2.03",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 9.828,
+    "map_y": 70.726,
+    "source_page": 20
+  },
+  {
+    "code": "H2.04",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 8.374,
+    "map_y": 70.726,
+    "source_page": 20
+  },
+  {
+    "code": "H2.05",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 7.487,
+    "map_y": 66.885,
+    "source_page": 20
+  },
+  {
+    "code": "H2.06",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 11.309,
+    "map_y": 67.678,
+    "source_page": 20
+  },
+  {
+    "code": "H2.07",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 7.487,
+    "map_y": 65.473,
+    "source_page": 20
+  },
+  {
+    "code": "H2.08",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 11.429,
+    "map_y": 66.357,
+    "source_page": 20
+  },
+  {
+    "code": "H2.09",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 8.437,
+    "map_y": 63.938,
+    "source_page": 20
+  },
+  {
+    "code": "H2.10",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 12.092,
+    "map_y": 64.939,
+    "source_page": 20
+  },
+  {
+    "code": "H2.11",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 8.438,
+    "map_y": 62.412,
+    "source_page": 20
+  },
+  {
+    "code": "H2.12",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 12.092,
+    "map_y": 63.435,
+    "source_page": 20
+  },
+  {
+    "code": "H2.14",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 9.369,
+    "map_y": 61.089,
+    "source_page": 20
+  },
+  {
+    "code": "H2.15",
+    "building_id": "R8",
+    "floor_id": "R8-2",
+    "map_x": 9.369,
+    "map_y": 59.661,
+    "source_page": 20
+  },
+  {
+    "code": "3.01",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.74,
+    "map_y": 73.396,
+    "source_page": 21
+  },
+  {
+    "code": "3.02",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.74,
+    "map_y": 74.712,
+    "source_page": 21
+  },
+  {
+    "code": "3.03",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.802,
+    "map_y": 76.356,
+    "source_page": 21
+  },
+  {
+    "code": "3.04",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.802,
+    "map_y": 78.693,
+    "source_page": 21
+  },
+  {
+    "code": "3.05",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.802,
+    "map_y": 80.291,
+    "source_page": 21
+  },
+  {
+    "code": "3.06",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.49,
+    "map_y": 82.356,
+    "source_page": 21
+  },
+  {
+    "code": "3.07",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 35.278,
+    "map_y": 82.559,
+    "source_page": 21
+  },
+  {
+    "code": "3.08",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 33.068,
+    "map_y": 82.356,
+    "source_page": 21
+  },
+  {
+    "code": "3.09",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.73,
+    "map_y": 80.291,
+    "source_page": 21
+  },
+  {
+    "code": "3.10",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.73,
+    "map_y": 78.693,
+    "source_page": 21
+  },
+  {
+    "code": "3.11",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.73,
+    "map_y": 76.628,
+    "source_page": 21
+  },
+  {
+    "code": "3.12",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.73,
+    "map_y": 74.713,
+    "source_page": 21
+  },
+  {
+    "code": "3.13",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.73,
+    "map_y": 73.396,
+    "source_page": 21
+  },
+  {
+    "code": "3.14",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.566,
+    "map_y": 71.378,
+    "source_page": 21
+  },
+  {
+    "code": "3.15",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.73,
+    "map_y": 69.408,
+    "source_page": 21
+  },
+  {
+    "code": "3.16",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 32.73,
+    "map_y": 68.085,
+    "source_page": 21
+  },
+  {
+    "code": "3.17",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 33.068,
+    "map_y": 66.802,
+    "source_page": 21
+  },
+  {
+    "code": "3.18",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 35.278,
+    "map_y": 66.802,
+    "source_page": 21
+  },
+  {
+    "code": "3.19",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.389,
+    "map_y": 66.802,
+    "source_page": 21
+  },
+  {
+    "code": "3.20",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.74,
+    "map_y": 68.085,
+    "source_page": 21
+  },
+  {
+    "code": "3.21",
+    "building_id": "R8",
+    "floor_id": "R8-3",
+    "map_x": 37.74,
+    "map_y": 69.407,
+    "source_page": 21
+  }
+]
