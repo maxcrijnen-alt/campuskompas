@@ -4,7 +4,8 @@ work
 outputs
 test-results
 playwright-report
-.openai
+.openai/*
+!.openai/hosting.json
 dist
 .wrangler
 .vinext
@@ -12,3 +13,4 @@ supabase
 tests
 scripts/*
 !scripts/vercel-build.mjs
+!scripts/test-env.ts
