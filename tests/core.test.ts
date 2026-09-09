@@ -158,7 +158,7 @@ describe('opening hours and Amsterdam DST', () => {
       'Open · closes at 17:00',
     );
     expect(openingStatus(h, new Date('2026-09-08T15:00:00Z'), 'en')).toBe(
-      'Closed',
+      'Closed · opens tomorrow at 08:30',
     );
   });
   it('supports holiday closure and unknown day', () => {
@@ -167,7 +167,7 @@ describe('opening hours and Amsterdam DST', () => {
         { ...h, exceptions: { '2026-09-08': [] } },
         new Date('2026-09-08T10:00:00Z'),
       ),
-    ).toBe('Gesloten');
+    ).toBe('Gesloten · opent morgen om 08:30');
     expect(openingStatus(h, new Date('2026-09-12T10:00:00Z'))).toBeNull();
   });
   it('hides stale and unverified data', () => {
@@ -190,7 +190,7 @@ describe('opening hours and Amsterdam DST', () => {
         new Date('2026-12-01T16:00:00Z'),
         'en',
       ),
-    ).toBe('Closed'));
+    ).toBe('Closed · opens tomorrow at 08:30'));
 });
 describe('public input validation', () => {
   const g = {

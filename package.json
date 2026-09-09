@@ -15,6 +15,7 @@
     "typecheck": "next typegen && tsc --noEmit",
     "test": "vitest run --config vitest.config.ts",
     "test:e2e": "playwright test",
+    "routing:audit": "tsx scripts/routing-audit.ts",
     "seed": "tsx scripts/seed.ts",
     "seed:check": "tsx scripts/seed.ts --check"
   },

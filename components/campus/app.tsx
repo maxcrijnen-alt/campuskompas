@@ -1,19 +1,20 @@
 'use client';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Compass, Search } from 'lucide-react';
 import type { CampusData, Locale, Location, Gem } from '@/lib/campus/types';
 import { brand } from '@/lib/campus/brand';
 import { normalizeRoomCode } from '@/lib/routing/normalization';
 import type { Route } from '@/lib/routing/graph';
+import { createRouteEndpointResolver } from '@/lib/routing/endpoints';
 import { CampusMap } from './map';
 import { Icon } from './icon';
 import { CampusSearch } from './search';
 import { LocationPanel } from './details';
 import { RoutePanel } from './route-panel';
 import { GemsPage } from './gems';
-import {TipsPage} from './tips';
-import {track} from '@/lib/campus/analytics';
+import { TipsPage } from './tips';
+import { track } from '@/lib/campus/analytics';
 export function CampusApp({
   data,
   connected,
@@ -33,7 +34,7 @@ export function CampusApp({
     [floorId, setFloor] = useState(data.floors[0]?.id ?? ''),
     [selected, setSelected] = useState<Location | null>(null),
     [from, setFrom] = useState(''),
-    [qrOrigin,setQrOrigin]=useState(false),
+    [qrOrigin, setQrOrigin] = useState(false),
     [hasOrigin, setHasOrigin] = useState(false),
     [routing, setRouting] = useState(false),
     [route, setRoute] = useState<Route | null>(null),
@@ -44,6 +45,11 @@ export function CampusApp({
     [missing, setMissing] = useState(false);
   const en = locale === 'en',
     floor = data.floors.find((f) => f.id === floorId);
+  const endpointResolver = useMemo(
+      () => createRouteEndpointResolver(data),
+      [data],
+    ),
+    originEndpoint = from ? endpointResolver.resolveReference(from) : null;
   useEffect(() => {
     try {
       const lang = localStorage.getItem('ck-locale');
@@ -54,14 +60,16 @@ export function CampusApp({
     if (target) {
       const l = data.locations.find(
         (l) =>
-          normalizeRoomCode(l.id) === normalizeRoomCode(target) || normalizeRoomCode(l.id)===normalizeRoomCode(target.replace(/^loc-/,'')) ||
+          normalizeRoomCode(l.id) === normalizeRoomCode(target) ||
+          normalizeRoomCode(l.id) ===
+            normalizeRoomCode(target.replace(/^loc-/, '')) ||
           (l.room_code &&
             normalizeRoomCode(l.room_code) === normalizeRoomCode(target)),
       );
       if (l) {
         setSelected(l);
         setFloor(l.floor_id);
-        if(params.get('navigate')==='1')setRouting(true);
+        if (params.get('navigate') === '1') setRouting(true);
       } else setMissing(true);
     }
     let origin = params.get('from');
@@ -69,17 +77,21 @@ export function CampusApp({
       origin =
         data.qr.find((q) => q.code === origin?.slice(3) && q.active)
           ?.route_node_id ?? null;
-    const n =
-      data.nodes.find((n) => n.id === origin) ||
-      data.nodes.find(
-        (n) => n.id === data.locations.find((l) => l.id === origin || l.id === origin?.replace(/^loc-/,''))?.node_id,
-      );
-    if (n) {
-      setQrOrigin(params.get('from')?.startsWith('qr:')??false);
-      if(params.get('from')?.startsWith('qr:'))track('qr_entry',{building:n.building_id});
-      setFrom(n.id);
+    const locationOrigin = data.locations.find(
+        (location) =>
+          location.id === origin ||
+          location.id === origin?.replace(/^loc-/, ''),
+      ),
+      endpoint = origin
+        ? endpointResolver.resolveReference(locationOrigin?.id ?? origin)
+        : null;
+    if (endpoint?.nodeId) {
+      setQrOrigin(params.get('from')?.startsWith('qr:') ?? false);
+      if (params.get('from')?.startsWith('qr:'))
+        track('qr_entry', { building: endpoint.buildingId ?? 'unknown' });
+      setFrom(locationOrigin?.id ?? origin!);
       setHasOrigin(true);
-      if (!target) setFloor(n.floor_id);
+      if (!target && endpoint.floorId) setFloor(endpoint.floorId);
       if (target) setRouting(true);
     } else if (params.has('from'))
       setToast('QR/startpunt niet herkend · Starting point not found');
@@ -91,25 +103,32 @@ export function CampusApp({
         })
         .then((v) => setGems((v as { gems: Gem[] }).gems))
         .catch(() => {});
-  }, [data, initialTarget, connected]);
+  }, [data, initialTarget, connected, endpointResolver]);
   useEffect(() => {
     document.documentElement.lang = locale;
   }, [locale]);
-  useEffect(()=>{if(view==='map'&&floor){try{sessionStorage.setItem('ck-building',floor.building_id);sessionStorage.setItem('ck-floor',floor.id);}catch{}}},[floor,view]);
+  useEffect(() => {
+    if (view === 'map' && floor) {
+      try {
+        sessionStorage.setItem('ck-building', floor.building_id);
+        sessionStorage.setItem('ck-floor', floor.id);
+      } catch {}
+    }
+  }, [floor, view]);
   useEffect(() => {
     if (!toast) return;
     const timer = setTimeout(() => setToast(''), 5000);
     return () => clearTimeout(timer);
   }, [toast]);
   function select(l: Location) {
-    if (picking && l.node_id) {
-      setFrom(l.node_id);
+    if (picking && endpointResolver.resolveLocation(l).nodeId) {
+      setFrom(l.id);
       setHasOrigin(true);
       setQrOrigin(false);
       setPicking(false);
       return;
     }
-    track('location_view',{location_id:l.id,category:l.category_id});
+    track('location_view', { location_id: l.id, category: l.category_id });
     setSelected(l);
     setFloor(l.floor_id);
     setRoute(null);
@@ -117,8 +136,12 @@ export function CampusApp({
     setMissing(false);
     const url = new URL(window.location.href);
     url.searchParams.set('to', l.id);
-    url.searchParams.delete('route');url.searchParams.delete('stage');
-    try{sessionStorage.setItem('ck-building',l.building_id);sessionStorage.setItem('ck-floor',l.floor_id);}catch{}
+    url.searchParams.delete('route');
+    url.searchParams.delete('stage');
+    try {
+      sessionStorage.setItem('ck-building', l.building_id);
+      sessionStorage.setItem('ck-floor', l.floor_id);
+    } catch {}
     window.history.replaceState(null, '', url);
   }
   const nav = (
@@ -169,13 +192,27 @@ export function CampusApp({
           <button
             className="locale"
             aria-label={en ? 'Switch to Dutch' : 'Switch to English'}
-            onClick={() => {const next=en?'nl':'en';try{localStorage.setItem('ck-locale',next);}catch{}setLocale(next);}}
+            onClick={() => {
+              const next = en ? 'nl' : 'en';
+              try {
+                localStorage.setItem('ck-locale', next);
+              } catch {}
+              setLocale(next);
+            }}
           >
             {en ? 'EN / NL' : 'NL / EN'}
           </button>
         </div>
       </header>
-      <main id="main" className={"page-wrap "+(view==='map'?'map-page '+(selected?'has-selection':''):'')}>
+      <main
+        id="main"
+        className={
+          'page-wrap ' +
+          (view === 'map'
+            ? 'map-page ' + (selected ? 'has-selection' : '')
+            : '')
+        }
+      >
         {unavailable && (
           <div role="status" className="notice">
             {en
@@ -196,8 +233,29 @@ export function CampusApp({
         )}
         {view === 'map' ? (
           <>
-            <div className="intro-line"><h1>{en?'Where are you heading?':'Waar moet je heen?'}</h1><span className="campus-label">Rengerslaan 8 & 10</span></div>
-            {hasOrigin&&<div className="origin-banner"><strong>{qrOrigin?(en?'You are here':'Je bent hier'):(en?'Starting point selected':'Startpunt gekozen')}</strong><span>{data.nodes.find(n=>n.id===from)?.label[locale]}</span></div>}
+            <div className="intro-line">
+              <h1>{en ? 'Where are you heading?' : 'Waar moet je heen?'}</h1>
+              <span className="campus-label">Rengerslaan 8 & 10</span>
+            </div>
+            {hasOrigin && (
+              <div className="origin-banner">
+                <strong>
+                  {qrOrigin
+                    ? en
+                      ? 'You are here'
+                      : 'Je bent hier'
+                    : en
+                      ? 'Starting point selected'
+                      : 'Startpunt gekozen'}
+                </strong>
+                <span>
+                  {
+                    data.nodes.find((n) => n.id === originEndpoint?.nodeId)
+                      ?.label[locale]
+                  }
+                </span>
+              </div>
+            )}
             {missing && (
               <div className="notice" role="status">
                 {en
@@ -281,7 +339,11 @@ export function CampusApp({
                       data={data}
                       floor={floor}
                       selected={selected}
-                      from={routing||hasOrigin?from:''}
+                      from={
+                        routing || hasOrigin
+                          ? (originEndpoint?.nodeId ?? '')
+                          : ''
+                      }
                       route={route}
                       onSelect={select}
                       locale={locale}
@@ -304,13 +366,20 @@ export function CampusApp({
                       to={selected}
                       locale={locale}
                       from={from}
-                      setFrom={(id)=>{setFrom(id);setHasOrigin(true);setQrOrigin(false);}}
+                      setFrom={(id) => {
+                        setFrom(id);
+                        setHasOrigin(true);
+                        setQrOrigin(false);
+                      }}
                       onRoute={setRoute}
                       onStop={() => {
                         setRouting(false);
                         setRoute(null);
                         setPicking(false);
-                        const u=new URL(window.location.href);u.searchParams.delete('route');u.searchParams.delete('stage');window.history.replaceState(null,'',u);
+                        const u = new URL(window.location.href);
+                        u.searchParams.delete('route');
+                        u.searchParams.delete('stage');
+                        window.history.replaceState(null, '', u);
                       }}
                       onFloor={setFloor}
                       onPick={() => setPicking(true)}
@@ -331,7 +400,36 @@ export function CampusApp({
                     />
                   )
                 ) : (
-                  <section className="panel welcome-panel"><span className="badge">{en?'FIND YOUR WAY':'VIND JE WEG'}</span><h2>{en?'Your next stop.':'Je volgende bestemming.'}</h2><p>{en?'Enter a room code or choose a facility. We will show the building, floor and place on the map.':'Vul een lokaalcode in of kies een voorziening. Je ziet meteen het gebouw, de verdieping en de plek op de kaart.'}</p><div className="welcome-example"><span>F</span><span>3</span><span>025</span><small>{en?'Zone':'Zone'}</small><small>{en?'Floor':'Verdieping'}</small><small>{en?'Room':'Lokaal'}</small></div><Link className="text-link" href="/tips">{en?'Help with your first week':'Hulp bij je eerste week'} →</Link><Link className="text-link" href="/gems">{en?'Discover campus tips':'Ontdek campustips'} →</Link></section>
+                  <section className="panel welcome-panel">
+                    <span className="badge">
+                      {en ? 'FIND YOUR WAY' : 'VIND JE WEG'}
+                    </span>
+                    <h2>
+                      {en ? 'Your next stop.' : 'Je volgende bestemming.'}
+                    </h2>
+                    <p>
+                      {en
+                        ? 'Enter a room code or choose a facility. We will show the building, floor and place on the map.'
+                        : 'Vul een lokaalcode in of kies een voorziening. Je ziet meteen het gebouw, de verdieping en de plek op de kaart.'}
+                    </p>
+                    <div className="welcome-example">
+                      <span>F</span>
+                      <span>3</span>
+                      <span>025</span>
+                      <small>{en ? 'Zone' : 'Zone'}</small>
+                      <small>{en ? 'Floor' : 'Verdieping'}</small>
+                      <small>{en ? 'Room' : 'Lokaal'}</small>
+                    </div>
+                    <Link className="text-link" href="/tips">
+                      {en
+                        ? 'Help with your first week'
+                        : 'Hulp bij je eerste week'}{' '}
+                      →
+                    </Link>
+                    <Link className="text-link" href="/gems">
+                      {en ? 'Discover campus tips' : 'Ontdek campustips'} →
+                    </Link>
+                  </section>
                 )}
               </aside>
             </div>
@@ -347,7 +445,7 @@ export function CampusApp({
             onToast={setToast}
           />
         ) : (
-          <TipsPage data={data} locale={locale}/>
+          <TipsPage data={data} locale={locale} />
         )}
         <footer className="page-footer">
           <span>

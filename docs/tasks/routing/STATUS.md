@@ -2,39 +2,41 @@
 
 Last updated: 2026-09-09
 
-## Current state
+## Completed phase
 
-- Existing CampusKompas codebase is on `main` in `maxcrijnen-alt/campuskompas`.
-- GitHub → Vercel production deployment is connected and working.
-- Vercel build-context issue caused by `.vercelignore` has been fixed in commit `f528b40b7517a125e001c2216d2f62f9d6fed339`.
-- Existing Supabase project `campuskompas` is active.
-- Universal routing implementation has **not yet started under this phased workflow**.
+**Phase 1 — Audit & routing architecture** is complete.
 
-## Active phase
+- Production data was audited directly against Supabase project `campuskompas`.
+- Routing now uses one central endpoint resolver for start and destination locations.
+- Direct mappings are accepted only when the node exists, matches the location floor/building, belongs to the main component, and can reach and be reached from that component.
+- A reusable `pnpm routing:audit` command reports graph and endpoint health and exits non-zero for critical endpoint or graph errors.
+- No database migration was needed: Phase 1 introduced no structural database change and the required foreign keys and indexes already exist.
 
-**Phase 1 — Audit & routing architecture**
+## Verified production baseline
 
-Read `INDEX.md`, then MASTER sections 1–5, 10–13 and 38–39.
+- 606 locations; all 606 approved.
+- 576 rooms; all 576 public and linked to a location.
+- 520 route nodes and 535 route edges.
+- 606 direct endpoint mappings; 0 inferred; 0 `needs_review`; 0 unavailable.
+- 100% routing endpoint coverage for approved locations and public rooms.
+- 0 invalid node references, floor/building mismatches, invalid edges, or public locations outside the main component.
+- 7 weakly connected components: `[514, 1, 1, 1, 1, 1, 1]`.
+- The six isolated nodes are unused legacy seed entries: `R8-1-entry`, `R8-2-entry`, `R8-3-entry`, `R10-1-entry`, `R10-2-entry`, and `R10-3-entry`.
+- All 535 edges are bidirectional, so all 514 nodes in the main component have two-way reachability.
+- iShop (`0.26`) resolves directly to `loc-ishop`; F3.025 resolves directly to `plan-R10-3-29_96-47_066`.
+- One canonical room-code collision remains for Phase 3: R10 `C0.102` and R8 `C0.1.02` both normalize to `C0102`.
 
-## Known baseline from the supplied audit
+## Verification
 
-Treat these as starting assumptions to verify against the live code/data before changing behavior:
-- ~606 locations;
-- 576 rooms;
-- ~217 locations without `node_id`;
-- ~7 locations with nodes outside the main component;
-- main route component ~460 nodes;
-- another component ~54 nodes plus some isolated nodes;
-- iShop 0.26 currently lacks an explicit `node_id` while F3.025 has one.
+- `pnpm routing:audit`: pass, 0 critical issues.
+- Targeted endpoint/graph tests: pass, 9 passed.
+- `pnpm test`: pass, 48 passed and 1 live test skipped without test-account variables.
+- `pnpm lint`: pass.
+- `pnpm typecheck`: pass.
+- `pnpm build`: pass.
 
-## Handoff rule
+## Next active phase
 
-After each phase, replace this section with:
-- completed work;
-- verified metrics that future phases actually need;
-- migrations/scripts added;
-- tests/checks run and their status;
-- unresolved blockers or `needs_review` items;
-- next active phase.
+**Phase 2 — Endpoint coverage & graph repair**
 
-Keep this file concise. Detailed requirements belong in `MASTER.md`; implementation details belong in code/docs/tests.
+No blocking dependency. Phase 2 should classify and remove or archive the six unused isolated entry nodes through a migration, then add the required all-location and critical-pair regression checks without changing the verified 100% endpoint coverage.
