@@ -40,4 +40,16 @@ describe('Phase 5 accessibility semantics', () => {
     expect(report.publicLocationsConfirmedAccessible).toBe(0);
     expect(report.criticalPairs.every((pair) => pair.stairs === 0)).toBe(true);
   });
+
+  it('reports impossible stair accessibility as an error', () => {
+    const stairs = seed.edges.find((edge) => edge.edge_type === 'stairs')!;
+    const report = auditAccessibility({
+      ...seed,
+      edges: seed.edges.map((edge) =>
+        edge.id === stairs.id ? { ...edge, accessible: true } : edge,
+      ),
+    });
+    expect(report.errorCount).toBe(1);
+    expect(report.contradictions).toEqual([stairs.id]);
+  });
 });

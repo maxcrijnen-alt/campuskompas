@@ -268,6 +268,8 @@ test('real Supabase submission, photo moderation, publishing and deduplicated li
     await page.reload();
     const publicCard = page.locator('article').filter({ hasText: title });
     await expect(publicCard).toBeVisible();
+    await expect(publicCard.getByRole('link', { name: 'Bekijk kaart' })).toHaveAttribute('href', '/map?to=library');
+    await expect(publicCard.getByRole('link', { name: 'Route hierheen' })).toHaveAttribute('href', '/map?to=library&navigate=1');
     await publicCard.getByRole('button', { name: 'Like ' + title }).click();
     await expect(
       publicCard.getByRole('button', { name: 'Like ' + title }),
@@ -291,6 +293,81 @@ test('real Supabase submission, photo moderation, publishing and deduplicated li
       if (data?.photo_path)
         await db.storage.from('gem-photos').remove([data.photo_path]);
     }
+  }
+});
+test('admin links a proposed gem to one validated canonical location', async ({ page }) => {
+  test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
+  const title = 'QA link proposal ' + Date.now();
+  const { data, error } = await serviceDb().from('hidden_gems').insert({
+    title,
+    description: 'Temporary proposed location for the admin linking test.',
+    category: 'study',
+    location_id: null,
+    location_review_status: 'proposed',
+    proposed_location_name: 'QA proposed study spot',
+    proposed_location_description: 'Exact location must be selected by a moderator.',
+    status: 'pending',
+    slug: crypto.randomUUID(),
+  }).select('id').single();
+  expect(error).toBeNull();
+  try {
+    await page.goto('/admin/gems');
+    await page.getByLabel('E-mail', { exact: true }).fill(process.env.TEST_ADMIN_EMAIL!);
+    await page.getByLabel('Wachtwoord / Password').fill(process.env.TEST_ADMIN_PASSWORD!);
+    await page.getByRole('button', { name: 'Inloggen / Sign in' }).click();
+    const card = page.locator('article').filter({ hasText: title });
+    await card.getByLabel('Canonieke locatie / Canonical location').selectOption('library');
+    await expect.poll(async () => (await serviceDb().from('hidden_gems').select('location_id,location_review_status,proposed_location_name').eq('id', data!.id).single()).data).toMatchObject({
+      location_id: 'library',
+      location_review_status: 'approved',
+      proposed_location_name: null,
+    });
+  } finally {
+    await serviceDb().from('hidden_gems').delete().eq('id', data!.id);
+  }
+});
+
+test('admin rejects a wrong-floor endpoint and validates a real endpoint', async ({ page }) => {
+  test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
+  const id = 'qa-location-' + Date.now();
+  await page.goto('/admin/locations');
+  await page.getByLabel('E-mail', { exact: true }).fill(process.env.TEST_ADMIN_EMAIL!);
+  await page.getByLabel('Wachtwoord / Password').fill(process.env.TEST_ADMIN_PASSWORD!);
+  await page.getByRole('button', { name: 'Inloggen / Sign in' }).click();
+  await expect(page.getByRole('button', { name: 'Nieuw / New' })).toBeVisible();
+  const base = {
+    id,
+    name: { nl: 'QA tijdelijke locatie', en: 'QA temporary location' },
+    description: { nl: 'Wordt na de test verwijderd.', en: 'Removed after the test.' },
+    building_id: 'R8',
+    floor_id: 'R8-0',
+    category_id: 'study',
+    room_code: null,
+    aliases: [],
+    node_id: null,
+    x: 180,
+    y: 230,
+    status: 'pending',
+    verification_status: 'unverified',
+    source_id: 'campus',
+    hours_id: null,
+    routing_status: 'needs_review',
+    endpoint_source: null,
+  };
+  try {
+    expect((await page.request.post('/api/admin/locations', { data: base })).status()).toBe(200);
+    expect((await page.request.post('/api/admin/locations', { data: { ...base, node_id: 'plan-R10-3-29_96-47_066' } })).status()).toBe(400);
+    expect((await page.request.post('/api/admin/locations', { data: { ...base, node_id: 'plan-R8-0-14-29_2', status: 'approved', verification_status: 'verified' } })).status()).toBe(200);
+    const saved = await serviceDb().from('locations').select('node_id,routing_status,endpoint_source,status,verification_status').eq('id', id).single();
+    expect(saved.data).toMatchObject({
+      node_id: 'plan-R8-0-14-29_2',
+      routing_status: 'direct',
+      endpoint_source: 'manual',
+      status: 'approved',
+      verification_status: 'verified',
+    });
+  } finally {
+    await serviceDb().from('locations').delete().eq('id', id);
   }
 });
 test('admin can edit data, produce QR and inspect maps; landing screenshot', async ({

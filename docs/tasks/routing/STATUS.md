@@ -1,6 +1,6 @@
 # CampusKompas routing status
 
-Last updated: 2026-09-09
+Last updated: 2026-09-10
 
 ## Completed phases
 
@@ -62,7 +62,7 @@ Last updated: 2026-09-09
 
 ## Verification
 
-- Phase 5 accessibility, normalization, routing, validation, and experience unit/integration suite: pass, 86/86.
+- Phase 5 accessibility, normalization, routing, validation, and experience unit/integration suite: pass, 87/87, including rejection of contradictory stair accessibility metadata.
 - Phase 4 required-pair experience audit: pass, 9/9 routes and 0 critical issues.
 - pnpm search:audit: pass, 606/606 From and To, 0 critical issues.
 - pnpm routing:audit: pass, 0 critical issues.
@@ -71,7 +71,7 @@ Last updated: 2026-09-09
 - Route browser acceptance: pass, 5/5 targeted checks on desktop and mobile.
 - Official-plan browser verification: pass, 8/8 floor images load at 1489 × 1489 and fit at 320 px.
 - pnpm seed:check: pass, 181 records validated.
-- pnpm test:e2e: pass, 15/15 against the real Supabase project, including admin, Storage, moderation, proposal, BRÛZE, mobile, map, opening-hours, and wheelchair behavior.
+- pnpm test:e2e: pass, 17/17 against the real Supabase project, including admin, Storage, moderation, proposal-to-canonical linking, wrong-floor endpoint rejection, BRÛZE, mobile, map, opening-hours, and wheelchair behavior.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.
