@@ -22,6 +22,7 @@ export type Category = {
   name: Text;
   icon: string;
   aliases: string[];
+  hours_relevant: boolean;
 };
 export type Location = {
   map_x?: number | null;
@@ -42,7 +43,7 @@ export type Location = {
   status: string;
   verification_status: Verification;
   source_id: string;
-  hours_id?: string;
+  hours_id?: string | null;
   routing_status?: 'direct' | 'inferred' | 'needs_review' | 'unavailable';
   endpoint_source?: 'existing_mapping' | 'manual' | 'inferred' | null;
 };
@@ -104,6 +105,7 @@ export type Gem = {
   status: 'pending' | 'approved' | 'rejected' | 'archived';
   featured: boolean;
   photo_path: string | null;
+  hours_id?: string | null;
   likes: number;
   demo?: boolean;
 };
@@ -115,6 +117,9 @@ export type Hours = {
   verification_status: Verification;
   exceptions_reviewed_through: string | null;
   source_url: string;
+  hours_kind: 'physical_opening' | 'building_access' | 'service_contact';
+  display_note: Text;
+  timezone: 'Europe/Amsterdam';
 };
 export type Source = {
   id: string;

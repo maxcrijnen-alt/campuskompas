@@ -1,2 +1,13 @@
-import {defineConfig} from 'vitest/config';
-export default defineConfig({test:{include:['tests/**/*.test.ts'],exclude:['tests/e2e/**'],testTimeout:30000}});
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vitest/config';
+
+export default defineConfig({
+  resolve: {
+    alias: { '@': fileURLToPath(new URL('.', import.meta.url)) },
+  },
+  test: {
+    include: ['tests/**/*.test.ts'],
+    exclude: ['tests/e2e/**'],
+    testTimeout: 30_000,
+  },
+});

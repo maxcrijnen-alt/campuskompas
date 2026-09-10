@@ -7,7 +7,7 @@ import type {
   Text,
 } from './types';
 const bi = (nl: string, en = nl): Text => ({ nl, en });
-const checked = '2026-09-08';
+const checked = '2026-09-10';
 const sources = [
   {
     id: 'campus',
@@ -82,6 +82,18 @@ const categories: Category[] = categoryRows.map(
     name: bi(nl, en),
     icon,
     aliases: aliases.split(' '),
+    hours_relevant: [
+      'library',
+      'coffee',
+      'food',
+      'canteen',
+      'cafe',
+      'info',
+      'reception',
+      'service',
+      'entrance',
+      'document',
+    ].includes(id),
   }),
 );
 const buildings = [
@@ -266,14 +278,14 @@ const rows: Entry[] = [
   ],
   [
     'ishop',
-    'iShop',
-    'iShop',
+    'iShop (voormalig)',
+    'iShop (former)',
     'R8',
     'service',
     0,
     620,
     'guide',
-    'Ondersteuning en uitleen volgens campusgids.',
+    'Historisch routepunt op R8. De actuele Campus Store is samengevoegd met het Document Center op R10; de exacte actuele kaartpositie moet nog worden bevestigd.',
     '0.26',
   ],
   [
@@ -322,14 +334,14 @@ const rows: Entry[] = [
   ],
   [
     'document-centre',
-    'Documentcentrum',
-    'Document Centre',
+    'Documentcentrum (voormalig)',
+    'Document Centre (former)',
     'R10',
     'document',
     0,
     375,
     'guide',
-    'Printen en inbinden volgens de campusgids.',
+    'Historisch routepunt. Het Document Center is samengevoegd in de Campus Store op R10; de actuele baliepositie moet nog worden bevestigd.',
     'E0.006',
   ],
   [
@@ -351,12 +363,14 @@ const english: Record<string, string> = {
   'central-brew': 'Coffee in the central hall.',
   canteen: 'A selection of food counters on campus.',
   'student-info': 'Help with practical questions about your studies.',
-  ishop: 'Support and equipment loans listed in the campus guide.',
+  ishop:
+    'Historic R8 route point. The current Campus Store was merged with the Document Center at R10; its exact current map position still needs confirmation.',
   brandstof: 'A place for a drink or lunch.',
   espresso: 'Coffee and tea in the central hall.',
   'food-court': 'Meals and seating around the central pit.',
   'service-desk': 'IT and facilities help in the central hall.',
-  'document-centre': 'Printing and binding listed in the campus guide.',
+  'document-centre':
+    'Historic route point. The Document Center was merged into the Campus Store at R10; the current desk position still needs confirmation.',
   F3025:
     'Zone F, third floor. Numbering example in the campus guide; current room status requires confirmation.',
 };
@@ -395,7 +409,9 @@ const locations: Location[] = rows.map(
       endpoint_source: 'existing_mapping',
       verification_status: source === 'guide' ? 'needs_review' : 'verified',
       source_id: source,
-      ...(id === 'library' ? { hours_id: 'library' } : {}),
+      ...(id === 'library' || id === 'student-info'
+        ? { hours_id: id === 'library' ? 'library' : 'student-info-contact' }
+        : {}),
     };
   },
 );
@@ -423,7 +439,10 @@ for (const b of buildings)
   });
 const weekly = (open: string, close: string, friday = close) =>
   Object.fromEntries(
-    [1, 2, 3, 4, 5].map((d) => [String(d), [[open, d === 5 ? friday : close]]]),
+    [0, 1, 2, 3, 4, 5, 6].map((day) => [
+      String(day),
+      day === 0 || day === 6 ? [] : [[open, day === 5 ? friday : close]],
+    ]),
   ) as Record<string, [string, string][]>;
 export const seed: CampusData = {
   buildings,
@@ -440,23 +459,78 @@ export const seed: CampusData = {
     active: true,
   })),
   hours: [
-    { id: 'R8', weekly: weekly('07:30', '18:00'), source_url: sources[0].url },
+    {
+      id: 'R8',
+      weekly: weekly('07:30', '18:00'),
+      source_url: sources[0].url,
+      hours_kind: 'building_access' as const,
+      display_note: bi(
+        'Gebouwuren; vakanties en extreem weer kunnen afwijken.',
+        'Building hours; holidays and extreme weather may differ.',
+      ),
+      verification_status: 'verified' as const,
+      exceptions_reviewed_through: '2026-10-11',
+    },
     {
       id: 'R10',
       weekly: weekly('07:30', '22:00', '18:00'),
       source_url: sources[0].url,
+      hours_kind: 'building_access' as const,
+      display_note: bi(
+        'Gebouwuren; vakanties en extreem weer kunnen afwijken.',
+        'Building hours; holidays and extreme weather may differ.',
+      ),
+      verification_status: 'verified' as const,
+      exceptions_reviewed_through: '2026-10-11',
     },
     {
       id: 'library',
       weekly: weekly('08:30', '17:00'),
       source_url: sources[2].url,
+      hours_kind: 'physical_opening' as const,
+      display_note: bi(
+        'Tijdens de herfstvakantie, 12 t/m 16 oktober 2026, is de bibliotheek geopend van 09:00 tot 13:00.',
+        'During the autumn break, 12–16 October 2026, the library is open from 09:00 to 13:00.',
+      ),
+      verification_status: 'verified' as const,
+      exceptions_reviewed_through: '2026-10-16',
+      exceptions: Object.fromEntries(
+        [12, 13, 14, 15, 16].map((day) => [
+          `2026-10-${day}`,
+          [['09:00', '13:00'] as [string, string]],
+        ]),
+      ),
     },
-  ].map((h) => ({
-    ...h,
+    {
+      id: 'student-info-contact',
+      weekly: weekly('08:30', '16:30'),
+      source_url:
+        'https://www.nhlstenden.com/werken-en-studeren/kom-in-contact',
+      hours_kind: 'service_contact' as const,
+      display_note: bi(
+        'Dit zijn telefoontijden. WhatsApp is op werkdagen bereikbaar van 09:30 tot 16:30; fysieke balie-uren zijn niet bevestigd.',
+        'These are phone hours. WhatsApp is available on weekdays from 09:30 to 16:30; physical desk hours are not confirmed.',
+      ),
+      verification_status: 'verified' as const,
+      exceptions_reviewed_through: '2026-10-11',
+    },
+    {
+      id: 'bruze',
+      weekly: {},
+      source_url: sources[1].url,
+      hours_kind: 'physical_opening' as const,
+      display_note: bi(
+        'De officiële cateringpagina noemt 09:00–18:00, maar vermeldt geen weekdagen. Daarom tonen we geen open/gesloten-claim.',
+        'The official catering page states 09:00–18:00 but does not specify weekdays, so no open/closed claim is shown.',
+      ),
+      verification_status: 'needs_review' as const,
+      exceptions_reviewed_through: null,
+    },
+  ].map((hours) => ({
     exceptions: {},
+    ...hours,
     verified_at: checked,
-    verification_status: 'verified',
-    exceptions_reviewed_through: null,
+    timezone: 'Europe/Amsterdam' as const,
   })),
   tips: [
     {

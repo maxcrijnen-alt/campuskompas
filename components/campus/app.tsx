@@ -487,7 +487,7 @@ export function CampusApp({
             {en ? 'Independent campus concept' : 'Onafhankelijk campusconcept'}
           </span>
           <span>
-            {en ? 'Sources checked' : 'Bronnen gecontroleerd'} 08.09.2026
+            {en ? 'Sources checked' : 'Bronnen gecontroleerd'} 10.09.2026
           </span>
           <Link href="/admin">{en ? 'Administration' : 'Beheer'}</Link>
         </footer>

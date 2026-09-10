@@ -105,7 +105,9 @@ describe('routing', () => {
       true,
     );
     expect(route?.accessibility).toBe('partially_unknown');
-    expect(route?.edges.some((edge) => edge.edge_type === 'stairs')).toBe(false);
+    expect(route?.edges.some((edge) => edge.edge_type === 'stairs')).toBe(
+      false,
+    );
   });
   it('uses lifts and avoids all stairs for verified accessible graph', () => {
     const nodes = seed.nodes.map((n) => ({
@@ -159,7 +161,10 @@ describe('opening hours and Amsterdam DST', () => {
   };
   it('does not claim open without reviewed exceptions', () =>
     expect(
-      openingStatus(seed.hours[2], new Date('2026-09-08T10:00:00Z')),
+      openingStatus(
+        { ...seed.hours[2], exceptions_reviewed_through: null },
+        new Date('2026-09-08T10:00:00Z'),
+      ),
     ).toBeNull());
   it('uses Amsterdam time and close boundary', () => {
     expect(openingStatus(h, new Date('2026-09-08T14:59:00Z'), 'en')).toBe(
@@ -176,10 +181,12 @@ describe('opening hours and Amsterdam DST', () => {
         new Date('2026-09-08T10:00:00Z'),
       ),
     ).toBe('Gesloten · opent morgen om 08:30');
-    expect(openingStatus(h, new Date('2026-09-12T10:00:00Z'))).toBeNull();
+    expect(openingStatus(h, new Date('2026-09-12T10:00:00Z'))).toBe(
+      'Gesloten · opent maandag 08:30',
+    );
   });
   it('hides stale and unverified data', () => {
-    expect(openingStatus(h, new Date('2026-11-08T10:00:00Z'))).toBeNull();
+    expect(openingStatus(h, new Date('2026-12-10T10:00:00Z'))).toBeNull();
     expect(
       openingStatus(
         { ...h, verification_status: 'unverified' },
@@ -234,7 +241,8 @@ describe('public input validation', () => {
         location_mode: 'proposed',
         location_id: '',
         proposed_location_name: 'Nieuwe studienis',
-        proposed_location_description: 'Naast de grote trap op de begane grond.',
+        proposed_location_description:
+          'Naast de grote trap op de begane grond.',
       }).success,
     ).toBe(true));
   it('does not accept accessible stairs', () =>

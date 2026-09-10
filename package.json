@@ -20,6 +20,7 @@
     "routing:experience-audit": "tsx scripts/route-experience-audit.ts",
     "routing:audit-accessibility": "tsx scripts/accessibility-audit.ts",
     "search:audit": "tsx scripts/search-audit.ts",
+    "hours:audit": "tsx scripts/hours-audit.ts",
     "seed": "tsx scripts/seed.ts",
     "seed:check": "tsx scripts/seed.ts --check"
   },

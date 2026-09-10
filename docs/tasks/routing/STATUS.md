@@ -4,7 +4,7 @@ Last updated: 2026-09-10
 
 ## Completed phases
 
-**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, **Phase 4 — Route experience**, and **Phase 5 — Accessibility, admin & Hidden Gems / BRÛZE** are complete.
+**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, **Phase 4 — Route experience**, **Phase 5 — Accessibility, admin & Hidden Gems / BRÛZE**, and **Phase 5.5 — Visual polish, operational data & opening hours** are complete.
 
 - Routing uses one central endpoint resolver for start and destination locations.
 - From and To now use the same endpoint-validated location universe and the same search/result component.
@@ -20,6 +20,8 @@ Last updated: 2026-09-10
 - Accessibility now has explicit `accessible`, `inaccessible`, and `unknown` semantics. Wheelchair routing always excludes stairs and confirmed inaccessible records, may use unknown records, and never describes an unknown route as confirmed.
 - Hidden Gem submissions can select the central routeable location universe or propose a place without creating a location or route endpoint. Only a valid canonical link enables map and route actions.
 - Admin now exposes stored routing status, endpoint source, same-floor endpoint selection, location verification controls, gem-location linking, and a live routing/accessibility health summary.
+- The visual system now uses shared color, spacing, radius, shadow, focus, button, card, badge, route, and accessibility tokens. From/To, route stages, details, Hidden Gems, empty states, and the changed admin screens use the same hierarchy on mobile and desktop.
+- Opening hours use one Europe/Amsterdam-aware engine for regular schedules, date-specific exceptions, multiple periods, closed days, next opening, and conservative verification labels.
 
 ## Verified production metrics
 
@@ -60,9 +62,26 @@ Last updated: 2026-09-10
 - The approved Bruze gem remains published, but its inaccurate `R10_MAIN` link was removed. Current official information places Café BRÛZE at Rengerslaan 1; no canonical location was created because its exact plan position, entrance, floor context, endpoint, and accessibility are not verified. The gem is now a `needs_review` location proposal and exposes no false map or route action.
 - The Phase 5 migration added constrained location routing metadata, nullable canonical gem links, structured proposal fields, foreign keys and indexes. Existing RLS remains enforced; public clients still see approved content only and cannot moderate it.
 
+## Phase 5.5 opening-hours and operational-data audit
+
+- 14 named facilities were researched: Rengerslaan 8, Rengerslaan 10, Bibliotheek, Campus Store / legacy iShop, Student Info, Service Desk, Central Brew, Café IF, Canteen, Café Brandstof, Espresso Bar, Food Court, Document Centre, and BRÛZE.
+- The approved location universe contains 13 hours-relevant facilities. Four locations have verified records: Bibliotheek has physical opening hours; R8 and R10 have building-access hours; Student Info has service/contact hours. BRÛZE has a separate `needs_review` record linked to its Hidden Gem. Nine approved facilities have no sufficiently current, unambiguous schedule and therefore make no open/closed claim.
+- Verified schedules: R8 Monday–Friday 07:30–18:00; R10 Monday–Thursday 07:30–22:00 and Friday 07:30–18:00; Bibliotheek Monday–Friday 08:30–17:00; Student Info phone Monday–Friday 08:30–16:30, with its source-backed WhatsApp window 09:30–16:30 stated only as a note. Weekends are closed for R8, R10, Bibliotheek, and the Student Info contact schedule.
+- Bibliotheek has five date-specific exceptions for 12–16 October 2026, each 09:00–13:00. The exception wins over the regular week and is labelled as an adjusted opening time.
+- The current catering page confirms which campus venues exist but no longer publishes unambiguous exact schedules for Central Brew, Brandstof, Café IF, Canteen, Espresso Bar, or Food Court. Their `hours_id` stays null. Older schedules were not promoted to current facts.
+- The same page states 09:00–18:00 for BRÛZE without naming weekdays. This is preserved as source-backed context with `needs_review`, an empty weekly schedule, and no Open/Closed claim. Its route/location remains independently unverified.
+- Student Info phone and WhatsApp availability is explicitly `service_contact`; the UI does not present either as confirmed physical desk opening.
+- Recent official information describes a Campus Store on R10 and confirms that the former shop and Document Center were merged. `ishop` and `document-centre` now identify former/legacy points with `needs_review`. The existing iShop endpoint and deep links remain compatible, but no current Campus Store endpoint is invented until its exact R10 desk position is verified.
+- Primary sources checked on 2026-09-10: the [Leeuwarden campus page](https://www.nhlstenden.com/locaties/leeuwarden), [Library opening-hours page](https://www.nhlstenden.com/bibliotheek/over-de-bibliotheek/openingstijden), [Library autumn-break notice](https://www.nhlstenden.com/bibliotheek/nieuws/aangepaste-openingstijden-nhl-stenden-bibliotheken), [campus catering page](https://www.nhlstenden.com/locaties/leeuwarden/catering), [Student Info contact page](https://www.nhlstenden.com/werken-en-studeren/kom-in-contact), and [NHL Stenden annual report 2025](https://publicaties.nhlstenden.com/jaarverslag-2025/de-leer--en-werkomgeving).
+- `hours:audit`: 606 approved locations; 13 hours-relevant facilities; 4 linked location records; 4 verified schedules; 1 needs-review schedule; 0 unverified schedules; 2 physical schedule records (one verified, one needs review); 2 building schedules; 1 service/contact schedule; 1 exception record covering 5 dates; 0 missing source URLs, 0 stale verification dates, 0 suspicious links, 0 orphan hours records, and 0 critical issues. 593 ordinary rooms/toilets/stairs and other non-hours locations are correctly ignored.
+- Migration `20260910012005_phase55_operational_hours.sql` was applied to production with exactly the same timestamp and identity. It adds hours relevance, constrained scope, bilingual notes, Europe/Amsterdam timezone, the Hidden Gem hours foreign key/index, current records, and legacy facility corrections. Older local/remote migration-history drift remains an explicit Phase 6 follow-up; Phase 5.5 introduced no new drift.
+- The location-details hierarchy puts relevant hours before secondary description without displacing route/map actions. The compact card shows current state first, expands the week on demand, highlights today and exceptions, and keeps source/provenance secondary. Hours cards are omitted data-driven for rooms, toilets, stairs, lifts, and other irrelevant categories.
+- Visual browser checks passed at 320, 375, and 390 px plus desktop: no horizontal overflow, usable touch controls and floor selector, a readable map and route instruction, distinct start/route/transition/destination states, compact From/To, and scan-friendly details/Hidden Gems. Accessibility status remains textual as well as colored, and no unknown route is described as confirmed accessible.
+- Admin now edits hours as structured fields: scope, status, weekdays, multiple periods, closed days/exceptions, source, verification dates, reviewed-through date, bilingual notes, and linked locations/gems. Invalid times, overlaps, dates, days, sources, and verified records without provenance are rejected.
+
 ## Verification
 
-- Phase 5 accessibility, normalization, routing, validation, and experience unit/integration suite: pass, 87/87, including rejection of contradictory stair accessibility metadata.
+- Phase 5.5 hours, UI rendering, accessibility, normalization, routing, validation, and experience unit/integration suite: pass, 101/101, including fixed-clock Europe/Amsterdam and exception coverage.
 - Phase 4 required-pair experience audit: pass, 9/9 routes and 0 critical issues.
 - pnpm search:audit: pass, 606/606 From and To, 0 critical issues.
 - pnpm routing:audit: pass, 0 critical issues.
@@ -70,8 +89,8 @@ Last updated: 2026-09-10
 - pnpm routing:audit-accessibility: pass, 0 graph/data contradictions; unknown verification reported separately.
 - Route browser acceptance: pass, 5/5 targeted checks on desktop and mobile.
 - Official-plan browser verification: pass, 8/8 floor images load at 1489 × 1489 and fit at 320 px.
-- pnpm seed:check: pass, 181 records validated.
-- pnpm test:e2e: pass, 17/17 against the real Supabase project, including admin, Storage, moderation, proposal-to-canonical linking, wrong-floor endpoint rejection, BRÛZE, mobile, map, opening-hours, and wheelchair behavior.
+- pnpm seed:check: pass, 183 records validated.
+- pnpm test:e2e: pass, 21/21 against the real Supabase project, including admin, Storage, moderation, deduplicated likes, proposal-to-canonical linking, wrong-floor endpoint rejection, structured hours editing, BRÛZE, 320/375/390 px mobile layouts, official maps, opening-hour exceptions, and wheelchair behavior.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.
@@ -79,6 +98,6 @@ Last updated: 2026-09-10
 
 ## Next active phase
 
-**Phase 5.5 / Phase 6 — not started**
+**Phase 6 — not started**
 
-No code blocker has been identified. Physical on-campus validation is required before any route or location can be marked confirmed accessible. The R10 lift-to-plan connections and Café BRÛZE map position/entrance are the main verification priorities.
+No code blocker has been identified. Physical on-campus validation is required before any route or location can be marked confirmed accessible. Priority checks are the R10 lift-to-plan connections, the current Campus Store desk/entrance, whether Document Centre still has any separate public counter, the BRÛZE map point/entrance, and current service/hospitality hours where official pages are silent. Phase 6 must also reconcile the pre-existing migration-history timestamp drift and review the existing Supabase advisor items, including leaked-password protection and unused/permissive-policy notices.

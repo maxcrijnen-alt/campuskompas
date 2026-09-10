@@ -30,17 +30,15 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { MapEditor } from './map-editor';
-import type {
-  Gem,
-  Floor,
-} from '@/lib/campus/types';
+import { HoursAdmin } from './hours-admin';
+import type { Gem, Floor, Hours, Location } from '@/lib/campus/types';
 import QRCode from 'qrcode';
 type Row = Record<string, unknown>;
 const sections = [
   ['dashboard', 'Overzicht / Overview', ''],
-  ['reports','Datameldingen / Reports','data_reports'],
-  ['feedback','Gebruikersfeedback / Feedback','user_feedback'],
-  ['sources','Bronnen / Sources','source_records'],
+  ['reports', 'Datameldingen / Reports', 'data_reports'],
+  ['feedback', 'Gebruikersfeedback / Feedback', 'user_feedback'],
+  ['sources', 'Bronnen / Sources', 'source_records'],
   ['locations', 'Locaties / Locations', 'locations'],
   ['rooms', 'Lokalen / Rooms', 'rooms'],
   ['maps', 'Kaarten / Maps', 'floors'],
@@ -61,8 +59,12 @@ export function AdminApp({
   const [email, setEmail] = useState(initialEmail),
     [rows, setRows] = useState<Row[]>([]),
     [locations, setLocations] = useState<Row[]>([]),
+    [relatedGems, setRelatedGems] = useState<Row[]>([]),
     [routeNodes, setRouteNodes] = useState<Row[]>([]),
-    [health, setHealth] = useState<Record<string, Record<string, unknown>> | null>(null),
+    [health, setHealth] = useState<Record<
+      string,
+      Record<string, unknown>
+    > | null>(null),
     [error, setError] = useState(''),
     [loading, setLoading] = useState(false),
     [edit, setEdit] = useState<string | null>(null),
@@ -72,7 +74,7 @@ export function AdminApp({
       locations: 0,
       review: 0,
       maps: 0,
-      reports:0,
+      reports: 0,
     }),
     [qr, setQr] = useState(''),
     [notice, setNotice] = useState('');
@@ -85,19 +87,43 @@ export function AdminApp({
     }
     if (!r.ok) throw Error('Gegevens niet beschikbaar / Data unavailable');
     const v = (await r.json()) as { rows: Row[] };
-    return v.rows;
+    const seen = new Set<string>();
+    return v.rows.filter((row) => {
+      const key = display(row.id ?? row.code);
+      if (!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
   }
   async function refresh() {
     setLoading(true);
     setError('');
     try {
       if (table) {
-        const loaded=await read(table);setRows(loaded);
-        if(table==='hidden_gems')setLocations(await read('locations'));
-        if(table==='locations')setRouteNodes(await read('route_nodes'));
-        const id=new URLSearchParams(window.location.search).get('edit');const record=id&&loaded.find(r=>r.id===id);if(record)setEdit(JSON.stringify(record,null,2));
-      }
-      else {
+        const relatedPromise =
+          table === 'opening_hours'
+            ? Promise.all([read('locations'), read('hidden_gems')])
+            : table === 'hidden_gems'
+              ? read('locations').then((linkedLocations) => [linkedLocations])
+              : table === 'locations'
+                ? read('route_nodes').then((linkedNodes) => [linkedNodes])
+                : Promise.resolve([]);
+        const [loaded, related] = await Promise.all([
+          read(table),
+          relatedPromise,
+        ]);
+        setRows(loaded);
+        if (table === 'hidden_gems') setLocations(related[0]);
+        if (table === 'locations') setRouteNodes(related[0]);
+        if (table === 'opening_hours') {
+          const [linkedLocations, linkedGems] = related;
+          setLocations(linkedLocations);
+          setRelatedGems(linkedGems);
+        }
+        const id = new URLSearchParams(window.location.search).get('edit');
+        const record = id && loaded.find((r) => r.id === id);
+        if (record) setEdit(JSON.stringify(record, null, 2));
+      } else {
         const [g, l, f, reports, healthResponse] = await Promise.all([
           read('hidden_gems'),
           read('locations'),
@@ -105,14 +131,15 @@ export function AdminApp({
           read('data_reports'),
           fetch('/api/admin/routing-health'),
         ]);
-        if(!healthResponse.ok)throw Error('Routing health niet beschikbaar / unavailable');
+        if (!healthResponse.ok)
+          throw Error('Routing health niet beschikbaar / unavailable');
         setHealth(await healthResponse.json());
         setStats({
           pending: g.filter((x) => x.status === 'pending').length,
           locations: l.length,
           review: l.filter((x) => x.verification_status !== 'verified').length,
           maps: f.length,
-          reports:reports.filter(r=>r.status==='pending').length,
+          reports: reports.filter((r) => r.status === 'pending').length,
         });
         setRows(
           [...g, ...l, ...reports]
@@ -270,17 +297,23 @@ export function AdminApp({
                     {sections.find((s) => s[0] === section)?.[1] ?? 'Overzicht'}
                   </h1>
                 </div>
-                {table && !['hidden_gems','data_reports','user_feedback'].includes(table) && (
-                  <button
-                    className="secondary-button"
-                    onClick={() =>
-                      setEdit(JSON.stringify(defaultRow(table), null, 2))
-                    }
-                  >
-                    <Plus size={18} />
-                    Nieuw / New
-                  </button>
-                )}
+                {table &&
+                  ![
+                    'hidden_gems',
+                    'data_reports',
+                    'user_feedback',
+                    'opening_hours',
+                  ].includes(table) && (
+                    <button
+                      className="secondary-button"
+                      onClick={() =>
+                        setEdit(JSON.stringify(defaultRow(table), null, 2))
+                      }
+                    >
+                      <Plus size={18} />
+                      Nieuw / New
+                    </button>
+                  )}
               </div>
               {error && (
                 <p className="notice" role="alert">
@@ -313,16 +346,65 @@ export function AdminApp({
                     <section className="panel admin-routing-health">
                       <h2>Routing health</h2>
                       <div className="stat-row">
-                        <div className="stat"><strong>{display(health.routing.routingCoveragePercent)}%</strong>Coverage</div>
-                        <div className="stat"><strong>{display(health.routing.directMappings)}</strong>Direct</div>
-                        <div className="stat"><strong>{display(health.routing.inferredMappings)}</strong>Inferred</div>
-                        <div className="stat"><strong>{display(health.routing.needsReview)}</strong>Needs review</div>
-                        <div className="stat"><strong>{display(health.routing.locationsOutsideMainComponent)}</strong>Disconnected</div>
-                        <div className="stat"><strong>{display(health.accessibility.publicLocationsWithPossibleWheelchairRoute)}</strong>Possible wheelchair</div>
-                        <div className="stat"><strong>{display(health.accessibility.publicLocationsConfirmedAccessible)}</strong>Confirmed accessible</div>
-                        <div className="stat"><strong>{display(health.gems.needsReview)}</strong>Gem locations to review</div>
+                        <div className="stat">
+                          <strong>
+                            {display(health.routing.routingCoveragePercent)}%
+                          </strong>
+                          Coverage
+                        </div>
+                        <div className="stat">
+                          <strong>
+                            {display(health.routing.directMappings)}
+                          </strong>
+                          Direct
+                        </div>
+                        <div className="stat">
+                          <strong>
+                            {display(health.routing.inferredMappings)}
+                          </strong>
+                          Inferred
+                        </div>
+                        <div className="stat">
+                          <strong>{display(health.routing.needsReview)}</strong>
+                          Needs review
+                        </div>
+                        <div className="stat">
+                          <strong>
+                            {display(
+                              health.routing.locationsOutsideMainComponent,
+                            )}
+                          </strong>
+                          Disconnected
+                        </div>
+                        <div className="stat">
+                          <strong>
+                            {display(
+                              health.accessibility
+                                .publicLocationsWithPossibleWheelchairRoute,
+                            )}
+                          </strong>
+                          Possible wheelchair
+                        </div>
+                        <div className="stat">
+                          <strong>
+                            {display(
+                              health.accessibility
+                                .publicLocationsConfirmedAccessible,
+                            )}
+                          </strong>
+                          Confirmed accessible
+                        </div>
+                        <div className="stat">
+                          <strong>{display(health.gems.needsReview)}</strong>Gem
+                          locations to review
+                        </div>
                       </div>
-                      <p className="form-note">Onbekende toegankelijkheidsdata telt als verificatiewerk, niet als graph-fout. / Unknown accessibility data is verification work, not a graph error.</p>
+                      <p className="form-note">
+                        Onbekende toegankelijkheidsdata telt als
+                        verificatiewerk, niet als graph-fout. / Unknown
+                        accessibility data is verification work, not a graph
+                        error.
+                      </p>
                     </section>
                   )}
                   <h2 style={{ fontSize: 22, margin: '25px 0' }}>
@@ -340,20 +422,125 @@ export function AdminApp({
                   </div>
                 </>
               ) : table === 'data_reports' ? (
-                <div className="card-grid" style={{gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))'}}>
-                 {[...rows].sort((a,b)=>Number(b.status==='pending')-Number(a.status==='pending')||display(b.created_at).localeCompare(display(a.created_at))).map(r=><article className="report-card" key={display(r.id)}>
-                  <span className="badge">{display(r.status)}</span><h3>{display(r.report_type)}</h3><p>{display(r.message)||'Geen toelichting / No comment'}</p>
-                  {Boolean(r.searched_code)&&<p>Zoekopdracht / Search: {display(r.searched_code)}</p>}
-                  {Boolean(r.entity_id)&&<><Link className="text-link" href={'/map?to='+display(r.entity_id)} target="_blank">Bekijk locatie / View location →</Link><Link className="text-link" href={'/admin/locations?edit='+display(r.entity_id)}>Locatie bewerken / Edit location →</Link></>}
-                  <small>{display(r.created_at)}</small><form onSubmit={e=>{e.preventDefault();const form=new FormData(e.currentTarget);void save({id:r.id,status:form.get('status'),internal_note:form.get('internal_note')}).catch(()=>{});}}>
-                   <label className="field-label">Afhandeling / Resolution<select className="field-input" name="status" defaultValue={display(r.status)}><option value="pending">Te beoordelen / Pending</option><option value="resolved">Opgelost / Resolved</option><option value="rejected">Afgewezen / Rejected</option></select></label>
-                   <label className="field-label">Interne notitie / Internal note<textarea className="field-input" name="internal_note" maxLength={4000} defaultValue={display(r.internal_note)} rows={3}/></label>
-                   <button className="primary-button">Afhandeling opslaan / Save resolution</button>
-                  </form></article>)}
-                  {!rows.length&&<p>Geen datameldingen / No reports</p>}
+                <div
+                  className="card-grid"
+                  style={{
+                    gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))',
+                  }}
+                >
+                  {[...rows]
+                    .sort(
+                      (a, b) =>
+                        Number(b.status === 'pending') -
+                          Number(a.status === 'pending') ||
+                        display(b.created_at).localeCompare(
+                          display(a.created_at),
+                        ),
+                    )
+                    .map((r) => (
+                      <article className="report-card" key={display(r.id)}>
+                        <span className="badge">{display(r.status)}</span>
+                        <h3>{display(r.report_type)}</h3>
+                        <p>
+                          {display(r.message) ||
+                            'Geen toelichting / No comment'}
+                        </p>
+                        {Boolean(r.searched_code) && (
+                          <p>
+                            Zoekopdracht / Search: {display(r.searched_code)}
+                          </p>
+                        )}
+                        {Boolean(r.entity_id) && (
+                          <>
+                            <Link
+                              className="text-link"
+                              href={'/map?to=' + display(r.entity_id)}
+                              target="_blank"
+                            >
+                              Bekijk locatie / View location →
+                            </Link>
+                            <Link
+                              className="text-link"
+                              href={
+                                '/admin/locations?edit=' + display(r.entity_id)
+                              }
+                            >
+                              Locatie bewerken / Edit location →
+                            </Link>
+                          </>
+                        )}
+                        <small>{display(r.created_at)}</small>
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            const form = new FormData(e.currentTarget);
+                            void save({
+                              id: r.id,
+                              status: form.get('status'),
+                              internal_note: form.get('internal_note'),
+                            }).catch(() => {});
+                          }}
+                        >
+                          <label className="field-label">
+                            Afhandeling / Resolution
+                            <select
+                              className="field-input"
+                              name="status"
+                              defaultValue={display(r.status)}
+                            >
+                              <option value="pending">
+                                Te beoordelen / Pending
+                              </option>
+                              <option value="resolved">
+                                Opgelost / Resolved
+                              </option>
+                              <option value="rejected">
+                                Afgewezen / Rejected
+                              </option>
+                            </select>
+                          </label>
+                          <label className="field-label">
+                            Interne notitie / Internal note
+                            <textarea
+                              className="field-input"
+                              name="internal_note"
+                              maxLength={4000}
+                              defaultValue={display(r.internal_note)}
+                              rows={3}
+                            />
+                          </label>
+                          <button className="primary-button">
+                            Afhandeling opslaan / Save resolution
+                          </button>
+                        </form>
+                      </article>
+                    ))}
+                  {!rows.length && <p>Geen datameldingen / No reports</p>}
                 </div>
               ) : table === 'user_feedback' ? (
-                <section className="panel"><h2>Feedback</h2><p>{rows.filter(r=>r.helpful===true).length} gevonden / found · {rows.filter(r=>r.helpful===false).length} niet gevonden / not found</p><div className="stat-row">{['search','location','route'].map(c=><div className="stat" key={c}><strong>{rows.filter(r=>r.context===c&&r.helpful===true).length} / {rows.filter(r=>r.context===c).length}</strong>{c} · positief / total</div>)}</div></section>
+                <section className="panel">
+                  <h2>Feedback</h2>
+                  <p>
+                    {rows.filter((r) => r.helpful === true).length} gevonden /
+                    found · {rows.filter((r) => r.helpful === false).length}{' '}
+                    niet gevonden / not found
+                  </p>
+                  <div className="stat-row">
+                    {['search', 'location', 'route'].map((c) => (
+                      <div className="stat" key={c}>
+                        <strong>
+                          {
+                            rows.filter(
+                              (r) => r.context === c && r.helpful === true,
+                            ).length
+                          }{' '}
+                          / {rows.filter((r) => r.context === c).length}
+                        </strong>
+                        {c} · positief / total
+                      </div>
+                    ))}
+                  </div>
+                </section>
               ) : table === 'hidden_gems' ? (
                 <div
                   className="card-grid"
@@ -367,7 +554,8 @@ export function AdminApp({
                       <article key={g.id} className="gem-card">
                         <span className="badge">{g.status}</span>
                         {g.photo_path && (
-                          <Image unoptimized
+                          <Image
+                            unoptimized
                             src={'/api/gems/' + g.id + '/photo?moderate=1'}
                             alt={g.title}
                             width={300}
@@ -381,22 +569,73 @@ export function AdminApp({
                         )}
                         <h2>{g.title}</h2>
                         <p>{g.description}</p>
-                        {g.location_id ? <Link
-                          className="text-link"
-                          href={'/map?to=' + g.location_id}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Locatie controleren / Check location →
-                        </Link> : <div className="gem-location-proposal"><strong>{g.proposed_location_name}</strong><p>{g.proposed_location_description}</p><small>{[g.proposed_building_id,g.proposed_floor_id,g.proposed_room_zone].filter(Boolean).join(' · ') || 'Gebouw en verdieping onbekend / unknown'}</small></div>}
+                        {g.location_id ? (
+                          <Link
+                            className="text-link"
+                            href={'/map?to=' + g.location_id}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            Locatie controleren / Check location →
+                          </Link>
+                        ) : (
+                          <div className="gem-location-proposal">
+                            <strong>{g.proposed_location_name}</strong>
+                            <p>{g.proposed_location_description}</p>
+                            <small>
+                              {[
+                                g.proposed_building_id,
+                                g.proposed_floor_id,
+                                g.proposed_room_zone,
+                              ]
+                                .filter(Boolean)
+                                .join(' · ') ||
+                                'Gebouw en verdieping onbekend / unknown'}
+                            </small>
+                          </div>
+                        )}
                         <label className="field-label">
                           Canonieke locatie / Canonical location
-                          <select className="field-input" defaultValue={g.location_id ?? ''} onChange={(event)=>{if(event.target.value)void save({...r,location_id:event.target.value},'hidden_gems').catch(()=>{});}}>
-                            <option value="">Nog niet koppelen / Keep proposed</option>
-                            {locations.filter((entry)=>entry.status==='approved'&&entry.routing_status==='direct').map((entry)=><option key={display(entry.id)} value={display(entry.id)}>{display((entry.name as {nl?:string})?.nl ?? entry.id)} · {display(entry.id)}</option>)}
+                          <select
+                            className="field-input"
+                            defaultValue={g.location_id ?? ''}
+                            onChange={(event) => {
+                              if (event.target.value)
+                                void save(
+                                  { ...r, location_id: event.target.value },
+                                  'hidden_gems',
+                                ).catch(() => {});
+                            }}
+                          >
+                            <option value="">
+                              Nog niet koppelen / Keep proposed
+                            </option>
+                            {locations
+                              .filter(
+                                (entry) =>
+                                  entry.status === 'approved' &&
+                                  entry.routing_status === 'direct',
+                              )
+                              .map((entry) => (
+                                <option
+                                  key={display(entry.id)}
+                                  value={display(entry.id)}
+                                >
+                                  {display(
+                                    (entry.name as { nl?: string })?.nl ??
+                                      entry.id,
+                                  )}{' '}
+                                  · {display(entry.id)}
+                                </option>
+                              ))}
                           </select>
                         </label>
-                        {!g.location_id&&<Link className="text-link" href="/admin/locations">Nieuwe canonieke locatie maken / Create canonical location →</Link>}
+                        {!g.location_id && (
+                          <Link className="text-link" href="/admin/locations">
+                            Nieuwe canonieke locatie maken / Create canonical
+                            location →
+                          </Link>
+                        )}
                         <div
                           style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}
                         >
@@ -462,10 +701,102 @@ export function AdminApp({
                 </div>
               ) : table === 'locations' ? (
                 <div className="panel" style={{ overflowX: 'auto' }}>
-                  <table className="admin-table"><thead><tr><th>Locatie</th><th>Route</th><th>Endpoint-node</th><th>Verificatie</th><th>Acties</th></tr></thead><tbody>
-                    {rows.map((r)=><tr key={display(r.id)}><td><strong>{display((r.name as {nl?:string})?.nl ?? r.id)}</strong><br/><small>{display(r.building_id)} · {display(r.floor_id)}</small></td><td><span className="badge">{display(r.routing_status)}</span><br/><small>{display(r.endpoint_source)}</small></td><td><select className="field-input" value={display(r.node_id)} onChange={(event)=>void save({...r,node_id:event.target.value||null}).catch(()=>{})}><option value="">Controle nodig</option>{routeNodes.filter((node)=>node.building_id===r.building_id&&node.floor_id===r.floor_id).map((node)=><option key={display(node.id)} value={display(node.id)}>{display(node.id)} · {display((node.label as {nl?:string})?.nl)}</option>)}</select></td><td>{display(r.verification_status)}</td><td><button className="text-link" onClick={()=>void save({...r,verification_status:'verified'}).catch(()=>{})}>Markeer verified</button><button className="text-link" onClick={()=>setEdit(JSON.stringify(r,null,2))}>Bewerken / Edit</button></td></tr>)}
-                  </tbody></table>
+                  <table className="admin-table">
+                    <thead>
+                      <tr>
+                        <th>Locatie</th>
+                        <th>Route</th>
+                        <th>Endpoint-node</th>
+                        <th>Verificatie</th>
+                        <th>Acties</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map((r) => (
+                        <tr key={display(r.id)}>
+                          <td>
+                            <strong>
+                              {display((r.name as { nl?: string })?.nl ?? r.id)}
+                            </strong>
+                            <br />
+                            <small>
+                              {display(r.building_id)} · {display(r.floor_id)}
+                            </small>
+                          </td>
+                          <td>
+                            <span className="badge">
+                              {display(r.routing_status)}
+                            </span>
+                            <br />
+                            <small>{display(r.endpoint_source)}</small>
+                          </td>
+                          <td>
+                            <select
+                              className="field-input"
+                              value={display(r.node_id)}
+                              onChange={(event) =>
+                                void save({
+                                  ...r,
+                                  node_id: event.target.value || null,
+                                }).catch(() => {})
+                              }
+                            >
+                              <option value="">Controle nodig</option>
+                              {routeNodes
+                                .filter(
+                                  (node) =>
+                                    node.building_id === r.building_id &&
+                                    node.floor_id === r.floor_id,
+                                )
+                                .map((node) => (
+                                  <option
+                                    key={display(node.id)}
+                                    value={display(node.id)}
+                                  >
+                                    {display(node.id)} ·{' '}
+                                    {display(
+                                      (node.label as { nl?: string })?.nl,
+                                    )}
+                                  </option>
+                                ))}
+                            </select>
+                          </td>
+                          <td>{display(r.verification_status)}</td>
+                          <td>
+                            <button
+                              className="text-link"
+                              onClick={() =>
+                                void save({
+                                  ...r,
+                                  verification_status: 'verified',
+                                }).catch(() => {})
+                              }
+                            >
+                              Markeer verified
+                            </button>
+                            <button
+                              className="text-link"
+                              onClick={() =>
+                                setEdit(JSON.stringify(r, null, 2))
+                              }
+                            >
+                              Bewerken / Edit
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
+              ) : table === 'opening_hours' ? (
+                <HoursAdmin
+                  hours={rows as unknown as Hours[]}
+                  locations={locations as unknown as Location[]}
+                  gems={relatedGems as unknown as Gem[]}
+                  onSave={(record) =>
+                    save(record as unknown as Row, 'opening_hours')
+                  }
+                />
               ) : (
                 <>
                   <div className="panel" style={{ overflowX: 'auto' }}>
@@ -627,7 +958,13 @@ export function AdminApp({
           </DialogDescription>
           {qr && (
             <>
-              <Image unoptimized src={qr} alt="QR code" width={300} height={300} />
+              <Image
+                unoptimized
+                src={qr}
+                alt="QR code"
+                width={300}
+                height={300}
+              />
               <Link
                 className="primary-button"
                 href={qr}
@@ -709,6 +1046,9 @@ function defaultRow(table: string): Row {
       verification_status: 'unverified',
       exceptions_reviewed_through: null,
       source_url: 'https://www.nhlstenden.com/locaties/leeuwarden',
+      hours_kind: 'physical_opening',
+      display_note: { nl: '', en: '' },
+      timezone: 'Europe/Amsterdam',
     },
     qr_locations: {
       code: id,
@@ -720,4 +1060,12 @@ function defaultRow(table: string): Row {
   return defaults[table] ?? { id };
 }
 
-function display(value:unknown):string{return typeof value==='string'?value:typeof value==='number'||typeof value==='boolean'?String(value):value==null?'':JSON.stringify(value);}
+function display(value: unknown): string {
+  return typeof value === 'string'
+    ? value
+    : typeof value === 'number' || typeof value === 'boolean'
+      ? String(value)
+      : value == null
+        ? ''
+        : JSON.stringify(value);
+}

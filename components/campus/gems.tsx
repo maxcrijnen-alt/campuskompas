@@ -2,7 +2,14 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect } from 'react';
-import { Plus, Heart, ArrowUpRight, Sparkles } from 'lucide-react';
+import {
+  Plus,
+  Heart,
+  ArrowUpRight,
+  Sparkles,
+  CheckCircle2,
+  AlertTriangle,
+} from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,8 +22,9 @@ import { Picker } from './picker';
 import { CampusMap } from './map';
 import { CampusSearch } from './search';
 import { Icon } from './icon';
-import {track} from '@/lib/campus/analytics';
+import { track } from '@/lib/campus/analytics';
 import { createRouteEndpointResolver } from '@/lib/routing/endpoints';
+import { OpeningHours } from './opening-hours';
 const labels = {
   nl: [
     'Rust',
@@ -60,23 +68,54 @@ export function GemsPage({
 }) {
   const [open, setOpen] = useState(false),
     [filter, setFilter] = useState('all'),
-    [sort,setSort]=useState('popular'),
-    [context,setContext]=useState({building:'',floor:''}),
+    [sort, setSort] = useState('popular'),
+    [context, setContext] = useState({ building: '', floor: '' }),
     [busy, setBusy] = useState<string | null>(null),
     [liked, setLiked] = useState<string[]>([]),
     en = locale === 'en',
     resolver = createRouteEndpointResolver(data);
-  useEffect(()=>{try{setContext({building:sessionStorage.getItem('ck-building')??'',floor:sessionStorage.getItem('ck-floor')??''});const ids=JSON.parse(localStorage.getItem('ck-liked')??'[]');if(Array.isArray(ids))setLiked(ids.filter(x=>typeof x==='string').slice(-1000));}catch{}if(slug)track('gem_view');},[slug]);
-  const near=(g:Gem)=>{const l=data.locations.find(l=>l.id===g.location_id);return l?.floor_id===context.floor?2:l?.building_id===context.building?1:0;};
-  const shown = gems.filter(
-    (g) =>
-      (!slug || g.slug === slug) && (filter === 'all' || g.category === filter),
-  ).sort((a,b)=>sort==='new'?(b.created_at??'').localeCompare(a.created_at??''):sort==='nearby'?near(b)-near(a)||b.likes-a.likes:b.likes-a.likes);
+  useEffect(() => {
+    try {
+      setContext({
+        building: sessionStorage.getItem('ck-building') ?? '',
+        floor: sessionStorage.getItem('ck-floor') ?? '',
+      });
+      const ids = JSON.parse(localStorage.getItem('ck-liked') ?? '[]');
+      if (Array.isArray(ids))
+        setLiked(ids.filter((x) => typeof x === 'string').slice(-1000));
+    } catch {}
+    if (slug) track('gem_view');
+  }, [slug]);
+  const near = (g: Gem) => {
+    const l = data.locations.find((l) => l.id === g.location_id);
+    return l?.floor_id === context.floor
+      ? 2
+      : l?.building_id === context.building
+        ? 1
+        : 0;
+  };
+  const shown = gems
+    .filter(
+      (g) =>
+        (!slug || g.slug === slug) &&
+        (filter === 'all' || g.category === filter),
+    )
+    .sort((a, b) =>
+      sort === 'new'
+        ? (b.created_at ?? '').localeCompare(a.created_at ?? '')
+        : sort === 'nearby'
+          ? near(b) - near(a) || b.likes - a.likes
+          : b.likes - a.likes,
+    );
   async function like(g: Gem) {
     if (busy || liked.includes(g.id)) return;
     setBusy(g.id);
-    setGems(gems.map(item=>item.id===g.id?{...item,likes:item.likes+1}:item));
-    setLiked([...liked,g.id]);
+    setGems(
+      gems.map((item) =>
+        item.id === g.id ? { ...item, likes: item.likes + 1 } : item,
+      ),
+    );
+    setLiked([...liked, g.id]);
     try {
       const response = await fetch('/api/gems/' + g.id + '/like', {
         method: 'POST',
@@ -88,11 +127,17 @@ export function GemsPage({
           item.id === g.id ? { ...item, likes: result.likes } : item,
         ),
       );
-      try{localStorage.setItem('ck-liked',JSON.stringify([...liked,g.id].slice(-1000)));}catch{}
-      track('gem_like',{gem_id:g.id});
+      try {
+        localStorage.setItem(
+          'ck-liked',
+          JSON.stringify([...liked, g.id].slice(-1000)),
+        );
+      } catch {}
+      track('gem_like', { gem_id: g.id });
       onToast(en ? 'Thanks for your vote!' : 'Bedankt voor je like!');
     } catch {
-      setGems(gems);setLiked(liked);
+      setGems(gems);
+      setLiked(liked);
       onToast(
         en
           ? 'Could not save your like. Please try again.'
@@ -140,7 +185,34 @@ export function GemsPage({
           </button>
         ))}
       </div>
-      <div className="gem-sorting" role="group" aria-label={en?'Sort gems':'Gems sorteren'}>{[['popular',en?'Popular':'Populair'],['new',en?'New':'Nieuw'],...(context.building?[['nearby',en?'Nearby':'Dichtbij']]:[])].map(([id,label])=><button className="secondary-button" key={id} aria-pressed={sort===id} onClick={()=>setSort(id)}>{label}</button>)}{sort==='nearby'&&<small>{en?'Based on your chosen floor/building':'Op basis van je gekozen verdieping/gebouw'} · {context.building}</small>}</div>
+      <div
+        className="gem-sorting"
+        role="group"
+        aria-label={en ? 'Sort gems' : 'Gems sorteren'}
+      >
+        {[
+          ['popular', en ? 'Popular' : 'Populair'],
+          ['new', en ? 'New' : 'Nieuw'],
+          ...(context.building ? [['nearby', en ? 'Nearby' : 'Dichtbij']] : []),
+        ].map(([id, label]) => (
+          <button
+            className="secondary-button"
+            key={id}
+            aria-pressed={sort === id}
+            onClick={() => setSort(id)}
+          >
+            {label}
+          </button>
+        ))}
+        {sort === 'nearby' && (
+          <small>
+            {en
+              ? 'Based on your chosen floor/building'
+              : 'Op basis van je gekozen verdieping/gebouw'}{' '}
+            · {context.building}
+          </small>
+        )}
+      </div>
       <div className="card-grid">
         {shown.map((g) => {
           const location = data.locations.find((l) => l.id === g.location_id);
@@ -150,12 +222,13 @@ export function GemsPage({
           return (
             <article className="gem-card" key={g.id}>
               {g.photo_path && (
-                <Image unoptimized
+                <Image
+                  unoptimized
                   src={'/api/gems/' + g.id + '/photo'}
                   alt={g.title}
                   width={400}
                   height={240}
-                  loading="lazy"
+                  loading="eager"
                   style={{
                     width: '100%',
                     height: 190,
@@ -174,9 +247,16 @@ export function GemsPage({
                   ]
                 }
               </span>
-              <small className="gem-origin">{en?'Discovered by students':'Door studenten ontdekt'}</small>
+              <small className="gem-origin">
+                {en ? 'Discovered by students' : 'Door studenten ontdekt'}
+              </small>
               <h2>
-                <Link onClick={()=>track('gem_view',{gem_id:g.id})} href={'/gems/' + g.slug}>{g.title}</Link>
+                <Link
+                  onClick={() => track('gem_view', { gem_id: g.id })}
+                  href={'/gems/' + g.slug}
+                >
+                  {g.title}
+                </Link>
               </h2>
               <p>{g.description}</p>
               <small className="muted">
@@ -186,12 +266,36 @@ export function GemsPage({
                       .filter(Boolean)
                       .join(' · ')}
               </small>
+              <div className="gem-statuses">
+                <span
+                  className={`status-chip ${routeable ? 'status-success' : 'status-warning'}`}
+                >
+                  {routeable ? (
+                    <CheckCircle2 size={15} />
+                  ) : (
+                    <AlertTriangle size={15} />
+                  )}
+                  {routeable
+                    ? en
+                      ? 'Route available'
+                      : 'Route beschikbaar'
+                    : en
+                      ? 'Route needs verification'
+                      : 'Route moet worden gecontroleerd'}
+                </span>
+              </div>
               {!routeable && (
                 <p className="form-note" role="status">
                   {en
                     ? 'This place is awaiting map and route verification.'
                     : 'Deze plek wacht nog op kaart- en routecontrole.'}
                 </p>
+              )}
+              {g.hours_id && (
+                <OpeningHours
+                  locale={locale}
+                  hours={data.hours.find((hours) => hours.id === g.hours_id)}
+                />
               )}
               <div className="gem-card-footer">
                 <button
@@ -212,7 +316,10 @@ export function GemsPage({
                     <Link className="text-link" href={'/map?to=' + location.id}>
                       {en ? 'View map' : 'Bekijk kaart'}
                     </Link>
-                    <Link className="text-link" href={'/map?to=' + location.id + '&navigate=1'}>
+                    <Link
+                      className="text-link"
+                      href={'/map?to=' + location.id + '&navigate=1'}
+                    >
                       {en ? 'Route here' : 'Route hierheen'}
                       <ArrowUpRight size={16} />
                     </Link>
@@ -249,7 +356,40 @@ export function GemsPage({
           </div>
         )}
       </div>
-      {!slug&&gems.length<3&&<section className="curated-section"><h2>CampusKompas-tips</h2><div className="card-grid">{['library','central-brew','food-court'].map(id=>data.locations.find(l=>l.id===id)).filter(l=>!!l&&(filter==='all'||filter==='coffee'&&l.category_id==='coffee'||filter==='food'&&l.category_id==='food'||filter==='study'&&l.category_id==='library')).map(l=>l&&<article key={l.id} className="gem-card"><span className="tag">CampusKompas-tip</span><h3>{l.name[locale]}</h3><p>{l.description[locale]}</p><small>{l.building_id} · {en?'Floor':'Verdieping'} {data.floors.find(f=>f.id===l.floor_id)?.level}</small><Link className="text-link" href={'/map?to='+l.id}>{en?'View on map':'Bekijk op kaart'} →</Link></article>)}</div></section>}
+      {!slug && gems.length < 3 && (
+        <section className="curated-section">
+          <h2>CampusKompas-tips</h2>
+          <div className="card-grid">
+            {['library', 'central-brew', 'food-court']
+              .map((id) => data.locations.find((l) => l.id === id))
+              .filter(
+                (l) =>
+                  !!l &&
+                  (filter === 'all' ||
+                    (filter === 'coffee' && l.category_id === 'coffee') ||
+                    (filter === 'food' && l.category_id === 'food') ||
+                    (filter === 'study' && l.category_id === 'library')),
+              )
+              .map(
+                (l) =>
+                  l && (
+                    <article key={l.id} className="gem-card">
+                      <span className="tag">CampusKompas-tip</span>
+                      <h3>{l.name[locale]}</h3>
+                      <p>{l.description[locale]}</p>
+                      <small>
+                        {l.building_id} · {en ? 'Floor' : 'Verdieping'}{' '}
+                        {data.floors.find((f) => f.id === l.floor_id)?.level}
+                      </small>
+                      <Link className="text-link" href={'/map?to=' + l.id}>
+                        {en ? 'View on map' : 'Bekijk op kaart'} →
+                      </Link>
+                    </article>
+                  ),
+              )}
+          </div>
+        </section>
+      )}
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="dialog-form">
           <DialogTitle>
@@ -292,7 +432,9 @@ function GemForm({
   const [mode, setMode] = useState<'existing' | 'proposed'>('existing'),
     [building, setBuilding] = useState(''),
     [floor, setFloor] = useState(''),
-    [location, setLocation] = useState<CampusData['locations'][number] | null>(null),
+    [location, setLocation] = useState<CampusData['locations'][number] | null>(
+      null,
+    ),
     [category, setCategory] = useState('study'),
     [started] = useState(Date.now),
     [error, setError] = useState(''),
@@ -392,8 +534,24 @@ function GemForm({
       />
       <fieldset className="location-mode">
         <legend>{en ? 'Where is it?' : 'Waar is de plek?'}</legend>
-        <label><input type="radio" checked={mode === 'existing'} onChange={() => setMode('existing')} /> {en ? 'Choose a known campus location' : 'Kies een bekende campuslocatie'}</label>
-        <label><input type="radio" checked={mode === 'proposed'} onChange={() => setMode('proposed')} /> {en ? 'Propose a new place' : 'Stel een nieuwe plek voor'}</label>
+        <label>
+          <input
+            type="radio"
+            checked={mode === 'existing'}
+            onChange={() => setMode('existing')}
+          />{' '}
+          {en
+            ? 'Choose a known campus location'
+            : 'Kies een bekende campuslocatie'}
+        </label>
+        <label>
+          <input
+            type="radio"
+            checked={mode === 'proposed'}
+            onChange={() => setMode('proposed')}
+          />{' '}
+          {en ? 'Propose a new place' : 'Stel een nieuwe plek voor'}
+        </label>
       </fieldset>
       {mode === 'existing' ? (
         <>
@@ -402,50 +560,108 @@ function GemForm({
             locale={locale}
             compact
             selected={location}
-            inputLabel={en ? 'Search a campus location' : 'Zoek een campuslocatie'}
-            placeholder={en ? 'Room, café, library…' : 'Lokaal, café, bibliotheek…'}
+            inputLabel={
+              en ? 'Search a campus location' : 'Zoek een campuslocatie'
+            }
+            placeholder={
+              en ? 'Room, café, library…' : 'Lokaal, café, bibliotheek…'
+            }
             onSelect={setLocation}
           />
           {location && (
-            <button type="button" className="text-link" onClick={() => setShowMap(!showMap)}>
+            <button
+              type="button"
+              className="text-link"
+              onClick={() => setShowMap(!showMap)}
+            >
               {en ? 'Check on map' : 'Controleer op kaart'}
             </button>
           )}
           {showMap && currentFloor && location && (
-            <CampusMap data={data} floor={currentFloor} selected={location} from="" route={null} onSelect={setLocation} locale={locale} />
+            <CampusMap
+              data={data}
+              floor={currentFloor}
+              selected={location}
+              from=""
+              route={null}
+              onSelect={setLocation}
+              locale={locale}
+            />
           )}
         </>
       ) : (
         <div className="proposed-location-fields">
           <label className="field-label">
             {en ? 'Place name' : 'Naam van de plek'}
-            <input className="field-input" name="proposed_location_name" required maxLength={120} />
+            <input
+              className="field-input"
+              name="proposed_location_name"
+              required
+              maxLength={120}
+            />
           </label>
           <div className="form-grid">
             <label className="field-label">
               {en ? 'Building (if known)' : 'Gebouw (indien bekend)'}
-              <select className="field-input" value={building} onChange={(event) => { setBuilding(event.target.value); setFloor(''); }}>
+              <select
+                className="field-input"
+                value={building}
+                onChange={(event) => {
+                  setBuilding(event.target.value);
+                  setFloor('');
+                }}
+              >
                 <option value="">{en ? 'Unknown' : 'Onbekend'}</option>
-                {data.buildings.map((entry) => <option key={entry.id} value={entry.id}>{entry.name}</option>)}
+                {data.buildings.map((entry) => (
+                  <option key={entry.id} value={entry.id}>
+                    {entry.name}
+                  </option>
+                ))}
               </select>
             </label>
             <label className="field-label">
               {en ? 'Floor (if known)' : 'Verdieping (indien bekend)'}
-              <select className="field-input" value={floor} onChange={(event) => setFloor(event.target.value)} disabled={!building}>
+              <select
+                className="field-input"
+                value={floor}
+                onChange={(event) => setFloor(event.target.value)}
+                disabled={!building}
+              >
                 <option value="">{en ? 'Unknown' : 'Onbekend'}</option>
-                {data.floors.filter((entry) => entry.building_id === building).map((entry) => <option key={entry.id} value={entry.id}>{entry.level}</option>)}
+                {data.floors
+                  .filter((entry) => entry.building_id === building)
+                  .map((entry) => (
+                    <option key={entry.id} value={entry.id}>
+                      {entry.level}
+                    </option>
+                  ))}
               </select>
             </label>
           </div>
           <label className="field-label">
             {en ? 'Room or zone (if known)' : 'Lokaal of zone (indien bekend)'}
-            <input className="field-input" name="proposed_room_zone" maxLength={120} />
+            <input
+              className="field-input"
+              name="proposed_room_zone"
+              maxLength={120}
+            />
           </label>
           <label className="field-label">
-            {en ? 'How can a moderator find it?' : 'Hoe kan een beheerder de plek vinden?'}
-            <textarea className="field-input" name="proposed_location_description" maxLength={600} rows={3} />
+            {en
+              ? 'How can a moderator find it?'
+              : 'Hoe kan een beheerder de plek vinden?'}
+            <textarea
+              className="field-input"
+              name="proposed_location_description"
+              maxLength={600}
+              rows={3}
+            />
           </label>
-          <p className="form-note">{en ? 'A proposal is reviewed before it can appear on the map or be used for routing.' : 'Een voorstel wordt gecontroleerd voordat het op de kaart of in een route kan verschijnen.'}</p>
+          <p className="form-note">
+            {en
+              ? 'A proposal is reviewed before it can appear on the map or be used for routing.'
+              : 'Een voorstel wordt gecontroleerd voordat het op de kaart of in een route kan verschijnen.'}
+          </p>
         </div>
       )}
       <label className="field-label">

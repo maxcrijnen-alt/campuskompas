@@ -15,13 +15,13 @@ for (const width of [1280, 320])
     await expect(
       hours.getByRole('heading', { name: 'Bibliotheek' }),
     ).toBeFocused();
+    await hours.getByText('Openingstijden bekijken').click();
     await expect(hours.getByText('08:30–17:00', { exact: true })).toHaveCount(
       5,
     );
-    await expect(
-      hours.getByText('Niet bevestigd', { exact: true }),
-    ).toHaveCount(2);
-    await expect(hours.getByRole('link')).toHaveAttribute(
+    await expect(hours.getByText('Gesloten', { exact: true })).toHaveCount(2);
+    await expect(hours.locator('.opening-week .today')).toContainText('Vandaag');
+    await expect(hours.getByRole('link', { name: /Officiële bron/ })).toHaveAttribute(
       'href',
       /nhlstenden.com\/bibliotheek/,
     );

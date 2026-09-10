@@ -9,6 +9,24 @@ export const bilingual = z.object({
   en: z.string().min(1).max(4000),
 });
 export const verification = z.enum(['verified', 'needs_review', 'unverified']);
+const clockTime = z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/);
+const period = z
+  .tuple([clockTime, clockTime])
+  .refine(([start, end]) => start < end, 'End time must be after start time');
+const periods = z.array(period).superRefine((value, context) => {
+  const ordered = [...value].sort(([a], [b]) => a.localeCompare(b));
+  for (let index = 1; index < ordered.length; index += 1) {
+    if (ordered[index][0] < ordered[index - 1][1]) {
+      context.addIssue({ code: 'custom', message: 'Opening periods overlap' });
+      return;
+    }
+  }
+});
+const hoursKind = z.enum([
+  'physical_opening',
+  'building_access',
+  'service_contact',
+]);
 export const gemCategories = [
   'quiet',
   'study',
@@ -45,11 +63,23 @@ export const gemSchema = z
   })
   .superRefine((value, context) => {
     if (value.location_mode === 'existing' && !value.location_id)
-      context.addIssue({ code: 'custom', path: ['location_id'], message: 'Select a location' });
+      context.addIssue({
+        code: 'custom',
+        path: ['location_id'],
+        message: 'Select a location',
+      });
     if (value.location_mode === 'proposed' && !value.proposed_location_name)
-      context.addIssue({ code: 'custom', path: ['proposed_location_name'], message: 'Name the proposed location' });
+      context.addIssue({
+        code: 'custom',
+        path: ['proposed_location_name'],
+        message: 'Name the proposed location',
+      });
     if (value.proposed_floor_id && !value.proposed_building_id)
-      context.addIssue({ code: 'custom', path: ['proposed_building_id'], message: 'Building is required for a floor' });
+      context.addIssue({
+        code: 'custom',
+        path: ['proposed_building_id'],
+        message: 'Building is required for a floor',
+      });
   })
   .strict();
 export const photoLimit = 3 * 1024 * 1024;
@@ -82,8 +112,8 @@ export const shapeSchema = z
     'Shape exceeds map bounds',
   );
 const node = z.object({
-  map_x:z.number().min(0).max(100).nullable().optional(),
-  map_y:z.number().min(0).max(100).nullable().optional(),
+  map_x: z.number().min(0).max(100).nullable().optional(),
+  map_y: z.number().min(0).max(100).nullable().optional(),
   id,
   building_id: id,
   floor_id: id,
@@ -115,8 +145,13 @@ const edge = z
     accessibility_status: verification,
     verification_status: verification,
     bidirectional: z.boolean(),
-    map_path:z.array(z.tuple([z.number().min(0).max(100),z.number().min(0).max(100)])).min(2).max(500).nullable().optional(),
-    source_id:id.nullable().optional(),
+    map_path: z
+      .array(z.tuple([z.number().min(0).max(100), z.number().min(0).max(100)]))
+      .min(2)
+      .max(500)
+      .nullable()
+      .optional(),
+    source_id: id.nullable().optional(),
   })
   .refine((e) => e.from_node_id !== e.to_node_id, 'Self edges not allowed')
   .refine(
@@ -124,9 +159,19 @@ const edge = z
     'Stairs cannot be accessible',
   );
 export const adminSchemas = {
-  data_reports:z.object({id:z.uuid(),status:z.enum(['pending','resolved','rejected']),internal_note:z.string().max(4000).default('')}),
-  user_feedback:z.object({id:z.uuid()}),
-  source_records:z.object({id,title:z.string().min(1).max(200),url:z.url().startsWith('https://'),verified_at:z.iso.date(),verification_status:verification}),
+  data_reports: z.object({
+    id: z.uuid(),
+    status: z.enum(['pending', 'resolved', 'rejected']),
+    internal_note: z.string().max(4000).default(''),
+  }),
+  user_feedback: z.object({ id: z.uuid() }),
+  source_records: z.object({
+    id,
+    title: z.string().min(1).max(200),
+    url: z.url().startsWith('https://'),
+    verified_at: z.iso.date(),
+    verification_status: verification,
+  }),
   buildings: z.object({
     id,
     name: z.string().min(2).max(100),
@@ -140,10 +185,10 @@ export const adminSchemas = {
     geometry: z.array(shapeSchema).max(3000),
   }),
   locations: z.object({
-    map_x:z.number().min(0).max(100).nullable().optional(),
-    map_y:z.number().min(0).max(100).nullable().optional(),
-    source_page:z.number().int().positive().nullable().optional(),
-    verification_notes:z.string().max(4000).optional(),
+    map_x: z.number().min(0).max(100).nullable().optional(),
+    map_y: z.number().min(0).max(100).nullable().optional(),
+    source_page: z.number().int().positive().nullable().optional(),
+    verification_notes: z.string().max(4000).optional(),
     id,
     name: bilingual,
     description: bilingual,
@@ -159,8 +204,15 @@ export const adminSchemas = {
     verification_status: verification,
     source_id: id,
     hours_id: id.nullable().optional(),
-    routing_status: z.enum(['direct', 'inferred', 'needs_review', 'unavailable']),
-    endpoint_source: z.enum(['existing_mapping', 'manual', 'inferred']).nullable(),
+    routing_status: z.enum([
+      'direct',
+      'inferred',
+      'needs_review',
+      'unavailable',
+    ]),
+    endpoint_source: z
+      .enum(['existing_mapping', 'manual', 'inferred'])
+      .nullable(),
   }),
   rooms: z.object({
     id,
@@ -183,51 +235,70 @@ export const adminSchemas = {
     label: z.string().min(1).max(100),
     active: z.boolean(),
   }),
-  opening_hours: z.object({
-    id,
-    weekly: z.record(
-      z.string().regex(/^[0-6]$/),
-      z
-        .array(
-          z.tuple([
-            z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-            z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-          ]),
-        )
-        .nullable(),
-    ),
-    exceptions: z.record(
-      z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-      z
-        .array(
-          z.tuple([
-            z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-            z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
-          ]),
-        )
-        .nullable(),
-    ),
-    verified_at: z.iso.date(),
-    verification_status: verification,
-    exceptions_reviewed_through: z.iso.date().nullable(),
-    source_url: z.url().startsWith('https://'),
-  }),
+  opening_hours: z
+    .object({
+      id,
+      weekly: z.record(z.string().regex(/^[0-6]$/), periods.nullable()),
+      exceptions: z.record(z.iso.date(), periods.nullable()),
+      verified_at: z.iso.date(),
+      verification_status: verification,
+      exceptions_reviewed_through: z.iso.date().nullable(),
+      source_url: z.url().startsWith('https://'),
+      hours_kind: hoursKind,
+      display_note: z.object({
+        nl: z.string().max(1000),
+        en: z.string().max(1000),
+      }),
+      timezone: z.literal('Europe/Amsterdam'),
+    })
+    .superRefine((value, context) => {
+      if (
+        value.verification_status === 'verified' &&
+        (!value.source_url || !value.verified_at)
+      ) {
+        context.addIssue({
+          code: 'custom',
+          message: 'Verified hours require a source URL and verification date',
+        });
+      }
+      if (
+        value.exceptions_reviewed_through &&
+        value.exceptions_reviewed_through < value.verified_at
+      ) {
+        context.addIssue({
+          code: 'custom',
+          path: ['exceptions_reviewed_through'],
+          message: 'Exception review date cannot be before verification date',
+        });
+      }
+    }),
   hidden_gems: z.object({
     id: z.uuid(),
     title: z.string().min(5).max(90),
     description: z.string().min(15).max(1200),
     category: z.enum(gemCategories),
     location_id: id.nullable(),
-    location_review_status: z.enum(['linked','proposed','needs_review','approved','rejected']),
+    location_review_status: z.enum([
+      'linked',
+      'proposed',
+      'needs_review',
+      'approved',
+      'rejected',
+    ]),
     proposed_location_name: z.string().min(2).max(120).nullable().optional(),
     proposed_building_id: id.nullable().optional(),
     proposed_floor_id: id.nullable().optional(),
     proposed_room_zone: z.string().max(120).nullable().optional(),
     proposed_location_description: z.string().max(600).nullable().optional(),
-    proposed_location_source_url: z.url().startsWith('https://').nullable().optional(),
+    proposed_location_source_url: z
+      .url()
+      .startsWith('https://')
+      .nullable()
+      .optional(),
     proposed_location_notes: z.string().max(2000).nullable().optional(),
     status: z.enum(['pending', 'approved', 'rejected', 'archived']),
     featured: z.boolean(),
+    hours_id: id.nullable().optional(),
   }),
 } as const;
 export type AdminTable = keyof typeof adminSchemas;

@@ -13,7 +13,7 @@ export async function GET() {
     const { data, error } = await publicDb()
       .from('hidden_gems')
       .select(
-        'id,slug,title,description,category,location_id,location_review_status,proposed_location_name,proposed_building_id,proposed_floor_id,proposed_room_zone,proposed_location_description,proposed_location_source_url,status,featured,photo_path,likes,created_at',
+        'id,slug,title,description,category,location_id,location_review_status,proposed_location_name,proposed_building_id,proposed_floor_id,proposed_room_zone,proposed_location_description,proposed_location_source_url,status,featured,photo_path,hours_id,likes,created_at',
       )
       .eq('status', 'approved')
       .order('featured', { ascending: false })
@@ -56,7 +56,10 @@ export async function POST(request: Request) {
     const db = serviceDb(),
       identity = await device(request);
     if (parsed.data.location_mode === 'existing') {
-      if (!parsed.data.location_id || !(await validateCanonicalLocation(db, parsed.data.location_id)))
+      if (
+        !parsed.data.location_id ||
+        !(await validateCanonicalLocation(db, parsed.data.location_id))
+      )
         throw new Error('INVALID_INPUT');
     } else if (parsed.data.proposed_building_id) {
       const { data: building } = await db
@@ -98,25 +101,25 @@ export async function POST(request: Request) {
     }
     const { title, description, category } = parsed.data;
     const existing = parsed.data.location_mode === 'existing';
-    const { error } = await db
-      .from('hidden_gems')
-      .insert({
-        title,
-        description,
-        category,
-        location_id: existing ? parsed.data.location_id : null,
-        location_review_status: existing ? 'linked' : 'proposed',
-        proposed_location_name: existing ? null : parsed.data.proposed_location_name,
-        proposed_building_id: existing ? null : parsed.data.proposed_building_id,
-        proposed_floor_id: existing ? null : parsed.data.proposed_floor_id,
-        proposed_room_zone: existing ? null : parsed.data.proposed_room_zone,
-        proposed_location_description: existing
-          ? null
-          : parsed.data.proposed_location_description,
-        photo_path: uploaded,
-        status: 'pending',
-        slug: crypto.randomUUID(),
-      });
+    const { error } = await db.from('hidden_gems').insert({
+      title,
+      description,
+      category,
+      location_id: existing ? parsed.data.location_id : null,
+      location_review_status: existing ? 'linked' : 'proposed',
+      proposed_location_name: existing
+        ? null
+        : parsed.data.proposed_location_name,
+      proposed_building_id: existing ? null : parsed.data.proposed_building_id,
+      proposed_floor_id: existing ? null : parsed.data.proposed_floor_id,
+      proposed_room_zone: existing ? null : parsed.data.proposed_room_zone,
+      proposed_location_description: existing
+        ? null
+        : parsed.data.proposed_location_description,
+      photo_path: uploaded,
+      status: 'pending',
+      slug: crypto.randomUUID(),
+    });
     if (error) throw error;
     return json({ ok: true }, 201, { 'Set-Cookie': identity.cookie });
   } catch (e) {
