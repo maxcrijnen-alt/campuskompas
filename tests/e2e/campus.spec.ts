@@ -28,6 +28,9 @@ test('find a room, route across floors, accessible failure, English and QR deep 
   page,
 }) => {
   await page.goto('/');
+  await expect(
+    page.getByRole('button', { name: 'R8', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
   await page
     .getByRole('textbox', { name: 'Zoek lokaal of voorziening' })
     .fill('f 3 025');
@@ -40,7 +43,9 @@ test('find a room, route across floors, accessible failure, English and QR deep 
   await page.getByRole('button', { name: /iShop.*R8.*0\.26/i }).click();
   await page.getByRole('switch', { name: 'Toegankelijke route' }).click();
   await page.getByRole('button', { name: 'Toon route' }).click();
-  await expect(page.getByText(/Geen mogelijke trapvrije route/)).toBeVisible();
+  await expect(
+    page.getByText(/nog geen geverifieerde trapvrije route/),
+  ).toBeVisible();
   await page.getByRole('button', { name: 'Kies ander startpunt' }).click();
   await page.getByRole('switch', { name: 'Toegankelijke route' }).click();
   await page.getByRole('button', { name: 'Toon route' }).click();
@@ -64,6 +69,9 @@ test('find a room, route across floors, accessible failure, English and QR deep 
   ).toBeVisible();
   await page.goto('/map?from=qr:R10_MAIN_ENTRANCE&to=F3025');
   await expect(page.getByRole('heading', { name: 'To F3.025' })).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'R10', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
 });
 test('same-floor route stays simple and route debug is development-only', async ({
   page,
@@ -86,6 +94,7 @@ test('wheelchair route uses unknown lift data with an honest warning', async ({
   await expect(
     page.getByText(/vermijdt trappen, maar de toegankelijkheid/),
   ).toBeVisible();
+  await expect(page.getByText(/Neem de lift naar verdieping 1/)).toBeVisible();
   await expect(page.locator('.route-path-active')).not.toHaveCount(0);
   await expect(page.getByText(/bevestigd toegankelijk/)).toHaveCount(0);
 });
@@ -130,6 +139,16 @@ test('homepage, map and opening-hours details fit 375px and 390px', async ({
       page.getByRole('button', { name: 'Route hierheen' }),
     ).toBeVisible();
     await expect(page.locator('.hours-card')).toBeVisible();
+    expect(
+      await page.locator('.hours-card').evaluate((hours) => {
+        const routeButton = document.querySelector('.location-cta');
+        return Boolean(
+          routeButton &&
+          hours.compareDocumentPosition(routeButton) &
+            Node.DOCUMENT_POSITION_FOLLOWING,
+        );
+      }),
+    ).toBe(true);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= window.innerWidth,
@@ -208,12 +227,14 @@ test('opening hours show a Library exception, closed state and semantic unknown 
   await page.getByText('Openingstijden bekijken').click();
   await expect(page.locator('.opening-week .today')).toContainText('Maandag');
   await expect(
-    page.getByRole('link', { name: /Officiële bron/ }),
+    page.getByRole('link', { name: /Bron bekijken/ }),
   ).toHaveAttribute('href', /nhlstenden\.com\/bibliotheek/);
 
   await page.clock.setFixedTime(new Date('2026-09-12T10:00:00Z'));
   await page.reload();
-  await expect(page.getByText(/Gesloten · opent maandag 08:30/)).toBeVisible();
+  await expect(
+    page.getByText(/Vandaag gesloten · opent maandag 08:30/),
+  ).toBeVisible();
 
   await page.goto('/map?to=central-brew');
   await expect(
@@ -239,11 +260,61 @@ test('Student Info labels confirmed contact times without claiming physical open
   await expect(page.getByText(/Gebouw open/)).toHaveCount(0);
 });
 
-test('admin edits structured hours with validation and multiple periods', async ({
+test('admin creates, previews and links URL-less hours by facility name', async ({
   page,
+  request,
 }) => {
   test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
-  const id = 'qa-hours-' + Date.now();
+  const suffix = Date.now();
+  const locationId = `qa-hours-location-${suffix}`;
+  const locationName = `QA tijdelijke urenvoorziening ${suffix}`;
+  const gemTitle = `QA tijdelijke uren-gem ${suffix}`;
+  const database = serviceDb();
+  const inserted = await database.from('locations').insert({
+    id: locationId,
+    name: { nl: locationName, en: `QA temporary hours facility ${suffix}` },
+    description: {
+      nl: 'Tijdelijke geautomatiseerde acceptatietest; wordt direct verwijderd.',
+      en: 'Temporary automated acceptance test; removed immediately.',
+    },
+    building_id: 'R8',
+    floor_id: 'R8-0',
+    category_id: 'coffee',
+    room_code: null,
+    aliases: ['qa hours facility'],
+    node_id: 'plan-R8-0-14-29_2',
+    x: 180,
+    y: 230,
+    status: 'approved',
+    verification_status: 'unverified',
+    source_id: 'campus',
+    hours_id: null,
+    routing_status: 'direct',
+    endpoint_source: 'manual',
+  });
+  if (inserted.error) throw inserted.error;
+  const insertedGem = await database
+    .from('hidden_gems')
+    .insert({
+      title: gemTitle,
+      description:
+        'Tijdelijke Hidden Gem voor de geautomatiseerde uren-koppelingstest.',
+      category: 'coffee',
+      location_id: locationId,
+      location_review_status: 'approved',
+      status: 'approved',
+      featured: false,
+      photo_path: null,
+      hours_id: null,
+    })
+    .select('id')
+    .single();
+  if (insertedGem.error || !insertedGem.data) {
+    await database.from('locations').delete().eq('id', locationId);
+    throw insertedGem.error ?? new Error('Temporary Hidden Gem not created');
+  }
+  const gemId = insertedGem.data.id as string;
+  let hoursId: string | null = null;
   try {
     await page.goto('/admin/opening-hours');
     await page
@@ -253,10 +324,19 @@ test('admin edits structured hours with validation and multiple periods', async 
       .getByLabel('Wachtwoord / Password')
       .fill(process.env.TEST_ADMIN_PASSWORD!);
     await page.getByRole('button', { name: 'Inloggen / Sign in' }).click();
-    await page.getByRole('button', { name: /Nieuw urenrecord/ }).click();
-    await page.getByLabel('ID', { exact: true }).fill(id);
+    const facilitySearch = page.getByRole('searchbox', {
+      name: /Voorziening of Hidden Gem/,
+    });
+    await facilitySearch.fill(locationName);
+    await page.getByRole('button', { name: new RegExp(locationName) }).click();
+    await expect(
+      page.getByRole('heading', { name: locationName }),
+    ).toBeVisible();
+    await page
+      .getByLabel('Korte bronbeschrijving / Short source description')
+      .fill('Tijdelijke handmatige testbron zonder URL; wordt verwijderd.');
     await page.getByLabel('Maandag').fill('17:00–08:30');
-    await page.getByRole('button', { name: /Openingstijden opslaan/ }).click();
+    await page.getByRole('button', { name: /Opslaan en koppelen/ }).click();
     await expect(page.locator('.hours-admin-form .form-error')).toContainText(
       /eindtijd moet later zijn/,
     );
@@ -268,18 +348,38 @@ test('admin edits structured hours with validation and multiple periods', async 
     await page
       .getByLabel('Uitzonderingstijden / Exception periods')
       .fill('09:00–13:00');
-    await page.getByRole('button', { name: /Openingstijden opslaan/ }).click();
+    await expect(page.getByLabel('Brontype / Source type')).toHaveValue(
+      'manual_admin',
+    );
+    await page.getByRole('button', { name: /Opslaan en koppelen/ }).click();
     await expect
-      .poll(
-        async () =>
-          (
-            await serviceDb()
-              .from('opening_hours')
-              .select('weekly,exceptions,hours_kind,timezone')
-              .eq('id', id)
-              .maybeSingle()
-          ).data,
-      )
+      .poll(async () => {
+        const result = await database
+          .from('locations')
+          .select('hours_id')
+          .eq('id', locationId)
+          .single();
+        return result.data?.hours_id ?? null;
+      })
+      .toMatch(/^hours-/);
+    hoursId = (
+      await database
+        .from('locations')
+        .select('hours_id')
+        .eq('id', locationId)
+        .single()
+    ).data!.hours_id;
+    await expect
+      .poll(async () => {
+        const result = await database
+          .from('opening_hours')
+          .select(
+            'weekly,exceptions,hours_kind,timezone,source_type,source_url,source_description,verification_status',
+          )
+          .eq('id', hoursId!)
+          .maybeSingle();
+        return result.data;
+      })
       .toMatchObject({
         weekly: {
           '1': [
@@ -290,9 +390,137 @@ test('admin edits structured hours with validation and multiple periods', async 
         exceptions: { '2026-10-12': [['09:00', '13:00']] },
         hours_kind: 'physical_opening',
         timezone: 'Europe/Amsterdam',
+        source_type: 'manual_admin',
+        source_url: null,
+        verification_status: 'unverified',
       });
+
+    await page.goto(`/map?to=${encodeURIComponent(locationId)}`);
+    await expect(
+      page.getByRole('heading', { name: locationName }),
+    ).toBeVisible();
+    await page.getByText('Openingstijden bekijken').click();
+    await expect(page.getByText('Handmatige beheernotitie')).toBeVisible();
+    await expect(
+      page.getByText('Tijden moeten worden gecontroleerd'),
+    ).toBeVisible();
+
+    await page.goto('/admin/opening-hours');
+    const gemSearch = page.getByRole('searchbox', {
+      name: /Voorziening of Hidden Gem/,
+    });
+    await gemSearch.fill(gemTitle);
+    await page.getByRole('button', { name: new RegExp(gemTitle) }).click();
+    await expect(page.locator('.hours-admin-form h2')).toContainText(gemTitle);
+    const hoursSelect = page.getByLabel('Urenrecord / Hours record');
+    const linkedHoursOption = hoursSelect
+      .locator('option')
+      .filter({ hasText: locationName });
+    const linkedHoursLabel = (await linkedHoursOption.textContent())?.trim();
+    expect(linkedHoursLabel).toBeTruthy();
+    await hoursSelect.selectOption({ label: linkedHoursLabel! });
+    await page.getByRole('button', { name: /Opslaan en koppelen/ }).click();
+    await expect
+      .poll(async () => {
+        const result = await database
+          .from('hidden_gems')
+          .select('hours_id')
+          .eq('id', gemId)
+          .single();
+        return result.data?.hours_id;
+      })
+      .toBe(hoursId);
+
+    const savedHours = (
+      await database
+        .from('opening_hours')
+        .select('*')
+        .eq('id', hoursId!)
+        .single()
+    ).data;
+    expect(savedHours).toBeTruthy();
+    expect(
+      (
+        await page.request.post('/api/admin/hours-records', {
+          data: { hours: savedHours, target: null },
+        })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await page.request.post('/api/admin/hours-records', {
+          data: {
+            hours: savedHours,
+            target: { target_type: 'location', target_id: 'F3025' },
+          },
+        })
+      ).status(),
+    ).toBe(400);
+    expect(
+      (
+        await page.request.post('/api/admin/hours-records', {
+          data: {
+            hours: { ...savedHours, hours_kind: 'building_access' },
+            target: null,
+          },
+        })
+      ).status(),
+    ).toBe(400);
+    expect(
+      (
+        await page.request.post('/api/admin/opening_hours', {
+          data: savedHours,
+        })
+      ).status(),
+    ).toBe(400);
+
+    expect(
+      (
+        await request.post('/api/admin/hours-records', {
+          data: {
+            hours: savedHours,
+            target: { target_type: 'location', target_id: locationId },
+          },
+        })
+      ).status(),
+    ).toBe(401);
+    expect(
+      (
+        await page.request.post('/api/admin/hours-records', {
+          headers: { Origin: 'https://example.invalid' },
+          data: {
+            hours: savedHours,
+            target: { target_type: 'location', target_id: locationId },
+          },
+        })
+      ).status(),
+    ).toBe(403);
   } finally {
-    await serviceDb().from('opening_hours').delete().eq('id', id);
+    const cleanupErrors: unknown[] = [];
+    const linked = await database
+      .from('locations')
+      .select('hours_id')
+      .eq('id', locationId)
+      .maybeSingle();
+    const cleanupHoursId = hoursId ?? linked.data?.hours_id ?? null;
+    const gemCleanup = await database
+      .from('hidden_gems')
+      .delete()
+      .eq('id', gemId);
+    if (gemCleanup.error) cleanupErrors.push(gemCleanup.error);
+    const locationCleanup = await database
+      .from('locations')
+      .delete()
+      .eq('id', locationId);
+    if (locationCleanup.error) cleanupErrors.push(locationCleanup.error);
+    if (cleanupHoursId) {
+      const hoursCleanup = await database
+        .from('opening_hours')
+        .delete()
+        .eq('id', cleanupHoursId);
+      if (hoursCleanup.error) cleanupErrors.push(hoursCleanup.error);
+    }
+    expect(cleanupErrors).toEqual([]);
   }
 });
 test('public cannot enter admin data or mutate protected resources', async ({
@@ -370,11 +598,163 @@ test('new Hidden Gem place stays a non-routeable proposal for moderation', async
       location_id: null,
       location_review_status: 'proposed',
       proposed_location_name: 'QA onbekende studienis',
+      proposed_location_context: 'r8',
+      proposed_building_id: 'R8',
       status: 'pending',
     });
   } finally {
     await removeTemporaryGems(title);
   }
+});
+
+test('an outdoor Hidden Gem can be moderated without inventing an indoor route', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
+  await removeTemporaryGems('QA outdoor gem %');
+  const title = 'QA outdoor gem ' + Date.now();
+  let gemId: string | undefined;
+  try {
+    await page.goto('/gems');
+    await page.getByRole('button', { name: 'Deel een Hidden Gem' }).click();
+    await page.getByLabel('Titel', { exact: true }).fill(title);
+    await page
+      .getByLabel('Beschrijving')
+      .fill('Tijdelijke buitentip om locatiecontext en moderatie te testen.');
+    await page.getByLabel('Stel een nieuwe plek voor').check();
+    await page.getByLabel('Gebied op de campus').selectOption('campus_outdoor');
+    await page.getByLabel('Naam van de plek').fill('QA tafel op campusplein');
+    await page
+      .getByLabel('Lokaal, zone of herkenningspunt (indien bekend)')
+      .fill('Bij de fietsenrekken aan het plein');
+    await page
+      .getByLabel('Hoe kan een beheerder de plek vinden?')
+      .fill('Buiten op het plein, naast de grote plantenbak.');
+    await expect(page.getByLabel('Gebouw')).toHaveCount(0);
+    await page.waitForTimeout(3200);
+    const submission = page.waitForResponse(
+      (response) =>
+        response.request().method() === 'POST' &&
+        new URL(response.url()).pathname === '/api/gems',
+      { timeout: 45000 },
+    );
+    await page
+      .getByRole('button', { name: 'Verstuur mijn ontdekking' })
+      .click();
+    expect((await submission).status()).toBe(201);
+
+    const saved = await serviceDb()
+      .from('hidden_gems')
+      .select(
+        'id,status,location_id,proposed_location_context,proposed_building_id,proposed_floor_id',
+      )
+      .eq('title', title)
+      .single();
+    expect(saved.error).toBeNull();
+    gemId = saved.data!.id;
+    expect(saved.data).toMatchObject({
+      status: 'pending',
+      location_id: null,
+      proposed_location_context: 'campus_outdoor',
+      proposed_building_id: null,
+      proposed_floor_id: null,
+    });
+
+    await page.goto('/admin/gems');
+    await page
+      .getByLabel('E-mail', { exact: true })
+      .fill(process.env.TEST_ADMIN_EMAIL!);
+    await page
+      .getByLabel('Wachtwoord / Password')
+      .fill(process.env.TEST_ADMIN_PASSWORD!);
+    await page.getByRole('button', { name: 'Inloggen / Sign in' }).click();
+    const moderationCard = page.locator('article').filter({ hasText: title });
+    await expect(moderationCard).toContainText(
+      'Buiten op campus / Campus outdoor',
+    );
+    await moderationCard
+      .getByRole('button', { name: 'Goedkeuren / Approve' })
+      .click();
+    await expect
+      .poll(
+        async () =>
+          (
+            await serviceDb()
+              .from('hidden_gems')
+              .select('status,location_id,proposed_location_context')
+              .eq('id', gemId!)
+              .single()
+          ).data,
+      )
+      .toMatchObject({
+        status: 'approved',
+        location_id: null,
+        proposed_location_context: 'campus_outdoor',
+      });
+
+    await page.goto('/gems');
+    const publicCard = page.locator('article').filter({ hasText: title });
+    await expect(publicCard).toContainText('Buiten de indoor routekaart');
+    await expect(publicCard).toContainText(
+      'Route via CampusKompas is voor deze plek nog niet beschikbaar.',
+    );
+    await expect(
+      publicCard.getByRole('link', { name: /Route hierheen|Bekijk kaart/ }),
+    ).toHaveCount(0);
+  } finally {
+    await removeTemporaryGems(title);
+  }
+});
+
+test('admin password reset is neutral and rejects invalid recovery tokens', async ({
+  page,
+}) => {
+  await page.goto('/admin');
+  await page
+    .getByLabel('E-mail', { exact: true })
+    .fill('unknown-admin@example.com');
+  const reset = page.waitForResponse(
+    (response) =>
+      new URL(response.url()).pathname === '/api/admin/password-reset',
+  );
+  await page
+    .getByRole('button', { name: 'Wachtwoord vergeten? / Forgot password?' })
+    .click();
+  expect((await reset).status()).toBe(202);
+  await expect(
+    page.getByText(/Als dit e-mailadres beheerderstoegang heeft/),
+  ).toBeVisible();
+  expect(
+    (
+      await page.request.post('/api/admin/password-reset', {
+        headers: { Origin: 'https://example.invalid' },
+        data: { email: 'unknown-admin@example.com' },
+      })
+    ).status(),
+  ).toBe(403);
+
+  await page.goto('/admin/reset-password');
+  await expect(
+    page.getByText(/resetlink is ongeldig of verlopen/),
+  ).toBeVisible();
+  expect(
+    (
+      await page.request.post('/api/admin/password-update', {
+        data: {
+          access_token: 'x'.repeat(120),
+          password: 'Valid-looking-Password123!',
+        },
+      })
+    ).status(),
+  ).toBe(401);
+
+  await page.goto('/#access_token=fake-recovery-token&type=recovery');
+  await expect(page).toHaveURL('/admin/reset-password');
+  await expect(
+    page.getByLabel('Nieuw wachtwoord / New password'),
+  ).toBeVisible();
+  expect(await page.evaluate(() => window.location.hash)).toBe('');
 });
 
 test('BRÛZE keeps its approved content without a false route link', async ({
@@ -384,7 +764,9 @@ test('BRÛZE keeps its approved content without a false route link', async ({
   const card = page.locator('article').filter({ hasText: /Bruze/i });
   await expect(card).toBeVisible();
   await expect(
-    card.getByText('Deze plek wacht nog op kaart- en routecontrole.'),
+    card.getByText(
+      'Route via CampusKompas is voor deze plek nog niet beschikbaar.',
+    ),
   ).toBeVisible();
   await expect(
     card.getByText(/Tijden moeten worden gecontroleerd/),
@@ -505,6 +887,8 @@ test('admin links a proposed gem to one validated canonical location', async ({
       category: 'study',
       location_id: null,
       location_review_status: 'proposed',
+      proposed_location_context: 'r8',
+      proposed_building_id: 'R8',
       proposed_location_name: 'QA proposed study spot',
       proposed_location_description:
         'Exact location must be selected by a moderator.',

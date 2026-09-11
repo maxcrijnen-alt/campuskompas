@@ -17,8 +17,21 @@ export function wheelchairNodeAllowed(node: RouteNode) {
 
 export function wheelchairEdgeAllowed(edge: RouteEdge) {
   return (
-    edge.edge_type !== 'stairs' &&
-    accessibilityState(edge) !== 'inaccessible'
+    edge.edge_type !== 'stairs' && accessibilityState(edge) !== 'inaccessible'
+  );
+}
+
+export function wheelchairConnectionAllowed(
+  edge: RouteEdge,
+  from: RouteNode,
+  to: RouteNode,
+) {
+  const sameBuilding = from.building_id === to.building_id;
+  return (
+    wheelchairEdgeAllowed(edge) &&
+    (sameBuilding
+      ? from.floor_id === to.floor_id || edge.edge_type === 'elevator'
+      : edge.edge_type === 'outdoor')
   );
 }
 

@@ -1,6 +1,12 @@
 export type Locale = 'nl' | 'en';
 export type Text = Record<Locale, string>;
 export type Verification = 'verified' | 'needs_review' | 'unverified';
+export type ProposedLocationContext = 'r8' | 'r10' | 'campus_outdoor' | 'other';
+export type HoursSourceType =
+  | 'official_web'
+  | 'physical_signage'
+  | 'staff_confirmation'
+  | 'manual_admin';
 export type Building = { id: string; name: string; address: string };
 export type Shape = {
   x: number;
@@ -96,6 +102,7 @@ export type Gem = {
     | 'approved'
     | 'rejected';
   proposed_location_name?: string | null;
+  proposed_location_context?: ProposedLocationContext | null;
   proposed_building_id?: string | null;
   proposed_floor_id?: string | null;
   proposed_room_zone?: string | null;
@@ -116,7 +123,9 @@ export type Hours = {
   verified_at: string;
   verification_status: Verification;
   exceptions_reviewed_through: string | null;
-  source_url: string;
+  source_url: string | null;
+  source_type: HoursSourceType;
+  source_description: string;
   hours_kind: 'physical_opening' | 'building_access' | 'service_contact';
   display_note: Text;
   timezone: 'Europe/Amsterdam';

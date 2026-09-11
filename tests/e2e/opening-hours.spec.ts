@@ -20,11 +20,12 @@ for (const width of [1280, 320])
       5,
     );
     await expect(hours.getByText('Gesloten', { exact: true })).toHaveCount(2);
-    await expect(hours.locator('.opening-week .today')).toContainText('Vandaag');
-    await expect(hours.getByRole('link', { name: /Officiële bron/ })).toHaveAttribute(
-      'href',
-      /nhlstenden.com\/bibliotheek/,
+    await expect(hours.locator('.opening-week .today')).toContainText(
+      'Vandaag',
     );
+    await expect(
+      hours.getByRole('link', { name: /Bron bekijken/ }),
+    ).toHaveAttribute('href', /nhlstenden.com\/bibliotheek/);
     await page.getByRole('button', { name: 'Details sluiten' }).click();
     await search.fill('cafe if');
     await page.getByRole('button', { name: /Café IF.*R8/i }).click();

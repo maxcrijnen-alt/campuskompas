@@ -1,6 +1,6 @@
 import type { RouteNode, RouteEdge } from '../campus/types';
 import {
-  wheelchairEdgeAllowed,
+  wheelchairConnectionAllowed,
   wheelchairNodeAllowed,
   wheelchairRouteConfidence,
   type WheelchairRouteConfidence,
@@ -30,10 +30,12 @@ export function shortestPath(
   for (const e of edges) {
     if (!Number.isFinite(e.weight) || e.weight < 0)
       throw new Error('Invalid graph weight');
+    const fromNode = allowed.get(e.from_node_id),
+      toNode = allowed.get(e.to_node_id);
     if (
-      !allowed.has(e.from_node_id) ||
-      !allowed.has(e.to_node_id) ||
-      (accessible && !wheelchairEdgeAllowed(e))
+      !fromNode ||
+      !toNode ||
+      (accessible && !wheelchairConnectionAllowed(e, fromNode, toNode))
     )
       continue;
     for (const [a, b] of [

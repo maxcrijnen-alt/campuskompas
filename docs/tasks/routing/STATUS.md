@@ -1,10 +1,10 @@
 # CampusKompas routing status
 
-Last updated: 2026-09-10
+Last updated: 2026-09-11
 
 ## Completed phases
 
-**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, **Phase 4 — Route experience**, **Phase 5 — Accessibility, admin & Hidden Gems / BRÛZE**, and **Phase 5.5 — Visual polish, operational data & opening hours** are complete.
+**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, **Phase 4 — Route experience**, **Phase 5 — Accessibility, admin & Hidden Gems / BRÛZE**, **Phase 5.5 — Visual polish, operational data & opening hours**, and **Phase 5.6 — User feedback, accessibility routing & final visual polish** are complete.
 
 - Routing uses one central endpoint resolver for start and destination locations.
 - From and To now use the same endpoint-validated location universe and the same search/result component.
@@ -79,9 +79,22 @@ Last updated: 2026-09-10
 - Visual browser checks passed at 320, 375, and 390 px plus desktop: no horizontal overflow, usable touch controls and floor selector, a readable map and route instruction, distinct start/route/transition/destination states, compact From/To, and scan-friendly details/Hidden Gems. Accessibility status remains textual as well as colored, and no unknown route is described as confirmed accessible.
 - Admin now edits hours as structured fields: scope, status, weekdays, multiple periods, closed days/exceptions, source, verification dates, reviewed-through date, bilingual notes, and linked locations/gems. Invalid times, overlaps, dates, days, sources, and verified records without provenance are rejected.
 
+## Phase 5.6 owner-feedback result
+
+- A neutral visit now selects canonical building `R8` and floor `R8-0` explicitly, independent of database ordering. Valid location, route-stage, QR and R10 deep links still select their own floor.
+- Relevant location details show the compact current opening-hours state directly below building/floor and before the route CTA on mobile and desktop. The weekly schedule and provenance remain expandable. Rooms and other non-hours categories do not get an hours card.
+- Wheelchair routing now permits a floor transition only through an explicit elevator edge, and a building transition only through an explicit outdoor edge. Stairs and verified-inaccessible records remain excluded; unknown data remains a candidate with an unverified warning and is never called inaccessible.
+- All 9 stored elevator edges are bidirectional, structurally vertical, have map coordinates, connect to corridors at both ends, and remain accessibility `unknown`. The current R8 plan lift chain supports R8-002/R8_MAIN → R8-301 with 3 elevator transitions and explicit “Neem de lift naar verdieping …” instructions. The R10 lift chain is not connected to the current endpoint component by a complete non-stair path, so R10_MAIN → F3.025 remains honestly unavailable for wheelchair routing.
+- Hidden Gem proposals now distinguish `r8`, `r10`, `campus_outdoor`, and `other`. External proposals require no building or floor, cannot claim indoor coordinates or route data, and show a clear public no-route message. Admin can inspect, edit, approve/reject, and later replace the proposal with one validated canonical location.
+- The interface uses a restrained purple primary, strong blue route/information color and pink Hidden Gem accent, with consistent focus, contrast, cards, buttons, chips and mobile states. Browser checks at 320, 375, 390 and 1280 px found no horizontal overflow.
+- `/admin` now includes a controlled email field and neutral “Wachtwoord vergeten?” action. Reset requests are rate-limited, only send for a provisioned admin, do not enumerate accounts, and lead to a dedicated password form. Recovery tokens stay in memory and are removed from the URL; the new password requires 12–72 characters with upper/lowercase, number and symbol. A root recovery redirect handles the configured Supabase Site URL as a safe fallback. Public registration remains disabled.
+- Opening-hours writes now use one target-aware atomic RPC. It rejects unsupported locations, incompatible schedule kinds, unapproved Gems, orphan schedules and generic-table writes while preserving edits to valid linked records.
+- Production contains 5 hours records: 4 verified and 1 needs-review, with 0 invalid provenance, suspicious links or orphan records. Of 13 hours-relevant locations, 4 have verified records; the 9 remaining facilities make no unsupported open/closed claim.
+- Migrations `20260911102132_phase56_external_gems_and_hours_integrity.sql` and `20260911193959_phase56_proposal_presence_constraints.sql` add the constrained external-proposal context, require an explicit proposal name/context at database level, and enforce final hours-link integrity. The already-applied additive provenance/link migrations `20260911045007_phase6_hours_provenance.sql` and `20260911070822_admin_hours_link.sql` were retained to keep production and local migration history aligned; retaining those deployed changes does not mark Phase 6 complete.
+
 ## Verification
 
-- Phase 5.5 hours, UI rendering, accessibility, normalization, routing, validation, and experience unit/integration suite: pass, 101/101, including fixed-clock Europe/Amsterdam and exception coverage.
+- Phase 5.6 hours, UI rendering, accessibility, normalization, routing, validation, reset, and experience unit/integration suite: pass, 108/108, including fixed-clock Europe/Amsterdam, exception coverage, and rejection of invalid cross-building lift edges.
 - Phase 4 required-pair experience audit: pass, 9/9 routes and 0 critical issues.
 - pnpm search:audit: pass, 606/606 From and To, 0 critical issues.
 - pnpm routing:audit: pass, 0 critical issues.
@@ -90,7 +103,9 @@ Last updated: 2026-09-10
 - Route browser acceptance: pass, 5/5 targeted checks on desktop and mobile.
 - Official-plan browser verification: pass, 8/8 floor images load at 1489 × 1489 and fit at 320 px.
 - pnpm seed:check: pass, 183 records validated.
-- pnpm test:e2e: pass, 21/21 against the real Supabase project, including admin, Storage, moderation, deduplicated likes, proposal-to-canonical linking, wrong-floor endpoint rejection, structured hours editing, BRÛZE, 320/375/390 px mobile layouts, official maps, opening-hour exceptions, and wheelchair behavior.
+- pnpm database:audit: pass, 0 integrity failures across 2 buildings, 8 floors, 24 categories, 4 sources, 5 hours records, 514 nodes, 535 edges, 606 locations, 576 rooms, and the approved Hidden Gem.
+- pnpm hours:audit: pass, 13 relevant facilities, 4 verified linked locations, 1 needs-review Gem schedule, and 0 critical issues.
+- pnpm test:e2e: pass, 23/23 against the real Supabase project, including admin, password-reset security, Storage, moderation, deduplicated likes, proposed indoor and outdoor Gems, proposal-to-canonical linking, wrong-floor endpoint rejection, structured hours editing, BRÛZE, 320/375/390 px mobile layouts, desktop, official maps, opening-hour exceptions, and wheelchair behavior.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.
@@ -100,4 +115,4 @@ Last updated: 2026-09-10
 
 **Phase 6 — not started**
 
-No code blocker has been identified. Physical on-campus validation is required before any route or location can be marked confirmed accessible. Priority checks are the R10 lift-to-plan connections, the current Campus Store desk/entrance, whether Document Centre still has any separate public counter, the BRÛZE map point/entrance, and current service/hospitality hours where official pages are silent. Phase 6 must also reconcile the pre-existing migration-history timestamp drift and review the existing Supabase advisor items, including leaked-password protection and unused/permissive-policy notices.
+No code blocker has been identified. Physical on-campus validation is required before any route or location can be marked confirmed accessible. Priority checks are the R10 lift-to-current-endpoint connections, the current Campus Store desk/entrance, whether Document Centre still has a separate public counter, the BRÛZE map point/entrance, and current service/hospitality hours where official pages are silent. Local migration timestamps now match the applied production history. Phase 6 must still complete the architecture/runbook review and assess the existing Supabase advisor items, including leaked-password protection and unused/permissive-policy notices.

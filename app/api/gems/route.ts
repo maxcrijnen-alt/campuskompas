@@ -13,7 +13,7 @@ export async function GET() {
     const { data, error } = await publicDb()
       .from('hidden_gems')
       .select(
-        'id,slug,title,description,category,location_id,location_review_status,proposed_location_name,proposed_building_id,proposed_floor_id,proposed_room_zone,proposed_location_description,proposed_location_source_url,status,featured,photo_path,hours_id,likes,created_at',
+        'id,slug,title,description,category,location_id,location_review_status,proposed_location_name,proposed_location_context,proposed_building_id,proposed_floor_id,proposed_room_zone,proposed_location_description,proposed_location_source_url,status,featured,photo_path,hours_id,likes,created_at',
       )
       .eq('status', 'approved')
       .order('featured', { ascending: false })
@@ -40,6 +40,7 @@ export async function POST(request: Request) {
       location_mode: body.get('location_mode') ?? 'existing',
       location_id: body.get('location_id'),
       proposed_location_name: body.get('proposed_location_name'),
+      proposed_location_context: body.get('proposed_location_context'),
       proposed_building_id: body.get('proposed_building_id'),
       proposed_floor_id: body.get('proposed_floor_id'),
       proposed_room_zone: body.get('proposed_room_zone'),
@@ -110,6 +111,9 @@ export async function POST(request: Request) {
       proposed_location_name: existing
         ? null
         : parsed.data.proposed_location_name,
+      proposed_location_context: existing
+        ? null
+        : parsed.data.proposed_location_context,
       proposed_building_id: existing ? null : parsed.data.proposed_building_id,
       proposed_floor_id: existing ? null : parsed.data.proposed_floor_id,
       proposed_room_zone: existing ? null : parsed.data.proposed_room_zone,

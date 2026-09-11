@@ -241,6 +241,8 @@ describe('public input validation', () => {
         location_mode: 'proposed',
         location_id: '',
         proposed_location_name: 'Nieuwe studienis',
+        proposed_location_context: 'r8',
+        proposed_building_id: 'R8',
         proposed_location_description:
           'Naast de grote trap op de begane grond.',
       }).success,

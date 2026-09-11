@@ -5,17 +5,30 @@ import {
   CalendarPlus,
   CheckCircle2,
   Clock3,
-  Plus,
+  Link2,
   Save,
+  Search,
   Trash2,
 } from 'lucide-react';
-import type { Gem, Hours, Location } from '@/lib/campus/types';
+import { OpeningHours } from '@/components/campus/opening-hours';
+import type { Category, Gem, Hours, Location } from '@/lib/campus/types';
 
 type PeriodInput = { value: string; closed: boolean };
 type ExceptionInput = PeriodInput & { date: string };
 type Draft = Omit<Hours, 'weekly' | 'exceptions'> & {
   weekly: Record<string, PeriodInput>;
   exceptions: ExceptionInput[];
+};
+export type HoursLinkTarget = {
+  target_type: 'location' | 'hidden_gem';
+  target_id: string;
+};
+type TargetOption = HoursLinkTarget & {
+  key: string;
+  label: string;
+  meta: string;
+  hours_id: string | null;
+  search: string;
 };
 
 const weekdayNames = [
@@ -70,7 +83,9 @@ function newDraft(): Draft {
     verified_at: today,
     verification_status: 'unverified',
     exceptions_reviewed_through: null,
-    source_url: 'https://www.nhlstenden.com/',
+    source_url: null,
+    source_type: 'manual_admin',
+    source_description: '',
     hours_kind: 'physical_opening',
     display_note: { nl: '', en: '' },
     timezone: 'Europe/Amsterdam',
@@ -101,16 +116,27 @@ function parsePeriods(input: PeriodInput, label: string) {
   return periods;
 }
 
-function fromDraft(draft: Draft): Hours {
+export function fromDraft(draft: Draft): Hours {
   if (!draft.id.trim()) throw new Error('ID is verplicht / required');
   if (
-    draft.verification_status === 'verified' &&
-    !draft.source_url.startsWith('https://')
+    draft.source_type === 'official_web' &&
+    !draft.source_url?.startsWith('https://')
   ) {
     throw new Error(
-      'Verified tijden vereisen een HTTPS-bron / require an HTTPS source',
+      'Een officiële webbron vereist een HTTPS-URL / requires an HTTPS URL',
     );
   }
+  if (draft.source_url && !draft.source_url.startsWith('https://'))
+    throw new Error('Bron-URL moet HTTPS gebruiken / must use HTTPS');
+  if (draft.source_description.trim().length < 3)
+    throw new Error('Beschrijf de bron kort / briefly describe the source');
+  if (
+    draft.source_type === 'manual_admin' &&
+    draft.verification_status === 'verified'
+  )
+    throw new Error(
+      'Een handmatige beheernotitie kan niet verified zijn / cannot be verified',
+    );
   if (
     draft.exceptions_reviewed_through &&
     draft.exceptions_reviewed_through < draft.verified_at
@@ -152,16 +178,116 @@ function fromDraft(draft: Draft): Hours {
 export function HoursAdmin({
   hours,
   locations,
+  categories,
   gems,
   onSave,
 }: {
   hours: Hours[];
   locations: Location[];
+  categories: Category[];
   gems: Gem[];
-  onSave: (hours: Hours) => Promise<void>;
+  onSave: (hours: Hours, target: HoursLinkTarget | null) => Promise<void>;
 }) {
   const [draft, setDraft] = useState<Draft | null>(null);
   const [error, setError] = useState('');
+  const [targetQuery, setTargetQuery] = useState('');
+  const [selectedTargetKey, setSelectedTargetKey] = useState<string | null>(
+    null,
+  );
+  const [saving, setSaving] = useState(false);
+  const hoursRelevantCategoryIds = useMemo(
+    () =>
+      new Set(
+        categories
+          .filter((category) => category.hours_relevant)
+          .map((category) => category.id),
+      ),
+    [categories],
+  );
+  const targetOptions = useMemo<TargetOption[]>(
+    () =>
+      [
+        ...locations
+          .filter(
+            (location) =>
+              location.status === 'approved' &&
+              hoursRelevantCategoryIds.has(location.category_id),
+          )
+          .map((location) => {
+            const label = location.name.nl || location.name.en;
+            const meta = [
+              location.building_id,
+              location.floor_id,
+              location.room_code,
+            ]
+              .filter(Boolean)
+              .join(' · ');
+            return {
+              key: `location:${location.id}`,
+              target_type: 'location' as const,
+              target_id: location.id,
+              label,
+              meta,
+              hours_id: location.hours_id ?? null,
+              search:
+                `${label} ${location.name.en} ${meta} ${location.aliases.join(' ')}`.toLocaleLowerCase(
+                  'nl',
+                ),
+            };
+          }),
+        ...gems
+          .filter((gem) => gem.status === 'approved')
+          .map((gem) => ({
+            key: `hidden_gem:${gem.id}`,
+            target_type: 'hidden_gem' as const,
+            target_id: gem.id,
+            label: gem.title,
+            meta: 'Hidden Gem',
+            hours_id: gem.hours_id ?? null,
+            search: `${gem.title} hidden gem`.toLocaleLowerCase('nl'),
+          })),
+      ].sort((a, b) => a.label.localeCompare(b.label, 'nl')),
+    [locations, gems, hoursRelevantCategoryIds],
+  );
+  const selectedTarget =
+    targetOptions.find((target) => target.key === selectedTargetKey) ?? null;
+  const hoursRecordLabels = useMemo(
+    () =>
+      new Map(
+        hours.map((record) => {
+          const names = [
+            ...locations
+              .filter((location) => location.hours_id === record.id)
+              .map((location) => location.name.nl),
+            ...gems
+              .filter((gem) => gem.hours_id === record.id)
+              .map((gem) => gem.title),
+          ];
+          const subject =
+            names.join(', ') || `${record.source_description.slice(0, 55)}…`;
+          return [
+            record.id,
+            `${subject} · ${record.hours_kind.replaceAll('_', ' ')} · ${record.verification_status}`,
+          ] as const;
+        }),
+      ),
+    [gems, hours, locations],
+  );
+  const matchingTargets = useMemo(() => {
+    const query = targetQuery.trim().toLocaleLowerCase('nl');
+    if (query.length < 2 || selectedTarget?.label === targetQuery) return [];
+    return targetOptions
+      .filter((target) => target.search.includes(query))
+      .slice(0, 8);
+  }, [selectedTarget, targetOptions, targetQuery]);
+  const preview = useMemo(() => {
+    if (!draft) return undefined;
+    try {
+      return fromDraft(draft);
+    } catch {
+      return undefined;
+    }
+  }, [draft]);
   const linked = useMemo(() => {
     if (!draft) return [];
     return [
@@ -177,7 +303,95 @@ export function HoursAdmin({
   return (
     <div className="hours-admin">
       <div className="hours-admin-list">
+        <section className="panel hours-target-picker">
+          <span className="eyebrow">KOPPELING / LINK</span>
+          <h2>Zoek een voorziening</h2>
+          <p className="form-note">
+            Zoek op naam en kies daarna bestaande of nieuwe openingstijden.
+          </p>
+          <label className="field-label">
+            Voorziening of Hidden Gem / Facility or Hidden Gem
+            <span className="hours-target-search">
+              <Search size={17} aria-hidden="true" />
+              <input
+                className="field-input"
+                type="search"
+                value={targetQuery}
+                placeholder="Bijv. Bibliotheek of BRUZE"
+                onChange={(event) => {
+                  setTargetQuery(event.target.value);
+                  if (event.target.value !== selectedTarget?.label)
+                    setSelectedTargetKey(null);
+                }}
+              />
+            </span>
+          </label>
+          {matchingTargets.length > 0 && (
+            <div
+              className="hours-target-results"
+              aria-label="Zoekresultaten / Search results"
+            >
+              {matchingTargets.map((target) => (
+                <button
+                  type="button"
+                  key={target.key}
+                  onClick={() => {
+                    setSelectedTargetKey(target.key);
+                    setTargetQuery(target.label);
+                    const current = hours.find(
+                      (record) => record.id === target.hours_id,
+                    );
+                    setDraft(current ? toDraft(current) : newDraft());
+                    setError('');
+                  }}
+                >
+                  <strong>{target.label}</strong>
+                  <span>{target.meta}</span>
+                </button>
+              ))}
+            </div>
+          )}
+          {selectedTarget && (
+            <div className="hours-target-selected" role="status">
+              <strong>{selectedTarget.label}</strong>
+              <span>{selectedTarget.meta}</span>
+              <label className="field-label">
+                Urenrecord / Hours record
+                <select
+                  className="field-input"
+                  value={
+                    draft && hours.some((record) => record.id === draft.id)
+                      ? draft.id
+                      : '__new__'
+                  }
+                  onChange={(event) => {
+                    const record = hours.find(
+                      (entry) => entry.id === event.target.value,
+                    );
+                    setDraft(record ? toDraft(record) : newDraft());
+                    setError('');
+                  }}
+                >
+                  <option value="__new__">Nieuwe tijden invoeren</option>
+                  {hours.map((record) => (
+                    <option key={record.id} value={record.id}>
+                      {hoursRecordLabels.get(record.id)}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
+        </section>
         {hours.map((record) => {
+          const connectedNames = [
+            ...locations
+              .filter((location) => location.hours_id === record.id)
+              .map((location) => location.name.nl),
+            ...gems
+              .filter((gem) => gem.hours_id === record.id)
+              .map((gem) => gem.title),
+          ];
           const connections =
             locations.filter((location) => location.hours_id === record.id)
               .length + gems.filter((gem) => gem.hours_id === record.id).length;
@@ -192,7 +406,7 @@ export function HoursAdmin({
                   )}
                   {record.verification_status}
                 </span>
-                <h2>{record.id}</h2>
+                <h2>{connectedNames.join(', ') || 'Nog niet gekoppeld'}</h2>
                 <p>
                   {record.hours_kind.replaceAll('_', ' ')} · {connections}{' '}
                   koppeling(en)
@@ -201,6 +415,8 @@ export function HoursAdmin({
               <button
                 className="secondary-button"
                 onClick={() => {
+                  setSelectedTargetKey(null);
+                  setTargetQuery('');
                   setDraft(toDraft(record));
                   setError('');
                 }}
@@ -210,15 +426,6 @@ export function HoursAdmin({
             </article>
           );
         })}
-        <button
-          className="hours-admin-new"
-          onClick={() => {
-            setDraft(newDraft());
-            setError('');
-          }}
-        >
-          <Plus size={20} /> Nieuw urenrecord / New hours record
-        </button>
       </div>
 
       {draft && (
@@ -229,9 +436,32 @@ export function HoursAdmin({
             setError('');
             try {
               const record = fromDraft(draft);
-              void onSave(record)
+              if (
+                !selectedTarget &&
+                !hours.some((entry) => entry.id === record.id)
+              )
+                throw new Error(
+                  'Kies eerst een voorziening / Select a facility first',
+                );
+              setSaving(true);
+              void onSave(
+                record,
+                selectedTarget
+                  ? {
+                      target_type: selectedTarget.target_type,
+                      target_id: selectedTarget.target_id,
+                    }
+                  : null,
+              )
                 .then(() => setDraft(toDraft(record)))
-                .catch(() => setError('Opslaan mislukt / Save failed'));
+                .catch((caught) =>
+                  setError(
+                    caught instanceof Error
+                      ? caught.message
+                      : 'Opslaan mislukt / Save failed',
+                  ),
+                )
+                .finally(() => setSaving(false));
             } catch (caught) {
               setError(
                 caught instanceof Error
@@ -244,7 +474,11 @@ export function HoursAdmin({
           <div className="hours-admin-heading">
             <div>
               <span className="eyebrow">OPERATIONELE DATA</span>
-              <h2>{draft.id}</h2>
+              <h2>
+                {selectedTarget?.label ??
+                  linked[0] ??
+                  'Openingstijden bewerken / Edit hours'}
+              </h2>
             </div>
             <button
               type="button"
@@ -256,17 +490,6 @@ export function HoursAdmin({
             </button>
           </div>
           <div className="form-grid">
-            <label className="field-label">
-              ID
-              <input
-                className="field-input"
-                value={draft.id}
-                onChange={(event) =>
-                  setDraft({ ...draft, id: event.target.value })
-                }
-                required
-              />
-            </label>
             <label className="field-label">
               Soort / Scope
               <select
@@ -301,7 +524,12 @@ export function HoursAdmin({
                   })
                 }
               >
-                <option value="verified">verified</option>
+                <option
+                  value="verified"
+                  disabled={draft.source_type === 'manual_admin'}
+                >
+                  verified
+                </option>
                 <option value="needs_review">needs_review</option>
                 <option value="unverified">unverified</option>
               </select>
@@ -337,18 +565,87 @@ export function HoursAdmin({
               />
             </label>
           </div>
-          <label className="field-label">
-            Officiële bron / Official source
-            <input
-              className="field-input"
-              type="url"
-              value={draft.source_url}
-              onChange={(event) =>
-                setDraft({ ...draft, source_url: event.target.value })
-              }
-              required
-            />
-          </label>
+          <fieldset className="hours-editor-section">
+            <legend>Bron en herkomst / Source and provenance</legend>
+            <div className="form-grid">
+              <label className="field-label">
+                Brontype / Source type
+                <select
+                  className="field-input"
+                  value={draft.source_type}
+                  onChange={(event) => {
+                    const source_type = event.target
+                      .value as Hours['source_type'];
+                    setDraft({
+                      ...draft,
+                      source_type,
+                      verification_status:
+                        source_type === 'manual_admin' &&
+                        draft.verification_status === 'verified'
+                          ? 'needs_review'
+                          : draft.verification_status,
+                    });
+                  }}
+                >
+                  <option value="official_web">
+                    Officiële website / Official website
+                  </option>
+                  <option value="physical_signage">
+                    Bord of poster op locatie / On-site signage
+                  </option>
+                  <option value="staff_confirmation">
+                    Medewerkerbevestiging / Staff confirmation
+                  </option>
+                  <option value="manual_admin">
+                    Handmatige beheernotitie / Manual admin note
+                  </option>
+                </select>
+              </label>
+              <label className="field-label">
+                Bron-URL / Source URL{' '}
+                {draft.source_type === 'official_web'
+                  ? '(verplicht / required)'
+                  : '(optioneel / optional)'}
+                <input
+                  className="field-input"
+                  type="url"
+                  value={draft.source_url ?? ''}
+                  onChange={(event) =>
+                    setDraft({
+                      ...draft,
+                      source_url: event.target.value || null,
+                    })
+                  }
+                  required={draft.source_type === 'official_web'}
+                  placeholder="https://…"
+                />
+              </label>
+            </div>
+            <label className="field-label">
+              Korte bronbeschrijving / Short source description
+              <textarea
+                className="field-input"
+                rows={2}
+                minLength={3}
+                maxLength={500}
+                value={draft.source_description}
+                onChange={(event) =>
+                  setDraft({
+                    ...draft,
+                    source_description: event.target.value,
+                  })
+                }
+                placeholder="Waar en hoe zijn deze tijden gecontroleerd?"
+                required
+              />
+            </label>
+            {draft.source_type === 'manual_admin' && (
+              <p className="form-note">
+                Een handmatige notitie blijft needs_review of unverified en
+                wordt publiek nooit als bevestigde open/gesloten-status getoond.
+              </p>
+            )}
+          </fieldset>
           {linked.length > 0 && (
             <p className="hours-admin-links">
               <strong>Gekoppeld / Linked:</strong> {linked.join(', ')}
@@ -540,13 +837,29 @@ export function HoursAdmin({
               />
             </label>
           </div>
+          <fieldset className="hours-editor-section hours-admin-preview">
+            <legend>Publieke preview / Public preview</legend>
+            {preview ? (
+              <OpeningHours hours={preview} locale="nl" />
+            ) : (
+              <p className="form-note">
+                Vul geldige tijden en broninformatie in om de publieke weergave
+                te bekijken.
+              </p>
+            )}
+          </fieldset>
           {error && (
             <p className="form-error" role="alert">
               {error}
             </p>
           )}
-          <button className="primary-button">
-            <Save size={18} /> Openingstijden opslaan / Save hours
+          <button className="primary-button" disabled={saving}>
+            {selectedTarget ? <Link2 size={18} /> : <Save size={18} />}{' '}
+            {saving
+              ? 'Opslaan… / Saving…'
+              : selectedTarget
+                ? 'Opslaan en koppelen / Save and link'
+                : 'Openingstijden opslaan / Save hours'}
           </button>
         </form>
       )}

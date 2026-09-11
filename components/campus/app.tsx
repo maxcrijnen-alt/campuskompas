@@ -15,6 +15,8 @@ import { RoutePanel } from './route-panel';
 import { GemsPage } from './gems';
 import { TipsPage } from './tips';
 import { track } from '@/lib/campus/analytics';
+import { defaultCampusFloorId } from '@/lib/campus/default-view';
+
 export function CampusApp({
   data,
   connected,
@@ -31,7 +33,7 @@ export function CampusApp({
   gemSlug?: string;
 }) {
   const [locale, setLocale] = useState<Locale>('nl'),
-    [floorId, setFloor] = useState(data.floors[0]?.id ?? ''),
+    [floorId, setFloor] = useState(() => defaultCampusFloorId(data)),
     [selected, setSelected] = useState<Location | null>(null),
     [from, setFrom] = useState(''),
     [qrOrigin, setQrOrigin] = useState(false),
@@ -297,12 +299,17 @@ export function CampusApp({
                               b.id === floor.building_id ? 'active' : ''
                             }
                             aria-pressed={b.id === floor.building_id}
-                            onClick={() =>
-                              setFloor(
-                                data.floors.find((f) => f.building_id === b.id)!
-                                  .id,
-                              )
-                            }
+                            onClick={() => {
+                              const groundFloor = data.floors.find(
+                                (candidate) =>
+                                  candidate.building_id === b.id &&
+                                  candidate.level === 0,
+                              );
+                              const firstFloor = data.floors.find(
+                                (candidate) => candidate.building_id === b.id,
+                              );
+                              setFloor(groundFloor?.id ?? firstFloor?.id ?? '');
+                            }}
                           >
                             {b.id}
                           </button>

@@ -30,8 +30,8 @@ import {
 } from '@/components/ui/alert-dialog';
 
 import { MapEditor } from './map-editor';
-import { HoursAdmin } from './hours-admin';
-import type { Gem, Floor, Hours, Location } from '@/lib/campus/types';
+import { HoursAdmin, type HoursLinkTarget } from './hours-admin';
+import type { Category, Gem, Floor, Hours, Location } from '@/lib/campus/types';
 import QRCode from 'qrcode';
 type Row = Record<string, unknown>;
 const sections = [
@@ -57,9 +57,12 @@ export function AdminApp({
   initialEmail: string | null;
 }) {
   const [email, setEmail] = useState(initialEmail),
+    [loginEmail, setLoginEmail] = useState(''),
+    [resetStatus, setResetStatus] = useState(''),
     [rows, setRows] = useState<Row[]>([]),
     [locations, setLocations] = useState<Row[]>([]),
     [relatedGems, setRelatedGems] = useState<Row[]>([]),
+    [relatedCategories, setRelatedCategories] = useState<Row[]>([]),
     [routeNodes, setRouteNodes] = useState<Row[]>([]),
     [health, setHealth] = useState<Record<
       string,
@@ -102,7 +105,11 @@ export function AdminApp({
       if (table) {
         const relatedPromise =
           table === 'opening_hours'
-            ? Promise.all([read('locations'), read('hidden_gems')])
+            ? Promise.all([
+                read('locations'),
+                read('hidden_gems'),
+                read('location_categories'),
+              ])
             : table === 'hidden_gems'
               ? read('locations').then((linkedLocations) => [linkedLocations])
               : table === 'locations'
@@ -116,9 +123,10 @@ export function AdminApp({
         if (table === 'hidden_gems') setLocations(related[0]);
         if (table === 'locations') setRouteNodes(related[0]);
         if (table === 'opening_hours') {
-          const [linkedLocations, linkedGems] = related;
+          const [linkedLocations, linkedGems, linkedCategories] = related;
           setLocations(linkedLocations);
           setRelatedGems(linkedGems);
+          setRelatedCategories(linkedCategories);
         }
         const id = new URLSearchParams(window.location.search).get('edit');
         const record = id && loaded.find((r) => r.id === id);
@@ -176,6 +184,26 @@ export function AdminApp({
     setNotice('Opgeslagen / Saved');
     await refresh();
   }
+  async function saveHours(record: Hours, target: HoursLinkTarget | null) {
+    setError('');
+    const response = await fetch('/api/admin/hours-records', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ hours: record, target }),
+    });
+    if (!response.ok)
+      throw new Error(
+        target
+          ? 'Niet opgeslagen of gekoppeld. Controleer voorziening, scope, tijden en bron / Not saved or linked. Check facility, scope, times and source.'
+          : 'Openingstijden niet opgeslagen. Controleer tijden en bron / Hours not saved. Check times and source.',
+      );
+    setNotice(
+      target
+        ? 'Opgeslagen en gekoppeld / Saved and linked'
+        : 'Opgeslagen / Saved',
+    );
+    await refresh();
+  }
   async function login(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
@@ -186,7 +214,7 @@ export function AdminApp({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          email: form.get('email'),
+          email: loginEmail,
           password: form.get('password'),
         }),
       });
@@ -196,9 +224,36 @@ export function AdminApp({
             ? 'Database tijdelijk niet bereikbaar / Database unavailable'
             : 'Geen beheerderstoegang of onjuiste gegevens / Admin access denied',
         );
-      setEmail(display(form.get('email')));
+      setEmail(loginEmail);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Error');
+    } finally {
+      setLoading(false);
+    }
+  }
+  async function requestPasswordReset() {
+    if (!loginEmail) {
+      setError('Vul eerst je e-mailadres in / Enter your email first');
+      return;
+    }
+    setLoading(true);
+    setError('');
+    setResetStatus('');
+    try {
+      const response = await fetch('/api/admin/password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail }),
+      });
+      if (!response.ok)
+        throw new Error(
+          'Reset kon niet worden gestart / Reset could not start',
+        );
+      setResetStatus(
+        'Als dit e-mailadres beheerderstoegang heeft, ontvang je een veilige resetlink. / If this email has administrator access, you will receive a secure reset link.',
+      );
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : 'Error');
     } finally {
       setLoading(false);
     }
@@ -249,6 +304,8 @@ export function AdminApp({
                   name="email"
                   type="email"
                   autoComplete="username"
+                  value={loginEmail}
+                  onChange={(event) => setLoginEmail(event.target.value)}
                   required
                 />
               </label>
@@ -270,6 +327,19 @@ export function AdminApp({
               <button className="primary-button" disabled={loading}>
                 Inloggen / Sign in
               </button>
+              <button
+                className="text-link admin-forgot-password"
+                type="button"
+                disabled={loading}
+                onClick={() => void requestPasswordReset()}
+              >
+                Wachtwoord vergeten? / Forgot password?
+              </button>
+              {resetStatus && (
+                <p className="form-note" role="status">
+                  {resetStatus}
+                </p>
+              )}
             </form>
             <Link className="text-link" href="/">
               <ArrowLeft size={15} />
@@ -580,6 +650,9 @@ export function AdminApp({
                           </Link>
                         ) : (
                           <div className="gem-location-proposal">
+                            <span className="tag">
+                              {gemContextLabel(g.proposed_location_context)}
+                            </span>
                             <strong>{g.proposed_location_name}</strong>
                             <p>{g.proposed_location_description}</p>
                             <small>
@@ -792,10 +865,9 @@ export function AdminApp({
                 <HoursAdmin
                   hours={rows as unknown as Hours[]}
                   locations={locations as unknown as Location[]}
+                  categories={relatedCategories as unknown as Category[]}
                   gems={relatedGems as unknown as Gem[]}
-                  onSave={(record) =>
-                    save(record as unknown as Row, 'opening_hours')
-                  }
+                  onSave={saveHours}
                 />
               ) : (
                 <>
@@ -1068,4 +1140,15 @@ function display(value: unknown): string {
       : value == null
         ? ''
         : JSON.stringify(value);
+}
+
+function gemContextLabel(context: Gem['proposed_location_context']) {
+  return (
+    {
+      r8: 'Voorstel Rengerslaan 8 / R8 proposal',
+      r10: 'Voorstel Rengerslaan 10 / R10 proposal',
+      campus_outdoor: 'Buiten op campus / Campus outdoor',
+      other: 'Andere externe plek / Other external place',
+    }[context ?? 'other'] ?? 'Locatievoorstel / Location proposal'
+  );
 }

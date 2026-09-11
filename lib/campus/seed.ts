@@ -463,6 +463,9 @@ export const seed: CampusData = {
       id: 'R8',
       weekly: weekly('07:30', '18:00'),
       source_url: sources[0].url,
+      source_type: 'official_web' as const,
+      source_description:
+        'Official NHL Stenden Leeuwarden campus page for Rengerslaan 8 building access.',
       hours_kind: 'building_access' as const,
       display_note: bi(
         'Gebouwuren; vakanties en extreem weer kunnen afwijken.',
@@ -475,6 +478,9 @@ export const seed: CampusData = {
       id: 'R10',
       weekly: weekly('07:30', '22:00', '18:00'),
       source_url: sources[0].url,
+      source_type: 'official_web' as const,
+      source_description:
+        'Official NHL Stenden Leeuwarden campus page for Rengerslaan 10 building access.',
       hours_kind: 'building_access' as const,
       display_note: bi(
         'Gebouwuren; vakanties en extreem weer kunnen afwijken.',
@@ -487,6 +493,8 @@ export const seed: CampusData = {
       id: 'library',
       weekly: weekly('08:30', '17:00'),
       source_url: sources[2].url,
+      source_type: 'official_web' as const,
+      source_description: 'Official NHL Stenden library opening-hours page.',
       hours_kind: 'physical_opening' as const,
       display_note: bi(
         'Tijdens de herfstvakantie, 12 t/m 16 oktober 2026, is de bibliotheek geopend van 09:00 tot 13:00.',
@@ -506,6 +514,8 @@ export const seed: CampusData = {
       weekly: weekly('08:30', '16:30'),
       source_url:
         'https://www.nhlstenden.com/werken-en-studeren/kom-in-contact',
+      source_type: 'official_web' as const,
+      source_description: 'Official NHL Stenden Student Info contact page.',
       hours_kind: 'service_contact' as const,
       display_note: bi(
         'Dit zijn telefoontijden. WhatsApp is op werkdagen bereikbaar van 09:30 tot 16:30; fysieke balie-uren zijn niet bevestigd.',
@@ -518,6 +528,9 @@ export const seed: CampusData = {
       id: 'bruze',
       weekly: {},
       source_url: sources[1].url,
+      source_type: 'official_web' as const,
+      source_description:
+        'Official NHL Stenden Leeuwarden catering page; weekdays remain unspecified.',
       hours_kind: 'physical_opening' as const,
       display_note: bi(
         'De officiële cateringpagina noemt 09:00–18:00, maar vermeldt geen weekdagen. Daarom tonen we geen open/gesloten-claim.',

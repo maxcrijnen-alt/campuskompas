@@ -11,7 +11,8 @@ export type HoursAuditReport = {
   physicalOpeningSchedules: number;
   buildingAccessSchedules: number;
   serviceContactSchedules: number;
-  missingSourceUrl: string[];
+  sourceTypeCounts: Record<Hours['source_type'], number>;
+  invalidProvenance: string[];
   staleVerifiedAt: string[];
   exceptionRecords: number;
   exceptionDates: number;
@@ -118,6 +119,33 @@ export function auditOpeningHours(
         hours.get(gem.hours_id)?.verification_status !== 'verified',
     )
     .map((gem) => `hidden-gem:${gem.title}`);
+  const sourceTypes: Hours['source_type'][] = [
+    'official_web',
+    'physical_signage',
+    'staff_confirmation',
+    'manual_admin',
+  ];
+  const invalidProvenance = input.hours.flatMap((record) => {
+    const failures: string[] = [];
+    if (record.source_description.trim().length < 3)
+      failures.push(`${record.id}: source description missing`);
+    if (
+      record.source_type === 'official_web' &&
+      !record.source_url?.startsWith('https://')
+    )
+      failures.push(`${record.id}: official web source URL missing`);
+    if (record.source_url && !record.source_url.startsWith('https://'))
+      failures.push(`${record.id}: source URL is not HTTPS`);
+    if (
+      record.source_type === 'manual_admin' &&
+      record.verification_status === 'verified'
+    )
+      failures.push(`${record.id}: manual admin source marked verified`);
+    return failures;
+  });
+  const orphanHoursRecords = input.hours
+    .filter((record) => !linkedIds.has(record.id))
+    .map((record) => record.id);
 
   return {
     approvedLocations: approved.length,
@@ -143,9 +171,14 @@ export function auditOpeningHours(
     serviceContactSchedules: input.hours.filter(
       (record) => record.hours_kind === 'service_contact',
     ).length,
-    missingSourceUrl: input.hours
-      .filter((record) => !record.source_url.startsWith('https://'))
-      .map((record) => record.id),
+    sourceTypeCounts: Object.fromEntries(
+      sourceTypes.map((sourceType) => [
+        sourceType,
+        input.hours.filter((record) => record.source_type === sourceType)
+          .length,
+      ]),
+    ) as Record<Hours['source_type'], number>,
+    invalidProvenance,
     staleVerifiedAt,
     exceptionRecords: input.hours.filter(
       (record) => Object.keys(record.exceptions).length > 0,
@@ -155,9 +188,7 @@ export function auditOpeningHours(
       0,
     ),
     semanticallySuspiciousLinks: suspicious,
-    orphanHoursRecords: input.hours
-      .filter((record) => !linkedIds.has(record.id))
-      .map((record) => record.id),
+    orphanHoursRecords,
     facilitiesWithoutConfirmedHours: withoutConfirmed,
     physicalVerificationOrSourceUpdateNeeded: [
       ...withoutConfirmed,
@@ -168,6 +199,7 @@ export function auditOpeningHours(
         !categories.get(location.category_id)?.hours_relevant &&
         !location.hours_id,
     ).length,
-    criticalIssueCount: suspicious.length,
+    criticalIssueCount:
+      suspicious.length + invalidProvenance.length + orphanHoursRecords.length,
   };
 }

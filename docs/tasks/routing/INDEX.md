@@ -73,6 +73,20 @@ Goals:
 - expose routing status and manual endpoint control in admin;
 - add routing health summary to admin.
 
+## Phase 5.6 — User feedback, accessibility routing & final visual polish
+
+Use the completed Phase 5.5 baseline and the owner feedback recorded for this
+phase.
+
+Goals:
+- open the neutral homepage on Rengerslaan 8 ground floor while preserving valid deep links, QR links and route stages;
+- surface compact, semantically filtered opening-hours status before the primary location action;
+- require explicit lift or outdoor graph metadata for wheelchair floor/building transitions and describe unknown data honestly;
+- support moderated indoor, campus-outdoor and other external Hidden Gem proposals without creating route data;
+- apply a restrained purple, blue and pink visual identity across public and admin flows;
+- provide the provisioned owner account with a secure, non-enumerating password-reset flow;
+- preserve the structured opening-hours admin and all Phase 1–5.5 routing regressions.
+
 ## Phase 6 — Full verification & documentation
 
 Read MASTER sections: **40–42, 49–55** and revisit any earlier section whose Definition of Done is not satisfied.

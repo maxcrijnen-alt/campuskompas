@@ -102,6 +102,12 @@ export function LocationPanel({
           ? ' · Zone ' + l.room_code[0]
           : ''}
       </p>
+      {category?.hours_relevant && (
+        <OpeningHours
+          hours={data.hours.find((hours) => hours.id === l.hours_id)}
+          locale={locale}
+        />
+      )}
       <div className="location-cta">
         <button className="primary-button" onClick={onRoute}>
           <Navigation size={18} />
@@ -119,12 +125,6 @@ export function LocationPanel({
       <div className={'sheet-content ' + (expanded ? 'expanded' : '')}>
         {l.category_id !== 'room' && (
           <>
-            {category?.hours_relevant && (
-              <OpeningHours
-                hours={data.hours.find((h) => h.id === l.hours_id)}
-                locale={locale}
-              />
-            )}{' '}
             {l.description[locale] && <p>{l.description[locale]}</p>}
             {node && (
               <p className="form-note accessibility-status">

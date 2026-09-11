@@ -11,7 +11,7 @@ import {
 } from '../lib/campus/hours';
 import { seed } from '../lib/campus/seed';
 import type { Hours } from '../lib/campus/types';
-import { adminSchemas } from '../lib/campus/validation';
+import { adminSchemas, hoursTargetSchema } from '../lib/campus/validation';
 
 const base: Hours = {
   id: 'test-hours',
@@ -32,6 +32,8 @@ const base: Hours = {
   verification_status: 'verified',
   exceptions_reviewed_through: '2026-10-31',
   source_url: 'https://www.nhlstenden.com/test',
+  source_type: 'official_web',
+  source_description: 'Official test page for this schedule.',
   hours_kind: 'physical_opening',
   display_note: { nl: 'Actuele bron.', en: 'Current source.' },
   timezone: 'Europe/Amsterdam',
@@ -182,7 +184,7 @@ describe('Phase 5.5 operational records and presentation', () => {
       }),
     );
     expect(html).toContain('class="today"');
-    expect(html).toContain('Officiële bron');
+    expect(html).toContain('Officiële webbron');
     expect(html).toContain(base.source_url);
     expect(
       renderToStaticMarkup(
@@ -230,6 +232,8 @@ describe('Phase 5.5 operational records and presentation', () => {
     expect(report.facilitiesWithoutConfirmedHours).not.toContain('F3025');
     expect(report.irrelevantLocationsWithoutHoursIgnored).toBeGreaterThan(0);
     expect(report.exceptionDates).toBe(5);
+    expect(report.invalidProvenance).toEqual([]);
+    expect(report.sourceTypeCounts.official_web).toBe(5);
   });
 
   it('validates ranges, overlap, day numbers and exception dates', () => {
@@ -259,6 +263,69 @@ describe('Phase 5.5 operational records and presentation', () => {
       adminSchemas.opening_hours.safeParse({
         ...base,
         exceptions: { '2026-13-40': [] },
+      }).success,
+    ).toBe(false);
+  });
+
+  it('supports honest URL-less provenance without treating manual notes as verified', () => {
+    const signage = {
+      ...base,
+      source_type: 'physical_signage' as const,
+      source_url: null,
+      source_description: 'Opening-hours sign beside the facility entrance.',
+    };
+    expect(adminSchemas.opening_hours.safeParse(signage).success).toBe(true);
+    const signageHtml = renderToStaticMarkup(
+      createElement(OpeningHours, { hours: signage, locale: 'nl' }),
+    );
+    expect(signageHtml).toContain('Bord of poster op locatie');
+    expect(signageHtml).not.toContain('Bron bekijken');
+
+    const manual = {
+      ...base,
+      source_type: 'manual_admin' as const,
+      source_url: null,
+      source_description: 'Temporary administrator note pending verification.',
+      verification_status: 'unverified' as const,
+    };
+    expect(adminSchemas.opening_hours.safeParse(manual).success).toBe(true);
+    expect(
+      adminSchemas.opening_hours.safeParse({
+        ...manual,
+        verification_status: 'verified',
+      }).success,
+    ).toBe(false);
+    expect(
+      adminSchemas.opening_hours.safeParse({
+        ...signage,
+        source_description: '',
+      }).success,
+    ).toBe(false);
+    expect(
+      adminSchemas.opening_hours.safeParse({
+        ...base,
+        source_url: null,
+      }).success,
+    ).toBe(false);
+  });
+
+  it('validates narrow location and Hidden Gem hours-link requests', () => {
+    expect(
+      hoursTargetSchema.safeParse({
+        target_type: 'location',
+        target_id: 'library',
+      }).success,
+    ).toBe(true);
+    expect(
+      hoursTargetSchema.safeParse({
+        target_type: 'hidden_gem',
+        target_id: '3ed27dd9-0af0-48a7-aaf8-e3bdf614fa62',
+      }).success,
+    ).toBe(true);
+    expect(
+      hoursTargetSchema.safeParse({
+        target_type: 'room',
+        target_id: 'library',
       }).success,
     ).toBe(false);
   });

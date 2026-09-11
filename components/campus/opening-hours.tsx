@@ -98,22 +98,31 @@ function primaryStatus(hours: Hours, locale: Locale, state: OpeningState) {
             .join(' · '),
         };
   }
+  const closedToday = state.reason === 'closed_day';
   const prefix =
     hours.hours_kind === 'building_access'
       ? state.status === 'open'
         ? en
           ? 'Building open'
           : 'Gebouw open'
-        : en
-          ? 'Building closed'
-          : 'Gebouw gesloten'
+        : closedToday
+          ? en
+            ? 'Building closed today'
+            : 'Gebouw vandaag gesloten'
+          : en
+            ? 'Building closed'
+            : 'Gebouw gesloten'
       : state.status === 'open'
         ? en
           ? 'Open'
           : 'Open'
-        : en
-          ? 'Closed'
-          : 'Gesloten';
+        : closedToday
+          ? en
+            ? 'Closed today'
+            : 'Vandaag gesloten'
+          : en
+            ? 'Closed'
+            : 'Gesloten';
   return {
     tone: state.status,
     icon: hours.hours_kind === 'building_access' ? Building2 : Clock3,
@@ -173,6 +182,24 @@ export function OpeningHours({
           ? 'Opening hours'
           : 'Openingstijden';
   const note = hours.display_note[locale];
+  const sourceLabel = {
+    official_web: {
+      nl: 'Officiële webbron',
+      en: 'Official web source',
+    },
+    physical_signage: {
+      nl: 'Bord of poster op locatie',
+      en: 'On-site sign or poster',
+    },
+    staff_confirmation: {
+      nl: 'Bevestigd door medewerker',
+      en: 'Confirmed by staff',
+    },
+    manual_admin: {
+      nl: 'Handmatige beheernotitie',
+      en: 'Manual admin note',
+    },
+  }[hours.source_type][locale];
 
   return (
     <section
@@ -252,10 +279,15 @@ export function OpeningHours({
             {' · '}
             <time dateTime={hours.verified_at}>{hours.verified_at}</time>
           </span>
-          <a href={hours.source_url} target="_blank" rel="noreferrer">
-            {en ? 'Official source' : 'Officiële bron'}{' '}
-            <ExternalLink size={14} />
-          </a>
+          <span className="hours-provenance-source">
+            <strong>{sourceLabel}</strong>
+            <small>{hours.source_description}</small>
+          </span>
+          {hours.source_url && (
+            <a href={hours.source_url} target="_blank" rel="noreferrer">
+              {en ? 'View source' : 'Bron bekijken'} <ExternalLink size={14} />
+            </a>
+          )}
         </div>
       </details>
     </section>

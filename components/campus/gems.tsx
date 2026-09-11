@@ -16,7 +16,12 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import type { CampusData, Locale, Gem } from '@/lib/campus/types';
+import type {
+  CampusData,
+  Locale,
+  Gem,
+  ProposedLocationContext,
+} from '@/lib/campus/types';
 import { gemCategories, gemSchema, photoLimit } from '@/lib/campus/validation';
 import { Picker } from './picker';
 import { CampusMap } from './map';
@@ -219,6 +224,9 @@ export function GemsPage({
           const routeable = location
             ? resolver.resolveLocation(location).nodeId !== null
             : false;
+          const externalProposal =
+            g.proposed_location_context === 'campus_outdoor' ||
+            g.proposed_location_context === 'other';
           return (
             <article className="gem-card" key={g.id}>
               {g.photo_path && (
@@ -262,7 +270,15 @@ export function GemsPage({
               <small className="muted">
                 {location
                   ? `${location.name[locale]} · ${location.building_id} · ${en ? 'Floor' : 'Verdieping'} ${data.floors.find((f) => f.id === location.floor_id)?.level}`
-                  : [g.proposed_location_name, g.proposed_room_zone]
+                  : [
+                      g.proposed_location_name,
+                      externalProposal
+                        ? en
+                          ? 'outside the indoor map'
+                          : 'buiten de binnenkaart'
+                        : g.proposed_building_id,
+                      g.proposed_room_zone,
+                    ]
                       .filter(Boolean)
                       .join(' · ')}
               </small>
@@ -279,16 +295,24 @@ export function GemsPage({
                     ? en
                       ? 'Route available'
                       : 'Route beschikbaar'
-                    : en
-                      ? 'Route needs verification'
-                      : 'Route moet worden gecontroleerd'}
+                    : externalProposal
+                      ? en
+                        ? 'Outside the indoor route map'
+                        : 'Buiten de indoor routekaart'
+                      : en
+                        ? 'Route needs verification'
+                        : 'Route moet worden gecontroleerd'}
                 </span>
               </div>
               {!routeable && (
                 <p className="form-note" role="status">
-                  {en
-                    ? 'This place is awaiting map and route verification.'
-                    : 'Deze plek wacht nog op kaart- en routecontrole.'}
+                  {externalProposal
+                    ? en
+                      ? 'Routing via CampusKompas is not yet available for this place.'
+                      : 'Route via CampusKompas is voor deze plek nog niet beschikbaar.'
+                    : en
+                      ? 'This place is awaiting map and route verification.'
+                      : 'Deze plek wacht nog op kaart- en routecontrole.'}
                 </p>
               )}
               {g.hours_id && (
@@ -430,7 +454,9 @@ function GemForm({
   onDone: () => void;
 }) {
   const [mode, setMode] = useState<'existing' | 'proposed'>('existing'),
-    [building, setBuilding] = useState(''),
+    [proposedContext, setProposedContext] =
+      useState<ProposedLocationContext>('r8'),
+    [building, setBuilding] = useState('R8'),
     [floor, setFloor] = useState(''),
     [location, setLocation] = useState<CampusData['locations'][number] | null>(
       null,
@@ -450,6 +476,7 @@ function GemForm({
     form.set('location_mode', mode);
     form.set('location_id', mode === 'existing' ? (location?.id ?? '') : '');
     if (mode === 'proposed') {
+      form.set('proposed_location_context', proposedContext);
       form.set('proposed_building_id', building);
       form.set('proposed_floor_id', floor);
     }
@@ -548,7 +575,12 @@ function GemForm({
           <input
             type="radio"
             checked={mode === 'proposed'}
-            onChange={() => setMode('proposed')}
+            onChange={() => {
+              setMode('proposed');
+              setProposedContext('r8');
+              setBuilding('R8');
+              setFloor('');
+            }}
           />{' '}
           {en ? 'Propose a new place' : 'Stel een nieuwe plek voor'}
         </label>
@@ -592,6 +624,31 @@ function GemForm({
       ) : (
         <div className="proposed-location-fields">
           <label className="field-label">
+            {en ? 'Campus area' : 'Gebied op de campus'}
+            <select
+              className="field-input"
+              name="proposed_location_context"
+              value={proposedContext}
+              onChange={(event) => {
+                const context = event.target.value as ProposedLocationContext;
+                setProposedContext(context);
+                setBuilding(
+                  context === 'r8' ? 'R8' : context === 'r10' ? 'R10' : '',
+                );
+                setFloor('');
+              }}
+            >
+              <option value="r8">Rengerslaan 8</option>
+              <option value="r10">Rengerslaan 10</option>
+              <option value="campus_outdoor">
+                {en ? 'Outside on campus' : 'Buiten op campus'}
+              </option>
+              <option value="other">
+                {en ? 'Other location' : 'Andere locatie'}
+              </option>
+            </select>
+          </label>
+          <label className="field-label">
             {en ? 'Place name' : 'Naam van de plek'}
             <input
               className="field-input"
@@ -600,46 +657,40 @@ function GemForm({
               maxLength={120}
             />
           </label>
-          <div className="form-grid">
-            <label className="field-label">
-              {en ? 'Building (if known)' : 'Gebouw (indien bekend)'}
-              <select
-                className="field-input"
-                value={building}
-                onChange={(event) => {
-                  setBuilding(event.target.value);
-                  setFloor('');
-                }}
-              >
-                <option value="">{en ? 'Unknown' : 'Onbekend'}</option>
-                {data.buildings.map((entry) => (
-                  <option key={entry.id} value={entry.id}>
-                    {entry.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field-label">
-              {en ? 'Floor (if known)' : 'Verdieping (indien bekend)'}
-              <select
-                className="field-input"
-                value={floor}
-                onChange={(event) => setFloor(event.target.value)}
-                disabled={!building}
-              >
-                <option value="">{en ? 'Unknown' : 'Onbekend'}</option>
-                {data.floors
-                  .filter((entry) => entry.building_id === building)
-                  .map((entry) => (
-                    <option key={entry.id} value={entry.id}>
-                      {entry.level}
-                    </option>
-                  ))}
-              </select>
-            </label>
-          </div>
+          {(proposedContext === 'r8' || proposedContext === 'r10') && (
+            <div className="form-grid">
+              <label className="field-label">
+                {en ? 'Building' : 'Gebouw'}
+                <input
+                  className="field-input"
+                  value={building === 'R8' ? 'Rengerslaan 8' : 'Rengerslaan 10'}
+                  readOnly
+                />
+              </label>
+              <label className="field-label">
+                {en ? 'Floor (if known)' : 'Verdieping (indien bekend)'}
+                <select
+                  className="field-input"
+                  value={floor}
+                  onChange={(event) => setFloor(event.target.value)}
+                  disabled={!building}
+                >
+                  <option value="">{en ? 'Unknown' : 'Onbekend'}</option>
+                  {data.floors
+                    .filter((entry) => entry.building_id === building)
+                    .map((entry) => (
+                      <option key={entry.id} value={entry.id}>
+                        {entry.level}
+                      </option>
+                    ))}
+                </select>
+              </label>
+            </div>
+          )}
           <label className="field-label">
-            {en ? 'Room or zone (if known)' : 'Lokaal of zone (indien bekend)'}
+            {en
+              ? 'Room, zone or nearby landmark (if known)'
+              : 'Lokaal, zone of herkenningspunt (indien bekend)'}
             <input
               className="field-input"
               name="proposed_room_zone"
@@ -658,9 +709,13 @@ function GemForm({
             />
           </label>
           <p className="form-note">
-            {en
-              ? 'A proposal is reviewed before it can appear on the map or be used for routing.'
-              : 'Een voorstel wordt gecontroleerd voordat het op de kaart of in een route kan verschijnen.'}
+            {proposedContext === 'campus_outdoor' || proposedContext === 'other'
+              ? en
+                ? 'This place can be published after moderation, but it will not receive an indoor map point or route automatically.'
+                : 'Deze plek kan na moderatie worden gepubliceerd, maar krijgt niet automatisch een punt of route op de binnenkaart.'
+              : en
+                ? 'A proposal is reviewed before it can appear on the map or be used for routing.'
+                : 'Een voorstel wordt gecontroleerd voordat het op de kaart of in een route kan verschijnen.'}
           </p>
         </div>
       )}

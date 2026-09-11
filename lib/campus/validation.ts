@@ -27,6 +27,12 @@ const hoursKind = z.enum([
   'building_access',
   'service_contact',
 ]);
+const hoursSourceType = z.enum([
+  'official_web',
+  'physical_signage',
+  'staff_confirmation',
+  'manual_admin',
+]);
 export const gemCategories = [
   'quiet',
   'study',
@@ -38,6 +44,12 @@ export const gemCategories = [
   'group',
   'other',
 ] as const;
+export const proposedLocationContexts = [
+  'r8',
+  'r10',
+  'campus_outdoor',
+  'other',
+] as const;
 const optionalText = (max: number) =>
   z.preprocess(
     (value) =>
@@ -46,6 +58,12 @@ const optionalText = (max: number) =>
         : value,
     z.string().trim().max(max).optional(),
   );
+export const hoursTargetSchema = z
+  .object({
+    target_type: z.enum(['location', 'hidden_gem']),
+    target_id: id,
+  })
+  .strict();
 export const gemSchema = z
   .object({
     title: z.string().trim().min(5).max(90),
@@ -54,6 +72,10 @@ export const gemSchema = z
     location_mode: z.enum(['existing', 'proposed']).default('existing'),
     location_id: optionalText(100).pipe(id.optional()),
     proposed_location_name: optionalText(120),
+    proposed_location_context: z.preprocess(
+      (value) => (value === null || value === '' ? undefined : value),
+      z.enum(proposedLocationContexts).optional(),
+    ),
     proposed_building_id: optionalText(100).pipe(id.optional()),
     proposed_floor_id: optionalText(100).pipe(id.optional()),
     proposed_room_zone: optionalText(120),
@@ -68,12 +90,50 @@ export const gemSchema = z
         path: ['location_id'],
         message: 'Select a location',
       });
-    if (value.location_mode === 'proposed' && !value.proposed_location_name)
-      context.addIssue({
-        code: 'custom',
-        path: ['proposed_location_name'],
-        message: 'Name the proposed location',
-      });
+    if (value.location_mode === 'proposed') {
+      if (!value.proposed_location_name)
+        context.addIssue({
+          code: 'custom',
+          path: ['proposed_location_name'],
+          message: 'Name the proposed location',
+        });
+      if (!value.proposed_location_context)
+        context.addIssue({
+          code: 'custom',
+          path: ['proposed_location_context'],
+          message: 'Select the proposed location context',
+        });
+      if (
+        value.proposed_location_context === 'r8' &&
+        value.proposed_building_id !== 'R8'
+      )
+        context.addIssue({
+          code: 'custom',
+          path: ['proposed_building_id'],
+          message: 'R8 proposals must use building R8',
+        });
+      if (
+        value.proposed_location_context === 'r10' &&
+        value.proposed_building_id !== 'R10'
+      )
+        context.addIssue({
+          code: 'custom',
+          path: ['proposed_building_id'],
+          message: 'R10 proposals must use building R10',
+        });
+      if (
+        ['campus_outdoor', 'other'].includes(
+          value.proposed_location_context ?? '',
+        ) &&
+        (value.proposed_building_id || value.proposed_floor_id)
+      )
+        context.addIssue({
+          code: 'custom',
+          path: ['proposed_location_context'],
+          message:
+            'External proposals cannot claim an indoor building or floor',
+        });
+    }
     if (value.proposed_floor_id && !value.proposed_building_id)
       context.addIssue({
         code: 'custom',
@@ -243,7 +303,12 @@ export const adminSchemas = {
       verified_at: z.iso.date(),
       verification_status: verification,
       exceptions_reviewed_through: z.iso.date().nullable(),
-      source_url: z.url().startsWith('https://'),
+      source_url: z.preprocess(
+        (value) => (value === '' ? null : value),
+        z.url().startsWith('https://').nullable(),
+      ),
+      source_type: hoursSourceType,
+      source_description: z.string().trim().min(3).max(500),
       hours_kind: hoursKind,
       display_note: z.object({
         nl: z.string().max(1000),
@@ -252,13 +317,21 @@ export const adminSchemas = {
       timezone: z.literal('Europe/Amsterdam'),
     })
     .superRefine((value, context) => {
+      if (value.source_type === 'official_web' && !value.source_url) {
+        context.addIssue({
+          code: 'custom',
+          path: ['source_url'],
+          message: 'Official web sources require an HTTPS URL',
+        });
+      }
       if (
-        value.verification_status === 'verified' &&
-        (!value.source_url || !value.verified_at)
+        value.source_type === 'manual_admin' &&
+        value.verification_status === 'verified'
       ) {
         context.addIssue({
           code: 'custom',
-          message: 'Verified hours require a source URL and verification date',
+          path: ['verification_status'],
+          message: 'Manual admin entries cannot be marked verified',
         });
       }
       if (
@@ -286,6 +359,10 @@ export const adminSchemas = {
       'rejected',
     ]),
     proposed_location_name: z.string().min(2).max(120).nullable().optional(),
+    proposed_location_context: z
+      .enum(proposedLocationContexts)
+      .nullable()
+      .optional(),
     proposed_building_id: id.nullable().optional(),
     proposed_floor_id: id.nullable().optional(),
     proposed_room_zone: z.string().max(120).nullable().optional(),

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { brand } from '@/lib/campus/brand';
+import { RecoveryRedirect } from '@/components/admin/recovery-redirect';
 import './globals.css';
 export const metadata: Metadata = {
   metadataBase: new URL(brand.origin),
@@ -43,6 +44,7 @@ export default function RootLayout({
         <a className="skip" href="#main">
           Naar inhoud / Skip to content
         </a>
+        <RecoveryRedirect />
         {children}
       </body>
     </html>

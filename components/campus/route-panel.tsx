@@ -272,8 +272,8 @@ export function RoutePanel({
           <strong>
             {accessible
               ? en
-                ? 'No step-free candidate route is available.'
-                : 'Geen mogelijke trapvrije route beschikbaar.'
+                ? 'No confirmed step-free route can be made from the current data.'
+                : 'Met de huidige gegevens kunnen we nog geen geverifieerde trapvrije route maken.'
               : en
                 ? 'We cannot make a reliable route for this combination yet.'
                 : 'Voor deze combinatie kunnen we nog geen betrouwbare route maken.'}
@@ -281,8 +281,8 @@ export function RoutePanel({
           <p>
             {accessible
               ? en
-                ? 'The current graph cannot provide a route without stairs or confirmed barriers. Ask reception for help.'
-                : 'De huidige kaart kan geen route zonder trappen of bevestigde barrières maken. Vraag de receptie om hulp.'
+                ? 'The lift and connecting corridors may not yet be fully mapped or verified. Ask reception for the accessible route.'
+                : 'De lift en aansluitende gangen zijn mogelijk nog niet volledig gekoppeld of gecontroleerd. Vraag bij de receptie naar de toegankelijke route.'
               : candidateRoute && !experience?.visuallyComplete
                 ? en
                   ? 'A technical path exists, but part of its corridor geometry is missing. We do not draw a shortcut through the building.'
@@ -341,7 +341,14 @@ export function RoutePanel({
             </p>
           )}
           {accessible && (
-            <p className={active.accessibility === 'confirmed' ? 'route-accessibility-confirmed' : 'route-accessibility-warning'} role="status">
+            <p
+              className={
+                active.accessibility === 'confirmed'
+                  ? 'route-accessibility-confirmed'
+                  : 'route-accessibility-warning'
+              }
+              role="status"
+            >
               {active.accessibility === 'confirmed'
                 ? en
                   ? 'This route is confirmed accessible.'
