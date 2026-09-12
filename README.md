@@ -1,129 +1,113 @@
 # CampusKompas
 
-Vind je weg op campus Leeuwarden. Een tweetalige, mobiele campusapp met originele NHL Stenden-plattegronden, zoeken, afzonderlijke routevoorbeelden, voorzieningen en gemodereerde studententips. Geen studentenaccounts, geen officieel NHL Stenden-logo in de appbranding.
+CampusKompas is een tweetalige, mobiele campusnavigator voor NHL Stenden Leeuwarden. De app combineert de officiële Rengerslaan 8- en Rengerslaan 10-plattegronden met lokaalzoeken, graph-routing, openingstijden en gemodereerde Hidden Gems. Studenten hebben geen account nodig.
 
-## Direct gebruiken
+- Productie: https://campuskompas.vercel.app
+- Beheer: https://campuskompas.vercel.app/admin
+- Repository: https://github.com/maxcrijnen-alt/campuskompas
+- Productiestatus en runbook: [docs/PRODUCTION_READINESS.md](docs/PRODUCTION_READINESS.md)
 
-Openbaar: https://campuskompas.vercel.app. Beheer: https://campuskompas.vercel.app/admin. Zes browsertests zijn tegen de openbare Vercel-site geslaagd, waaronder alle acht verdiepingskaarten en de echte Supabase-inzendings- en moderatieflow.
+De software is productierijp voor de huidige dataset. De routegeometrie, toegankelijkheid en enkele operationele locaties zijn nog niet fysiek door NHL Stenden gevalideerd. De app communiceert die onzekerheid expliciet en presenteert onbekende toegankelijkheid nooit als toegankelijk of ontoegankelijk.
 
-De app is gekoppeld aan het nieuwe Supabase-project **campuskompas**, regio **eu-central-1 (Frankfurt)**. De lokale `.env.local` bevat de verbinding; dit bestand wordt niet gecommit. Het beheerdersaccount is aangemaakt voor de eigenaar; de persoonlijke inloggegevens staan alleen in het genegeerde bestand `admin-access.txt`. Er is geen e-mail verstuurd.
+## Lokaal starten
+
+Vereisten: Node.js 24 en pnpm 11.19.0. Beide versies zijn in `package.json` vastgelegd; `.node-version` helpt lokale version managers dezelfde Node-major te kiezen.
 
 ```sh
-cd campuskompas
-npm install
-npm run dev
+corepack enable
+pnpm install --frozen-lockfile
+copy .env.example .env.local
+pnpm dev
 ```
 
-Open http://127.0.0.1:3000. Beheer: http://127.0.0.1:3000/admin.
+Open daarna http://127.0.0.1:3000. Vul vóór het starten de vereiste waarden in `.env.local` in. Dit bestand wordt genegeerd door Git.
 
-De vastgelegde pakketbeheerder van het project is pnpm. Met pnpm: `pnpm install`, `pnpm dev`. Node.js 22.13+ vereist. Deze omgeving gebruikt Node 24. Na `next build`: `npm start` start de productieversie.
+## Omgevingsvariabelen
 
-## Wat werkt
+| Variabele                  | Doel                                                                       |
+| -------------------------- | -------------------------------------------------------------------------- |
+| `SUPABASE_URL`             | URL van het Supabase-project                                               |
+| `SUPABASE_PUBLISHABLE_KEY` | Publieke sleutel voor RLS-beveiligde toegang                               |
+| `SUPABASE_SECRET_KEY`      | Optionele server-only sleutel                                              |
+| `SUPABASE_GATEWAY_SECRET`  | Server-only alternatief voor de secret key via de beveiligde Edge Function |
+| `NEXT_PUBLIC_SITE_URL`     | Publieke origin voor onder meer wachtwoordherstel                          |
+| `NEXT_TELEMETRY_DISABLED`  | Optionele Next.js-telemetrie-instelling                                    |
 
-- Zoeken op lokaal, naam, aliassen, NL/EN, categorie en goedgekeurde Hidden Gems; fuzzy matching en recente zoekopdrachten.
-- Acht originele verdiepingskaarten, pan/zoom/pinch, gebouw- en verdiepingkeuze, locatiepanelen, deelbare links, QR-startpunten. Schematische SVG-routevoorbeelden staan in een aparte weergave.
-- Klikbare informatiepunten op de originele kaart en plekknoppen eronder openen openingstijden uit Supabase. Ontbrekende dagen of tijden worden expliciet als niet bevestigd getoond, met een link naar de officiële bron wanneer beschikbaar.
-- Zelfstandige Dijkstra-engine met meerdere verdiepingen, trappen, liften en buitenverbindingen. Geen schijnprecisie in afstanden of looptijden.
-- Rolstoeloptie vereist bevestigde toegankelijkheid van alle nodes en edges. In de initiële dataset bestaat bewust **geen geverifieerde toegankelijke route**.
-- Echte anonieme inzendingen, foto-upload naar privéopslag, moderatie, featured-status en gededupliceerde likes.
-- Admin Auth met databasebeheerde autorisatie, locatie-/lokaal-/kaart-/route-/tip-/urenbeheer en QR-export.
-- Kaarteditor voor toevoegen/verplaatsen van routepunten, verbinden van punten, verplaatsen/koppelen van locaties en JSON-vectorgeometrie.
-- Manifest, PNG-iconen, mobiele navigatie, keyboardalternatieven, NL/EN en foutafhandeling.
+Gebruik precies één serverroute: `SUPABASE_SECRET_KEY`, of de ingerichte gateway met `SUPABASE_GATEWAY_SECRET`. Geef secrets nooit een `NEXT_PUBLIC_`-prefix en zet ze uitsluitend in lokale/Vercel secret stores.
 
-## Belangrijk vóór campusgebruik
-
-Dit is een werkende technische applicatie met **nog niet gevalideerde campusgeometrie**. Kaarten zijn eigen schematische vectoren, geen kopieën van externe PDF-pagina's. Routes zijn zichtbaar als voorbeelden gemarkeerd. Ze mogen niet als echte loopinstructies worden gebruikt voordat NHL Stenden de gegevens heeft gecontroleerd.
-
-Het beperkte register bevat vijf uit de gids herleidbare lokaalnummers. F3.025 is het expliciete nummeringsvoorbeeld uit de gids, geen bevestiging van actueel lokaalgebruik. Er worden geen ontbrekende lokalen verzonnen. De acht verdiepingen zijn uitbreidbare records; op sommige verdiepingen zijn nog geen locaties geregistreerd.
-
-Actuele officiële bronnen bevestigen de gebouwen, bibliotheek en horeca-namen. Openingstijden R8/R10/bibliotheek volgen de officiële website, niet de oudere gids. De uitzonderingenkalender is nog niet compleet: daarom geen live “Nu open”-claim. Zie [DATA_SOURCES](docs/DATA_SOURCES.md).
+Voor live E2E zijn daarnaast `TEST_ADMIN_EMAIL`, `TEST_ADMIN_PASSWORD` en `TEST_ADMIN_ID` nodig in het genegeerde `.env.test.local`.
 
 ## Architectuur
 
-Next.js 16.3.4 App Router, React 19, strict TypeScript, Tailwind 4, Base UI/Shadcn, Lucide, Supabase/PostgreSQL/Auth/Storage. Sites-publicatie gebruikt de aanvullende Vinext/Workers-build. De primaire `build` blijft echte Next.js voor Vercel.
-
-```
-app/                    pagina's en beveiligde HTTP-handlers
-components/campus/      zoekfunctie, kaartlagen, details, routes, gems
-components/admin/       beheer en kaarteditor
-lib/campus/             centrale types, branding, data, validatie, uren
-lib/routing/            pure routing, normalisatie en instructies
-lib/server/             Supabase, authenticatie en begrensde requests
-supabase/migrations/    reproduceerbaar schema en policies
+```text
+app/                    Next.js-pagina's en begrensde HTTP-handlers
+components/campus/      zoeken, kaart, details, routes en Hidden Gems
+components/admin/       beheerdersschermen en kaart-/urenbeheer
+lib/campus/             types, validatie, search en opening-hours-engine
+lib/routing/            endpointresolver, graph, Dijkstra en instructies
+lib/server/             Supabase-clients, data en adminautorisatie
+supabase/migrations/    reproduceerbaar schema, constraints en RLS
 supabase/functions/     beveiligde servergateway
-tests/                  unit-, live-integratie- en browsertests
+scripts/                data-, routing-, search- en uren-audits
+tests/                  unit-, integratie- en Playwright-tests
 ```
 
-Geometry, locations en graph zijn afzonderlijke modellen. Coordinaatruimte: 800×600 schematische eenheden. Een edge-weight is een relatieve routekost, geen afstand in meters. Een room entrance moet aan het einde van een gang liggen. Wijziging van officiële kaarten hoeft de routingcode niet te veranderen.
+De centrale resolver vertaalt zowel `Van` als `Naar` naar één gevalideerd route-endpoint. Normalisatie bewaart betekenisvolle kamercodes; bijvoorbeeld `C0.102` en `C0.1.02` blijven verschillende lokalen. Routes gebruiken uitsluitend opgeslagen graph-edges en `map_path`-geometrie. Er bestaat geen rechte-lijnfallback door muren.
 
-## Supabase op een nieuwe omgeving
+Bij rolstoelrouting zijn trappen en verified-inaccessible records verboden. Onbekende gegevens mogen als kandidaat worden gebruikt met een duidelijke waarschuwing. Een verdiepingsovergang binnen één gebouw moet een expliciete `elevator`-edge gebruiken; een gebouwovergang een expliciete `outdoor`-edge.
 
-1. Maak een eigen Supabase-project in een passende regio.
-2. Pas alle SQL-bestanden in `supabase/migrations` in tijdstempelvolgorde toe, via de CLI of SQL-editor. Met een gekoppelde CLI: `supabase db push` (controleer eerst `supabase db push --help`).
-3. Kopieer `.env.example` naar `.env.local`. Vul `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY` en **óf** `SUPABASE_SECRET_KEY` **óf** de servergateway-verbinding in. Gebruik geen `NEXT_PUBLIC_`-prefix voor secrets.
-4. `npm run seed:check` valideert zonder writes. `npm run seed` schrijft de brondata idempotent. **Gebruik seed alleen bij inrichting:** upserts kunnen later handmatig aangepaste bronrecords overschrijven.
-5. Privébucket `gem-photos` wordt door de migration aangemaakt. Geen publieke Storage policies. Maximaal 3 MB; JPEG, PNG of WebP; servercontrole op MIME en bestandskenmerken; willekeurige bestandsnamen.
+Lees [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) voor de volledige datastroom en [docs/DATA_SOURCES.md](docs/DATA_SOURCES.md) voor bron- en fysieke beperkingen.
 
-### Waarom een servergateway?
+## Supabase inrichten
 
-De Supabase-MCP geeft geen geheime servicekey terug. Daarom is de gekoppelde omgeving ingericht met een eigen servercredential. Alleen de SHA-256-hash staat in de database. De Supabase Edge Function controleert dit credential, beperkt toegestane API-paden en voert serverwerk uit met zijn ingebouwde servicekey. Browsercode ontvangt dit credential nooit. Een normale `SUPABASE_SECRET_KEY` kan later dezelfde datalaag zonder gateway gebruiken.
+1. Maak een Supabase-project in een passende regio.
+2. Pas alle bestanden in `supabase/migrations/` in tijdstempelvolgorde toe. Gebruik bij een gekoppelde CLI `supabase db push` en controleer eerst of de remote history overeenkomt.
+3. Vul `.env.local` vanuit `.env.example`.
+4. Voer `pnpm seed:check` uit. Gebruik `pnpm seed` alleen bij een nieuwe inrichting; de seed is idempotent maar kan later handmatig beheerde bronrecords terugzetten.
+5. Controleer de private Storage-bucket `gem-photos`. Alleen gevalideerde JPEG-, PNG- en WebP-bestanden tot 3 MB worden geaccepteerd.
 
-De gateway heeft platform-JWT-controle uitgeschakeld omdat hij **eigen verplichte authenticatie** doet. Zonder het servercredential volgt 401; er is geen openbare privileged proxy. Rotatie: genereer een nieuw random credential, update de hash in `server_credentials` en de serveromgeving gelijktijdig. Deploy daarna opnieuw.
+De huidige productie gebruikt project `campuskompas` in `eu-central-1`. Supabase is de bron van waarheid voor database, Auth en private Storage.
 
-## Beheerder toevoegen
+## Beheer
 
-Er is geen publieke registratie. Een database-trigger weigert nieuwe Auth-gebruikers tenzij de eigenaar vooraf een eenmalige, vijf minuten geldige permit verstrekt. Daardoor werken ook directe anonieme signup-aanvragen niet. Een Auth-identiteit alleen geeft nog geen beheerdersrechten.
+Publieke self-registration is uitgeschakeld. `/admin` accepteert alleen een geldige Supabase-gebruiker die tevens in `admin_profiles` staat. De eigenaar kan via **Wachtwoord vergeten?** een neutrale, rate-limited reset aanvragen; de response onthult niet of een adres bestaat.
 
-1. Voeg als database-eigenaar kort voor provisioning toe:
-   `insert into private.registration_permits(email) values ('YOUR_ADMIN_EMAIL');`
-2. Voer `pnpm exec tsx scripts/provision-admin.ts YOUR_ADMIN_EMAIL` uit. Dit creëert een Auth-identiteit en schrijft een random wachtwoord naar het genegeerde lokale toegangsbestand. Het overschrijft dat bestand; bewaar bestaande toegangsgegevens veilig.
-3. Voeg de teruggegeven UUID toe:
-   `insert into public.admin_profiles(user_id) values ('RETURNED_USER_UUID');`
+Nieuwe beheerders worden bewust geprovisioned:
 
-Alle admin-API-aanvragen doen `auth.getUser()` plus een actuele `admin_profiles`-controle. Zelf benoemen tot admin is niet mogelijk. Sessiecookie: HttpOnly, SameSite=Strict, Secure op HTTPS, beperkte levensduur; na verlopen opnieuw inloggen. Verwijder `admin_profiles` om app-toegang onmiddellijk in te trekken.
+1. Voeg kort vóór provisioning een vijf minuten geldige `private.registration_permits`-rij toe.
+2. Voer `pnpm exec tsx scripts/provision-admin.ts ADMIN_EMAIL` uit in een beveiligde lokale omgeving.
+3. Voeg de teruggegeven user-ID toe aan `public.admin_profiles`.
 
-## Kaarten, routes en data bijwerken
+De Hours Admin laat een beheerder een voorziening of Hidden Gem op naam zoeken, een weekrooster, gesloten dagen, meerdere tijdblokken, uitzonderingen, bron, verificatie en notities beheren en het record atomair koppelen. Hiervoor zijn geen SQL of UUID's nodig.
 
-- **Branding:** `lib/campus/brand.ts` beheert naam, kleuren en teksten. Pas bij een officiële theme ook de PWA-iconen aan.
-- **Nieuwe verdieping:** maak een floor met uniek `(building_id, level)`; daarna nodes en locaties. Nieuwe gebouwen zijn records in `buildings`.
-- **Officiële kaart:** zet goedgekeurde brongeometrie om naar het JSON Shape-model (`room`, `hall`, `outside`) in de floor-editor. SVG/CAD/PDF vereist conversie naar dit model; er is geen automatische CAD-parser.
-- **Marker/node:** kies `/admin/maps`, voeg/verplaats punten. Numerieke X/Y-velden bieden een keyboardalternatief. Een nieuwe locatie maak je eerst bij Locations en koppel je daarna aan een node.
-- **Edge:** verbind twee nodes. Pas type, relatieve kosten, toegankelijkheid en verificatiestatus aan bij Route edges. Verbindingen tussen verdiepingen zijn expliciete lift-/trap-edges; tussen gebouwen een outdoor-edge.
-- **Lokaal:** location met room_code én rooms-record koppelen. Publicatie via status `approved`.
-- **Openingstijden:** weektijden onder ISO-weekdag 0–6 (zondag=0); ontbrekend/null betekent onbekend, lege lijst gesloten. `exceptions` overschrijft de weekdag per datum. Alleen geverifieerde, maximaal 30 dagen oude data met gecontroleerde uitzonderingenperiode krijgt een live status. Tijdzone Europe/Amsterdam; overnacht open intervallen splits je over twee dagen.
-- **QR:** koppel actieve code aan route_node_id. Export geeft een PNG met `/map?from=qr:CODE`. Controleer fysieke positie en toegankelijkheid vóór plaatsing.
-- **Gems:** alleen approved wordt publiek. Review foto, tekst en locatie vóór goedkeuring. Communitytekst blijft in de oorspronkelijke taal.
-
-## Tests
+## Verificatie
 
 ```sh
-npm run lint
-npm run typecheck
-npm test
-npm run seed:check
-npx playwright install chromium
-npm run test:e2e
-npm run build
+pnpm search:audit
+pnpm routing:audit
+pnpm routing:regression
+pnpm routing:audit-accessibility
+pnpm routing:audit-experience
+pnpm hours:audit
+pnpm database:audit
+pnpm seed:check
+pnpm test
+pnpm test:e2e
+pnpm lint
+pnpm typecheck
+pnpm build
 ```
 
-Voor live tests: `.env.local` en `.env.test.local` met `TEST_ADMIN_EMAIL`, `TEST_ADMIN_PASSWORD`, `TEST_ADMIN_ID`. De tests maken uitsluitend herkenbare tijdelijke QA-records en ruimen deze op. Geen live tests overslaan wanneer je database/security wijzigt. In deze Windows-omgeving kan `PLAYWRIGHT_CHANNEL=msedge` de aanwezige Edge gebruiken. Start de developmentserver voor E2E.
-
-Browserchecks omvatten lokaal zoeken, routefasen, toegankelijke foutmelding, QR, taalbehoud, 320px layout, keyboardselectie, axe, publieke afscherming, echte foto-inzending, admin-goedkeuring, publieke zichtbaarheid, likes en QR-export. Een axe-test is geen volledige WCAG-audit; screenreader- en fysieke toegankelijkheidstests blijven nodig vóór officiële uitrol.
+Playwright draait standaard tegen `http://127.0.0.1:3000`; stel `PLAYWRIGHT_BASE_URL` alleen in voor een expliciete andere omgeving. Tests tegen Supabase maken herkenbare tijdelijke QA-records en ruimen die op.
 
 ## Deployment
 
-**Vercel:** project `campuskompas` in `maxcrijnen-alts-projects`, openbare origin `https://campuskompas.vercel.app`. `vercel.json` configureert Next.js en de build. De Supabase-instellingen staan in Production en Preview; `SUPABASE_GATEWAY_SECRET` is een Secret. `.vercelignore` sluit lokale toegangsbestanden en werkmappen uit. Publicaties vanuit de connector bevatten uitsluitend applicatiebestanden. Er is nog geen automatische GitHub-koppeling. Gebruik bij nieuwe publicaties dezelfde projectnaam en team.
+Pushes naar GitHub `main` worden automatisch als Vercel-productiedeployment gebouwd. `vercel.json` gebruikt Frankfurt (`fra1`), een frozen pnpm-lockfile en de Next.js-build. Controleer na iedere release dat de deployment exact de verwachte Git-SHA heeft, `READY` is, de productiealias bezit en geen runtimefouten meldt.
 
-**Originele plattegronden:** de acht kaarten in `public/maps/` zijn ongewijzigde paginarenders uit de NHL Stenden-gids. Zie `public/maps/README.md` voor de bron en paginanummers. Deze kaarten worden standaard getoond, met inzoomen en PDF-bronlink. De routeprototypeweergave staat apart; de oorspronkelijke schematische routecoördinaten zijn niet op de echte kaarten gelegd.
+Direct pushen naar `main` blijft een bewuste keuze van de eigenaar. Er zijn geen verplichte PR's, approvals, branch protection of blokkerende statuschecks.
 
-**Sites:** `pnpm run build:sites` maakt de aparte Worker-build. Hosting-ID staat in `.openai/hosting.json`; alle secrets staan in de hostingomgeving. In deze Windows-runtime crasht lokale workerd-start door een native runtimeprobleem; Next.js preview en de Worker-productiebuild werken wel.
+## Veiligheid en operationele grenzen
 
-## Privacy en beveiliging
+RLS beschermt alle exposed tabellen. Publieke mutaties lopen via begrensde handlers en transacties; adminhandlers verifiëren telkens de Auth-user en `admin_profiles`. De fotobucket is privé. Privileged keys bereiken de browser niet.
 
-Geen analytics actief. `lib/campus/analytics.ts` biedt een optionele adapter. Registreer geen vrije zoektekst, persoonlijke gegevens of precieze studentlocaties. Het anonieme like-cookie is een willekeurig ID; de database bewaart alleen een hash. Cookies kunnen gewist worden: likes zijn sociale indicatie, geen fraudeproof stemming.
-
-Anti-spam: honeypot, minimum invultijd, lengte-/payloadlimieten, servercontrole en transactionele database-rate-limit. Rate-limitregistraties ouder dan twee dagen worden tijdens gebruik opgeschoond. Foto's kunnen persoonsgegevens bevatten; moderatie en bewaarbeleid moeten door de eigenaar worden vastgesteld.
-
-RLS staat op alle exposed tabellen. Public kan nooit status, routegraph of adminlidmaatschap wijzigen. Privileged tables hebben bewust geen publieke policies. Input wordt als tekst weergegeven, zonder `dangerouslySetInnerHTML`.
-
-Supabase kan op het gratis plan melden dat leaked-password protection uitstaat. Het aangemaakte wachtwoord is cryptografisch willekeurig; externe wachtwoordlekcontrole is niet geconfigureerd. Zie `docs/SECURITY.md` voor verificatie en resterende operationele aandachtspunten.
+De kaart is geen evacuatie-instrument of toegankelijkheidscertificaat. Controleer vóór officiële campusclaims alle ingangen, corridors, liften, trappen, buitenovergangen en openingstijden fysiek. Zie [docs/SECURITY.md](docs/SECURITY.md) en het production-readinessrunbook voor de resterende handmatige acties.

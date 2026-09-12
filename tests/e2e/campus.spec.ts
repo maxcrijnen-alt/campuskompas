@@ -523,6 +523,108 @@ test('admin creates, previews and links URL-less hours by facility name', async 
     expect(cleanupErrors).toEqual([]);
   }
 });
+test('admin maintains Central Brew hours by name without SQL or UUID input', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
+  const database = serviceDb();
+  const current = await database
+    .from('locations')
+    .select('hours_id')
+    .eq('id', 'central-brew')
+    .single();
+  expect(current.error).toBeNull();
+  test.skip(
+    current.data?.hours_id != null,
+    'Preserve an operational Central Brew schedule when one exists',
+  );
+  let createdHoursId: string | null = null;
+  try {
+    await page.goto('/admin/opening-hours');
+    await page
+      .getByLabel('E-mail', { exact: true })
+      .fill(process.env.TEST_ADMIN_EMAIL!);
+    await page
+      .getByLabel('Wachtwoord / Password')
+      .fill(process.env.TEST_ADMIN_PASSWORD!);
+    await page.getByRole('button', { name: 'Inloggen / Sign in' }).click();
+
+    const facilitySearch = page.getByRole('searchbox', {
+      name: /Voorziening of Hidden Gem/,
+    });
+    await facilitySearch.fill('Central Brew');
+    await page.getByRole('button', { name: /Central Brew/ }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Central Brew' }),
+    ).toBeVisible();
+    await page
+      .getByLabel('Korte bronbeschrijving / Short source description')
+      .fill('Tijdelijke Phase 6-beheerworkflow; wordt direct verwijderd.');
+    await page.getByLabel('Maandag').fill('08:30–12:00, 13:00–17:00');
+    await page.getByRole('button', { name: /Opslaan en koppelen/ }).click();
+
+    await expect
+      .poll(async () => {
+        const linked = await database
+          .from('locations')
+          .select('hours_id')
+          .eq('id', 'central-brew')
+          .single();
+        return linked.data?.hours_id ?? null;
+      })
+      .toMatch(/^hours-/);
+    createdHoursId = (
+      await database
+        .from('locations')
+        .select('hours_id')
+        .eq('id', 'central-brew')
+        .single()
+    ).data!.hours_id;
+
+    await page.goto('/map?to=central-brew');
+    await expect(
+      page.getByText('Tijden moeten worden gecontroleerd'),
+    ).toBeVisible();
+    await page.getByText('Openingstijden bekijken').click();
+    await expect(page.getByText(/Phase 6-beheerworkflow/)).toBeVisible();
+
+    await page.goto('/admin/opening-hours');
+    await facilitySearch.fill('Central Brew');
+    await page.getByRole('button', { name: /Central Brew/ }).click();
+    await page.getByLabel('Maandag').fill('09:00–13:00');
+    await page.getByRole('button', { name: /Opslaan en koppelen/ }).click();
+    await expect
+      .poll(async () => {
+        const saved = await database
+          .from('opening_hours')
+          .select('weekly')
+          .eq('id', createdHoursId!)
+          .single();
+        return saved.data?.weekly;
+      })
+      .toMatchObject({ '1': [['09:00', '13:00']] });
+  } finally {
+    const linked = await database
+      .from('locations')
+      .select('hours_id')
+      .eq('id', 'central-brew')
+      .maybeSingle();
+    const cleanupHoursId = createdHoursId ?? linked.data?.hours_id ?? null;
+    const unlink = await database
+      .from('locations')
+      .update({ hours_id: null })
+      .eq('id', 'central-brew');
+    expect(unlink.error).toBeNull();
+    if (cleanupHoursId) {
+      const cleanup = await database
+        .from('opening_hours')
+        .delete()
+        .eq('id', cleanupHoursId);
+      expect(cleanup.error).toBeNull();
+    }
+  }
+});
 test('public cannot enter admin data or mutate protected resources', async ({
   request,
   page,
@@ -755,6 +857,84 @@ test('admin password reset is neutral and rejects invalid recovery tokens', asyn
     page.getByLabel('Nieuw wachtwoord / New password'),
   ).toBeVisible();
   expect(await page.evaluate(() => window.location.hash)).toBe('');
+});
+
+test('a valid Supabase admin token can set a new password and log in', async ({
+  page,
+}) => {
+  test.setTimeout(120000);
+  test.skip(
+    !process.env.TEST_ADMIN_EMAIL ||
+      !process.env.TEST_ADMIN_PASSWORD ||
+      !process.env.TEST_ADMIN_ID,
+    'Requires provisioned admin credentials',
+  );
+  const email = process.env.TEST_ADMIN_EMAIL!;
+  const originalPassword = process.env.TEST_ADMIN_PASSWORD!;
+  const temporaryPassword = `Ck-${crypto.randomUUID()}-Aa1!`;
+  const login = await publicDb().auth.signInWithPassword({
+    email,
+    password: originalPassword,
+  });
+  expect(login.error).toBeNull();
+  const accessToken = login.data.session?.access_token;
+  expect(accessToken).toBeTruthy();
+
+  try {
+    expect(
+      (
+        await page.request.post('/api/admin/password-update', {
+          data: {
+            access_token: accessToken,
+            password: 'too-weak',
+          },
+        })
+      ).status(),
+    ).toBe(400);
+    await page.goto(
+      `/admin/reset-password#access_token=${encodeURIComponent(accessToken!)}&type=recovery`,
+    );
+    await expect(
+      page.getByLabel('Nieuw wachtwoord / New password'),
+    ).toBeVisible();
+    expect(await page.evaluate(() => window.location.hash)).toBe('');
+    await page
+      .getByLabel('Nieuw wachtwoord / New password')
+      .fill(temporaryPassword);
+    await page
+      .getByLabel('Herhaal wachtwoord / Confirm password')
+      .fill(temporaryPassword);
+    const update = page.waitForResponse(
+      (response) =>
+        new URL(response.url()).pathname === '/api/admin/password-update',
+    );
+    await page
+      .getByRole('button', { name: 'Wachtwoord wijzigen / Update password' })
+      .click();
+    expect((await update).status()).toBe(200);
+    await expect(page.getByText(/wachtwoord is gewijzigd/)).toBeVisible();
+
+    await page.goto('/admin');
+    await page.getByLabel('E-mail', { exact: true }).fill(email);
+    await page.getByLabel('Wachtwoord / Password').fill(temporaryPassword);
+    await page.getByRole('button', { name: 'Inloggen / Sign in' }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Routing health' }),
+    ).toBeVisible({
+      timeout: 30000,
+    });
+  } finally {
+    const restored = await serviceDb().auth.admin.updateUserById(
+      process.env.TEST_ADMIN_ID!,
+      { password: originalPassword },
+    );
+    expect(restored.error).toBeNull();
+    const verification = await publicDb().auth.signInWithPassword({
+      email,
+      password: originalPassword,
+    });
+    expect(verification.error).toBeNull();
+  }
 });
 
 test('BRÛZE keeps its approved content without a false route link', async ({

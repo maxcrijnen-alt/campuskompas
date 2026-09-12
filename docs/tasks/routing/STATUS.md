@@ -1,10 +1,10 @@
 # CampusKompas routing status
 
-Last updated: 2026-09-11
+Last updated: 2026-09-12
 
 ## Completed phases
 
-**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, **Phase 4 — Route experience**, **Phase 5 — Accessibility, admin & Hidden Gems / BRÛZE**, **Phase 5.5 — Visual polish, operational data & opening hours**, and **Phase 5.6 — User feedback, accessibility routing & final visual polish** are complete.
+**Phase 1 — Audit & routing architecture**, **Phase 2 — Endpoint coverage & graph repair**, **Phase 3 — Search normalization & destination resolution**, **Phase 4 — Route experience**, **Phase 5 — Accessibility, admin & Hidden Gems / BRÛZE**, **Phase 5.5 — Visual polish, operational data & opening hours**, **Phase 5.6 — User feedback, accessibility routing & final visual polish**, and **Phase 6 — Final verification, production readiness & handover** are complete.
 
 - Routing uses one central endpoint resolver for start and destination locations.
 - From and To now use the same endpoint-validated location universe and the same search/result component.
@@ -92,6 +92,26 @@ Last updated: 2026-09-11
 - Production contains 5 hours records: 4 verified and 1 needs-review, with 0 invalid provenance, suspicious links or orphan records. Of 13 hours-relevant locations, 4 have verified records; the 9 remaining facilities make no unsupported open/closed claim.
 - Migrations `20260911102132_phase56_external_gems_and_hours_integrity.sql` and `20260911193959_phase56_proposal_presence_constraints.sql` add the constrained external-proposal context, require an explicit proposal name/context at database level, and enforce final hours-link integrity. The already-applied additive provenance/link migrations `20260911045007_phase6_hours_provenance.sql` and `20260911070822_admin_hours_link.sql` were retained to keep production and local migration history aligned; retaining those deployed changes does not mark Phase 6 complete.
 
+## Phase 6 final verification and handover
+
+- The production baseline was measured again on 2026-09-12: 606 approved locations, 576 public rooms, 514 nodes, 535 edges, 606 direct endpoints, 0 inferred, 0 needs-review, 0 unavailable, one 514-node normal-routing component, and 0 locations outside it.
+- From, To, and exact-ID coverage are each 606/606. All-location endpoint regression is 606/606, deterministic route sampling is 48/48, critical pairs are 7/7, and visual route-experience pairs are 9/9.
+- Local and production migration histories contain the same 14 versions and names from `20260908133055_campus_schema` through `20260911193959_phase56_proposal_presence_constraints`. Unexpected drift is 0; no migration or history repair was needed in Phase 6.
+- Database integrity is clean across locations/buildings/floors/nodes, rooms/locations, edges/nodes, Hidden Gems/locations/hours, locations/hours, and floors/buildings. Duplicate canonical IDs, orphan records, dangling references, invalid floor/building pairs, invalid endpoints, invalid hours links, invalid proposals, invalid statuses, and critical failures are all 0.
+- The provenance model remains singular and enforced: `official_web` requires a URL; signage, staff confirmation, and manual administration retain source description and verification date; manual data is not promoted to verified official data automatically.
+- Search, aliases, legacy IDs, facilities, QR/deep links, structured room-code variants, and building context use the central resolver. `C0.102` and `C0.1.02` remain distinct while compact `C0102` remains explicitly ambiguous.
+- Normal routing is fully connected and uses stored graph geometry only. Required same-floor, multi-floor, reverse, inter-building, iShop ↔ F3.025, and R8 ↔ R10 routes pass without a straight-line fallback.
+- Accessibility remains truthful: 514/514 nodes and 535/535 edges are unknown, 0 are confirmed accessible, and 0 are confirmed inaccessible. Wheelchair routing excludes all stairs and confirmed-inaccessible data and permits floor changes only through explicit elevator edges. The R8 candidate route uses three elevator transitions and no stairs; the R10 candidate remains unavailable pending physical/topology verification.
+- Hidden Gem canonical, proposed R8/R10, campus-outdoor, and other-external modes pass submission and moderation checks. External proposals receive no fabricated route endpoint. BRÛZE remains an approved generic Gem with a `needs_review` external location proposal and no route action.
+- Opening-hours verification remains 5 records: 4 verified location schedules and 1 needs-review BRÛZE context, all with `official_web` provenance. The Central Brew admin acceptance test created, linked, edited, displayed, unlinked, and deleted a temporary schedule entirely through the application; cleanup left no test record.
+- The owner email remains provisioned as an administrator. Public registration and direct public mutations remain blocked. Forgot-password responses stay neutral and rate-limited; invalid tokens and weak passwords fail; a valid admin token can update the password and log in. The test restores the original test credential.
+- Supabase advisors were reviewed rather than optimized by count. Three no-policy findings are intentional deny-all/server-only tables. Thirteen overlapping authenticated SELECT-policy notices preserve public-read plus admin behavior and use cached admin checks. Nine unused-index notices are retained because the database is young and the indexes cover foreign keys or expected operational queries.
+- Leaked Password Protection remains disabled and cannot be changed through the available integration. Manual project setting required: Auth → Email provider → Password security → Prevent use of leaked passwords (available on eligible Supabase plans).
+- Production data access uses parallel, paginated snapshot reads with no route/search N+1 pattern. The current payload and route computation are acceptable for 606 locations; snapshot size should be monitored as the campus dataset grows.
+- Runtime requirements are explicit: Node 24 via `package.json` and `.node-version`, and pnpm 11.19.0 via `packageManager` plus the frozen-lockfile Vercel install command.
+- Architecture, security, data-source, setup, deployment, migration, admin, recovery, hours, Hidden Gem, accessibility, and remaining-physical-work documentation is current in `README.md`, `docs/ARCHITECTURE.md`, `docs/SECURITY.md`, `docs/DATA_SOURCES.md`, and `docs/PRODUCTION_READINESS.md`.
+- MASTER Definition of Done: endpoint/search/routing/integrity/auth/hours/Hidden Gem/deployment-readiness software requirements pass. Accessibility confirmation and exact unverified real-world positions/hours pass with a verified limitation because the UI reports them as unverified and makes no route or schedule claim.
+
 ## Verification
 
 - Phase 5.6 hours, UI rendering, accessibility, normalization, routing, validation, reset, and experience unit/integration suite: pass, 108/108, including fixed-clock Europe/Amsterdam, exception coverage, and rejection of invalid cross-building lift edges.
@@ -105,14 +125,20 @@ Last updated: 2026-09-11
 - pnpm seed:check: pass, 183 records validated.
 - pnpm database:audit: pass, 0 integrity failures across 2 buildings, 8 floors, 24 categories, 4 sources, 5 hours records, 514 nodes, 535 edges, 606 locations, 576 rooms, and the approved Hidden Gem.
 - pnpm hours:audit: pass, 13 relevant facilities, 4 verified linked locations, 1 needs-review Gem schedule, and 0 critical issues.
-- pnpm test:e2e: pass, 23/23 against the real Supabase project, including admin, password-reset security, Storage, moderation, deduplicated likes, proposed indoor and outdoor Gems, proposal-to-canonical linking, wrong-floor endpoint rejection, structured hours editing, BRÛZE, 320/375/390 px mobile layouts, desktop, official maps, opening-hour exceptions, and wheelchair behavior.
+- pnpm test:e2e: pass, 25/25 against the real Supabase project, including admin, a valid-token password update/login/restore, the full Central Brew no-SQL hours workflow, Storage, moderation, deduplicated likes, proposed indoor and outdoor Gems, proposal-to-canonical linking, wrong-floor endpoint rejection, structured hours editing, BRÛZE, 320/375/390 px mobile layouts, desktop, official maps, opening-hour exceptions, and wheelchair behavior. Post-run QA cleanup counts are 0.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.
 - Supabase migration and post-migration queries: pass. Security advisor found no Phase 5 schema error; existing informational no-policy findings protect intentionally private/deny-all tables. Leaked-password protection remains a project setting to enable separately.
 
-## Next active phase
+## Remaining physical / operational verification
 
-**Phase 6 — not started**
+- Verify the R10 lift-to-corridor topology on site before enabling a wheelchair route to F3.025 or calling any R10 route confirmed accessible.
+- Survey wheelchair suitability for the 305 possible candidate locations and connect or classify the 301 locations outside the largest stair-free candidate component.
+- Confirm the exact current Campus Store desk/entrance, whether Document Centre still has a separate public counter, and the exact BRÛZE map point/entrance before creating route endpoints.
+- Obtain current authoritative schedules for Service Desk, Central Brew, Café IF, Canteen, Brandstof, Espresso Bar, Food Court, legacy iShop/Document Centre context, and weekday semantics for BRÛZE.
+- Enable Supabase Leaked Password Protection manually when the project plan exposes the setting.
 
-No code blocker has been identified. Physical on-campus validation is required before any route or location can be marked confirmed accessible. Priority checks are the R10 lift-to-current-endpoint connections, the current Campus Store desk/entrance, whether Document Centre still has a separate public counter, the BRÛZE map point/entrance, and current service/hospitality hours where official pages are silent. Local migration timestamps now match the applied production history. Phase 6 must still complete the architecture/runbook review and assess the existing Supabase advisor items, including leaked-password protection and unused/permissive-policy notices.
+## Program state
+
+Phase 6 is complete. No Phase 7 is planned. Direct push to `main` remains the owner's deliberate low-friction workflow; no required PR, approval, branch-protection, or blocking status-check policy is introduced.
