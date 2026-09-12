@@ -84,8 +84,14 @@ test('same-floor route stays simple and route debug is development-only', async 
   await expect(
     page.getByRole('button', { name: 'Volgende routefase' }),
   ).toBeDisabled();
-  await expect(page.getByText('Routing debug')).toBeVisible();
   await expect(page.locator('.route-path-active')).not.toHaveCount(0);
+  const hostname = new URL(page.url()).hostname;
+  const localRuntime = hostname === '127.0.0.1' || hostname === 'localhost';
+  if (localRuntime) {
+    await expect(page.getByText('Routing debug')).toBeVisible();
+  } else {
+    await expect(page.getByText('Routing debug')).toHaveCount(0);
+  }
 });
 test('wheelchair route uses unknown lift data with an honest warning', async ({
   page,
