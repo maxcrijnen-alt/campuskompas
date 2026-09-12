@@ -49,7 +49,9 @@ Voor een nieuw project:
 4. voer alleen bij initiële inrichting `pnpm seed` uit;
 5. draai alle audits.
 
-De provenance-migration ondersteunt `official_web`, `physical_signage`, `staff_confirmation` en `manual_admin`. Een officiële webbron vereist HTTPS; handmatige invoer kan niet automatisch verified zijn.
+De provenance-migrations ondersteunen `official_web`, `physical_signage`, `staff_confirmation` en `manual_admin`. Een officiële webbron vereist HTTPS. Een opgeslagen Hours Admin-wijziging wordt bevestigd door de ingelogde beheerder en krijgt automatisch `verified` met de huidige datum; `manual_admin` blijft zichtbaar als de werkelijke herkomst.
+
+De generieke adminopslag bevestigt automatisch bronnen, verdiepingen, locaties, routenodes en routeverbindingen. Bij routenodes en routeverbindingen wordt ook de door de beheerder ingestelde toegankelijkheidsstatus bevestigd. Hidden Gems behouden hun eigen goedkeurings- en locatiereviewworkflow.
 
 ## Verificatiecommando's
 
@@ -94,7 +96,7 @@ Voor “Central Brew heeft vanaf morgen nieuwe openingstijden”:
 7. controleer de preview en kies **Opslaan en koppelen**;
 8. open de publieke locatie en controleer de compacte status en het weekrooster.
 
-Gebruik `manual_admin` voor een onbevestigde handmatige wijziging. Gebruik `verified` alleen met een toegestane, controleerbare bron.
+Gebruik `manual_admin` wanneer jij als beheerder de bron bent en beschrijf concreet waarop de wijziging is gebaseerd. De app markeert de opgeslagen wijziging als **geverifieerd door beheerder**. Kies `official_web`, signage of medewerkerbevestiging wanneer dat de werkelijke bron is.
 
 ## Hidden Gems modereren
 

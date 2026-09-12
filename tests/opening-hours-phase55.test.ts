@@ -267,7 +267,7 @@ describe('Phase 5.5 operational records and presentation', () => {
     ).toBe(false);
   });
 
-  it('supports honest URL-less provenance without treating manual notes as verified', () => {
+  it('supports URL-less provenance confirmed by an administrator', () => {
     const signage = {
       ...base,
       source_type: 'physical_signage' as const,
@@ -294,7 +294,7 @@ describe('Phase 5.5 operational records and presentation', () => {
         ...manual,
         verification_status: 'verified',
       }).success,
-    ).toBe(false);
+    ).toBe(true);
     expect(
       adminSchemas.opening_hours.safeParse({
         ...signage,

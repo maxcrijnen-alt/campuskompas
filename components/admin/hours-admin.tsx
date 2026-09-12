@@ -11,6 +11,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { OpeningHours } from '@/components/campus/opening-hours';
+import { amsterdamClock } from '@/lib/campus/hours';
 import type { Category, Gem, Hours, Location } from '@/lib/campus/types';
 
 type PeriodInput = { value: string; closed: boolean };
@@ -42,6 +43,7 @@ const weekdayNames = [
 ];
 const orderedDays = [1, 2, 3, 4, 5, 6, 0];
 const timePattern = /^([01]\d|2[0-3]):[0-5]\d$/;
+const todayIso = () => amsterdamClock().date;
 
 function periodsToText(periods: [string, string][] | null | undefined) {
   return periods?.map(([start, end]) => `${start}–${end}`).join(', ') ?? '';
@@ -50,6 +52,8 @@ function periodsToText(periods: [string, string][] | null | undefined) {
 function toDraft(hours: Hours): Draft {
   return {
     ...hours,
+    verified_at: todayIso(),
+    verification_status: 'verified',
     weekly: Object.fromEntries(
       orderedDays.map((day) => {
         const periods = hours.weekly[String(day)];
@@ -73,7 +77,7 @@ function toDraft(hours: Hours): Draft {
 }
 
 function newDraft(): Draft {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIso();
   return {
     id: `hours-${Date.now()}`,
     weekly: Object.fromEntries(
@@ -81,7 +85,7 @@ function newDraft(): Draft {
     ),
     exceptions: [],
     verified_at: today,
-    verification_status: 'unverified',
+    verification_status: 'verified',
     exceptions_reviewed_through: null,
     source_url: null,
     source_type: 'manual_admin',
@@ -131,13 +135,6 @@ export function fromDraft(draft: Draft): Hours {
   if (draft.source_description.trim().length < 3)
     throw new Error('Beschrijf de bron kort / briefly describe the source');
   if (
-    draft.source_type === 'manual_admin' &&
-    draft.verification_status === 'verified'
-  )
-    throw new Error(
-      'Een handmatige beheernotitie kan niet verified zijn / cannot be verified',
-    );
-  if (
     draft.exceptions_reviewed_through &&
     draft.exceptions_reviewed_through < draft.verified_at
   ) {
@@ -169,6 +166,8 @@ export function fromDraft(draft: Draft): Hours {
   }
   return {
     ...draft,
+    verified_at: todayIso(),
+    verification_status: 'verified',
     weekly,
     exceptions,
     exceptions_reviewed_through: draft.exceptions_reviewed_through || null,
@@ -513,26 +512,11 @@ export function HoursAdmin({
             </label>
             <label className="field-label">
               Status
-              <select
+              <input
                 className="field-input"
-                value={draft.verification_status}
-                onChange={(event) =>
-                  setDraft({
-                    ...draft,
-                    verification_status: event.target
-                      .value as Hours['verification_status'],
-                  })
-                }
-              >
-                <option
-                  value="verified"
-                  disabled={draft.source_type === 'manual_admin'}
-                >
-                  verified
-                </option>
-                <option value="needs_review">needs_review</option>
-                <option value="unverified">unverified</option>
-              </select>
+                value="Geverifieerd door beheerder / Admin verified"
+                readOnly
+              />
             </label>
             <label className="field-label">
               Tijdzone / Timezone
@@ -576,15 +560,7 @@ export function HoursAdmin({
                   onChange={(event) => {
                     const source_type = event.target
                       .value as Hours['source_type'];
-                    setDraft({
-                      ...draft,
-                      source_type,
-                      verification_status:
-                        source_type === 'manual_admin' &&
-                        draft.verification_status === 'verified'
-                          ? 'needs_review'
-                          : draft.verification_status,
-                    });
+                    setDraft({ ...draft, source_type });
                   }}
                 >
                   <option value="official_web">
@@ -641,8 +617,8 @@ export function HoursAdmin({
             </label>
             {draft.source_type === 'manual_admin' && (
               <p className="form-note">
-                Een handmatige notitie blijft needs_review of unverified en
-                wordt publiek nooit als bevestigde open/gesloten-status getoond.
+                Na opslaan geldt dit als bevestigd door een beheerder. De
+                bronbeschrijving blijft publiek zichtbaar als herkomst.
               </p>
             )}
           </fieldset>

@@ -398,7 +398,7 @@ test('admin creates, previews and links URL-less hours by facility name', async 
         timezone: 'Europe/Amsterdam',
         source_type: 'manual_admin',
         source_url: null,
-        verification_status: 'unverified',
+        verification_status: 'verified',
       });
 
     await page.goto(`/map?to=${encodeURIComponent(locationId)}`);
@@ -406,10 +406,11 @@ test('admin creates, previews and links URL-less hours by facility name', async 
       page.getByRole('heading', { name: locationName }),
     ).toBeVisible();
     await page.getByText('Openingstijden bekijken').click();
-    await expect(page.getByText('Handmatige beheernotitie')).toBeVisible();
+    await expect(page.getByText('Bevestigd door beheerder')).toBeVisible();
+    await expect(page.getByText(/^Gecontroleerd ·/)).toBeVisible();
     await expect(
       page.getByText('Tijden moeten worden gecontroleerd'),
-    ).toBeVisible();
+    ).toHaveCount(0);
 
     await page.goto('/admin/opening-hours');
     const gemSearch = page.getByRole('searchbox', {
@@ -591,8 +592,10 @@ test('admin maintains Central Brew hours by name without SQL or UUID input', asy
     await page.goto('/map?to=central-brew');
     await expect(
       page.getByText('Tijden moeten worden gecontroleerd'),
-    ).toBeVisible();
+    ).toHaveCount(0);
     await page.getByText('Openingstijden bekijken').click();
+    await expect(page.getByText('Bevestigd door beheerder')).toBeVisible();
+    await expect(page.getByText(/^Gecontroleerd ·/)).toBeVisible();
     await expect(page.getByText(/Phase 6-beheerworkflow/)).toBeVisible();
 
     await page.goto('/admin/opening-hours');
@@ -1176,7 +1179,7 @@ test('admin rejects a wrong-floor endpoint and validates a real endpoint', async
             ...base,
             node_id: 'plan-R8-0-14-29_2',
             status: 'approved',
-            verification_status: 'verified',
+            verification_status: 'unverified',
           },
         })
       ).status(),

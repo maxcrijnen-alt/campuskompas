@@ -78,7 +78,9 @@ Nieuwe beheerders worden bewust geprovisioned:
 2. Voer `pnpm exec tsx scripts/provision-admin.ts ADMIN_EMAIL` uit in een beveiligde lokale omgeving.
 3. Voeg de teruggegeven user-ID toe aan `public.admin_profiles`.
 
-De Hours Admin laat een beheerder een voorziening of Hidden Gem op naam zoeken, een weekrooster, gesloten dagen, meerdere tijdblokken, uitzonderingen, bron, verificatie en notities beheren en het record atomair koppelen. Hiervoor zijn geen SQL of UUID's nodig.
+De Hours Admin laat een beheerder een voorziening of Hidden Gem op naam zoeken, een weekrooster, gesloten dagen, meerdere tijdblokken, uitzonderingen, bron en notities beheren en het record atomair koppelen. Iedere opgeslagen wijziging wordt met de actuele datum als **geverifieerd door beheerder** gepubliceerd; het gekozen brontype blijft zichtbaar. Hiervoor zijn geen SQL of UUID's nodig.
+
+Ook andere beheergegevens met een verificatiestatus worden bij opslaan automatisch bevestigd. Voor routenodes en routeverbindingen bevestigt de beheerder daarbij zowel de algemene gegevens als de ingestelde toegankelijkheidsstatus.
 
 ## Verificatie
 

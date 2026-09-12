@@ -105,8 +105,8 @@ export function MapEditor({
                 node_type: 'waypoint',
                 label: { nl: 'Waypoint', en: 'Waypoint' },
                 accessible: false,
-                accessibility_status: 'unverified',
-                verification_status: 'unverified',
+                accessibility_status: 'verified',
+                verification_status: 'verified',
               };
               setNodes([...nodes, n]);
               setSelected(n.id);
@@ -181,8 +181,8 @@ export function MapEditor({
                       weight: 1,
                       edge_type: 'corridor',
                       accessible: false,
-                      accessibility_status: 'unverified',
-                      verification_status: 'unverified',
+                      accessibility_status: 'verified',
+                      verification_status: 'verified',
                       bidirectional: true,
                     };
                     setEdges([...edges, edge]);

@@ -136,11 +136,6 @@ export function auditOpeningHours(
       failures.push(`${record.id}: official web source URL missing`);
     if (record.source_url && !record.source_url.startsWith('https://'))
       failures.push(`${record.id}: source URL is not HTTPS`);
-    if (
-      record.source_type === 'manual_admin' &&
-      record.verification_status === 'verified'
-    )
-      failures.push(`${record.id}: manual admin source marked verified`);
     return failures;
   });
   const orphanHoursRecords = input.hours

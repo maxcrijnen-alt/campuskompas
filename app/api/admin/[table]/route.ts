@@ -7,6 +7,7 @@ import {
   loadRoutingData,
   validateCanonicalLocation,
 } from '@/lib/server/routing-data';
+import { confirmAdminRecord } from '@/lib/server/admin-verification';
 const readOnlyAdminTables = new Set(['location_categories']);
 function tableName(name: string): AdminTable {
   if (!Object.hasOwn(adminSchemas, name)) throw new Error('INVALID_INPUT');
@@ -71,7 +72,10 @@ export async function POST(
       if (error || !data) throw Error('INVALID_INPUT');
       return json({ ok: true });
     }
-    let record = result.data as Record<string, unknown>;
+    let record = confirmAdminRecord(
+      table,
+      result.data as Record<string, unknown>,
+    );
     if (table === 'locations') {
       const location = result.data as Location;
       if (location.node_id) {

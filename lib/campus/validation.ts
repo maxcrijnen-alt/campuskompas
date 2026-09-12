@@ -325,16 +325,6 @@ export const adminSchemas = {
         });
       }
       if (
-        value.source_type === 'manual_admin' &&
-        value.verification_status === 'verified'
-      ) {
-        context.addIssue({
-          code: 'custom',
-          path: ['verification_status'],
-          message: 'Manual admin entries cannot be marked verified',
-        });
-      }
-      if (
         value.exceptions_reviewed_through &&
         value.exceptions_reviewed_through < value.verified_at
       ) {

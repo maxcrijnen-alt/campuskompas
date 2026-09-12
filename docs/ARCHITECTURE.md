@@ -45,7 +45,7 @@ Een liftinstructie komt uit de echte transition-edge, bijvoorbeeld “Neem de li
 
 `lib/campus/hours.ts` is de centrale Europe/Amsterdam-engine voor weekroosters, meerdere periodes, gesloten dagen, datumuitzonderingen, volgende opening en DST. Een exception overschrijft de normale weekdag. Alleen semantisch relevante categorieën krijgen een compact hours-blok.
 
-`opening_hours` bewaart type, status, bronsoort, bronbeschrijving, optionele HTTPS-URL, verificatiedatum, reviewhorizon en tweetalige notities. `official_web` vereist een URL. `manual_admin` kan niet als verified worden opgeslagen. `admin_save_opening_hours_link` slaat het record en de gekozen locatie/Hidden Gem atomair op.
+`opening_hours` bewaart type, status, bronsoort, bronbeschrijving, optionele HTTPS-URL, verificatiedatum, reviewhorizon en tweetalige notities. `official_web` vereist een URL. Een wijziging die een provisioned beheerder via Hours Admin opslaat, wordt `verified` met de huidige datum. `manual_admin` blijft als afzonderlijk brontype zichtbaar en wordt niet als officiële websitebron gepresenteerd. `admin_save_opening_hours_link` slaat het record en de gekozen locatie/Hidden Gem atomair op.
 
 ## Hidden Gems
 
@@ -58,6 +58,8 @@ Foto's krijgen willekeurige namen in de private bucket `gem-photos`. Pending fot
 De browser gebruikt uitsluitend de publishable key. Publieke writes gaan via same-origin, payload-begrensde handlers met Zod-validatie en transactionele rate limiting. Privileged serverwerk gebruikt een secret key of de allowlisted Supabase Edge Function-gateway.
 
 Iedere adminrequest valideert de Supabase access token opnieuw met `auth.getUser()` en controleert daarna `admin_profiles`. Publieke signup vereist een kort geldige permit en staat normaal dicht. Password reset is generiek, rate-limited en alleen voor een provisioned admin; recoverytokens blijven in het browsergeheugen en worden direct uit de URL verwijderd.
+
+Een opslagactie door een beheerder bevestigt automatisch de algemene verificatiestatus van bronnen, verdiepingen, locaties, routenodes en routeverbindingen. Voor routenodes en routeverbindingen bevestigt dezelfde opslagactie ook de ingestelde toegankelijkheidsstatus: de beheerder geldt binnen dit proces als de bevoegde expert. Hidden Gems gebruiken hun afzonderlijke moderatie- en locatiereviewstatus.
 
 ## Reproduceerbaarheid en deployment
 

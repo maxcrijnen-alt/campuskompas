@@ -196,8 +196,8 @@ export function OpeningHours({
       en: 'Confirmed by staff',
     },
     manual_admin: {
-      nl: 'Handmatige beheernotitie',
-      en: 'Manual admin note',
+      nl: 'Bevestigd door beheerder',
+      en: 'Confirmed by administrator',
     },
   }[hours.source_type][locale];
 
