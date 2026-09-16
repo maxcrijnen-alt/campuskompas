@@ -1067,7 +1067,7 @@ function defaultRow(table: string): Row {
       x: 375,
       y: 280,
       status: 'pending',
-      verification_status: 'verified',
+      verification_status: 'unverified',
       source_id: 'campus',
       routing_status: 'needs_review',
       endpoint_source: null,
@@ -1078,7 +1078,7 @@ function defaultRow(table: string): Row {
       building_id: 'R8',
       level: 4,
       geometry: [],
-      verification_status: 'verified',
+      verification_status: 'unverified',
     },
     route_nodes: {
       id,
@@ -1089,8 +1089,8 @@ function defaultRow(table: string): Row {
       node_type: 'waypoint',
       label: text,
       accessible: false,
-      accessibility_status: 'verified',
-      verification_status: 'verified',
+      accessibility_status: 'unverified',
+      verification_status: 'unverified',
     },
     route_edges: {
       id,
@@ -1099,8 +1099,8 @@ function defaultRow(table: string): Row {
       weight: 1,
       edge_type: 'corridor',
       accessible: false,
-      accessibility_status: 'verified',
-      verification_status: 'verified',
+      accessibility_status: 'unverified',
+      verification_status: 'unverified',
       bidirectional: true,
     },
     first_year_tips: {
@@ -1148,7 +1148,7 @@ function gemContextLabel(context: Gem['proposed_location_context']) {
       r8: 'Voorstel Rengerslaan 8 / R8 proposal',
       r10: 'Voorstel Rengerslaan 10 / R10 proposal',
       campus_outdoor: 'Buiten op campus / Campus outdoor',
-      other: 'Andere externe plek / Other external place',
+      other: 'Buiten de campus / in de stad / Outside campus / in the city',
     }[context ?? 'other'] ?? 'Locatievoorstel / Location proposal'
   );
 }

@@ -24,6 +24,27 @@ async function removeTemporaryGems(titlePattern: string) {
   }
 }
 
+async function expectDottedRoute(page: import('@playwright/test').Page) {
+  const route = page.locator('.route-path-active').first();
+  await expect(page.locator('.route-path-active')).not.toHaveCount(0);
+  await expect(page.locator('.original-route-overlay')).toBeVisible();
+  const style = await route.evaluate((element) => {
+    const computed = getComputedStyle(element);
+    return {
+      dashArray: computed.strokeDasharray,
+      lineCap: computed.strokeLinecap,
+      vectorEffect: computed.vectorEffect,
+      pathLength: (element as SVGGeometryElement).getTotalLength(),
+    };
+  });
+  expect(style.pathLength).toBeGreaterThan(0);
+  expect(style.dashArray).not.toBe('none');
+  expect(style.dashArray).toMatch(/1(px)?[, ]+10(px)?/);
+  expect(style.lineCap).toBe('round');
+  expect(style.vectorEffect).toBe('non-scaling-stroke');
+  await expect(page.locator('marker, .route-arrow')).toHaveCount(0);
+}
+
 test('find a room, route across floors, accessible failure, English and QR deep link', async ({
   page,
 }) => {
@@ -52,7 +73,7 @@ test('find a room, route across floors, accessible failure, English and QR deep 
   await expect(page.getByText(/Kaartindicatie/)).toBeVisible();
   await expect(page.getByText('± 4 min lopen')).toBeVisible();
   await expect(page.getByLabel('START · 0.26')).toBeVisible();
-  await expect(page.locator('.route-path-active')).not.toHaveCount(0);
+  await expectDottedRoute(page);
   await page.getByRole('button', { name: 'Volgende routefase' }).click();
   await expect(
     page.getByRole('heading', { name: 'R10 · Begane grond' }),
@@ -84,7 +105,7 @@ test('same-floor route stays simple and route debug is development-only', async 
   await expect(
     page.getByRole('button', { name: 'Volgende routefase' }),
   ).toBeDisabled();
-  await expect(page.locator('.route-path-active')).not.toHaveCount(0);
+  await expectDottedRoute(page);
   const hostname = new URL(page.url()).hostname;
   const localRuntime = hostname === '127.0.0.1' || hostname === 'localhost';
   if (localRuntime) {
@@ -101,7 +122,7 @@ test('wheelchair route uses unknown lift data with an honest warning', async ({
     page.getByText(/vermijdt trappen, maar de toegankelijkheid/),
   ).toBeVisible();
   await expect(page.getByText(/Neem de lift naar verdieping 1/)).toBeVisible();
-  await expect(page.locator('.route-path-active')).not.toHaveCount(0);
+  await expectDottedRoute(page);
   await expect(page.getByText(/bevestigd toegankelijk/)).toHaveCount(0);
 });
 test('mobile route keeps the current map segment and controls usable at 320px', async ({
@@ -243,9 +264,10 @@ test('opening hours show a Library exception, closed state and semantic unknown 
   ).toBeVisible();
 
   await page.goto('/map?to=central-brew');
+  await expect(page.getByText('Actuele tijden niet bevestigd')).toBeVisible();
   await expect(
-    page.getByText('Openingstijden nog niet bevestigd'),
-  ).toBeVisible();
+    page.locator('.hours-card').getByText(/^(Open|Gesloten)\b/),
+  ).toHaveCount(0);
   await page.goto('/map?to=F3025');
   await expect(page.locator('.hours-card')).toHaveCount(0);
 });
@@ -680,7 +702,7 @@ test('new Hidden Gem place stays a non-routeable proposal for moderation', async
     await page
       .getByLabel('Beschrijving')
       .fill('Tijdelijk voorstel om de moderatiestroom te controleren.');
-    await page.getByLabel('Stel een nieuwe plek voor').check();
+    await page.getByLabel('Nieuwe plek in R8').check();
     await page.getByLabel('Naam van de plek').fill('QA onbekende studienis');
     await page
       .getByLabel('Hoe kan een beheerder de plek vinden?')
@@ -718,13 +740,13 @@ test('new Hidden Gem place stays a non-routeable proposal for moderation', async
   }
 });
 
-test('an outdoor Hidden Gem can be moderated without inventing an indoor route', async ({
+test('a city Hidden Gem can be moderated without inventing an indoor route', async ({
   page,
 }) => {
   test.setTimeout(120000);
   test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
-  await removeTemporaryGems('QA outdoor gem %');
-  const title = 'QA outdoor gem ' + Date.now();
+  await removeTemporaryGems('Restaurant test %');
+  const title = 'Restaurant test ' + Date.now();
   let gemId: string | undefined;
   try {
     await page.goto('/gems');
@@ -732,16 +754,17 @@ test('an outdoor Hidden Gem can be moderated without inventing an indoor route',
     await page.getByLabel('Titel', { exact: true }).fill(title);
     await page
       .getByLabel('Beschrijving')
-      .fill('Tijdelijke buitentip om locatiecontext en moderatie te testen.');
-    await page.getByLabel('Stel een nieuwe plek voor').check();
-    await page.getByLabel('Gebied op de campus').selectOption('campus_outdoor');
-    await page.getByLabel('Naam van de plek').fill('QA tafel op campusplein');
-    await page
-      .getByLabel('Lokaal, zone of herkenningspunt (indien bekend)')
-      .fill('Bij de fietsenrekken aan het plein');
+      .fill(
+        'Tijdelijk restaurant om externe locatiecontext en moderatie te testen.',
+      );
+    await page.getByLabel('Categorie').click();
+    await page.getByRole('option', { name: 'Eten' }).click();
+    await page.getByLabel('Buiten de campus / in de stad').check();
+    await page.getByLabel('Naam van de plek').fill('Restaurant test');
+    await page.getByLabel('Locatie of gebied').fill('Centrum Leeuwarden');
     await page
       .getByLabel('Hoe kan een beheerder de plek vinden?')
-      .fill('Buiten op het plein, naast de grote plantenbak.');
+      .fill('In het centrum van Leeuwarden, buiten de campusgebouwen.');
     await expect(page.getByLabel('Gebouw')).toHaveCount(0);
     await page.waitForTimeout(3200);
     const submission = page.waitForResponse(
@@ -758,7 +781,7 @@ test('an outdoor Hidden Gem can be moderated without inventing an indoor route',
     const saved = await serviceDb()
       .from('hidden_gems')
       .select(
-        'id,status,location_id,proposed_location_context,proposed_building_id,proposed_floor_id',
+        'id,status,category,location_id,proposed_location_context,proposed_building_id,proposed_floor_id,proposed_room_zone',
       )
       .eq('title', title)
       .single();
@@ -766,10 +789,12 @@ test('an outdoor Hidden Gem can be moderated without inventing an indoor route',
     gemId = saved.data!.id;
     expect(saved.data).toMatchObject({
       status: 'pending',
+      category: 'food',
       location_id: null,
-      proposed_location_context: 'campus_outdoor',
+      proposed_location_context: 'other',
       proposed_building_id: null,
       proposed_floor_id: null,
+      proposed_room_zone: 'Centrum Leeuwarden',
     });
 
     await page.goto('/admin/gems');
@@ -782,7 +807,7 @@ test('an outdoor Hidden Gem can be moderated without inventing an indoor route',
     await page.getByRole('button', { name: 'Inloggen / Sign in' }).click();
     const moderationCard = page.locator('article').filter({ hasText: title });
     await expect(moderationCard).toContainText(
-      'Buiten op campus / Campus outdoor',
+      'Buiten de campus / in de stad / Outside campus / in the city',
     );
     await moderationCard
       .getByRole('button', { name: 'Goedkeuren / Approve' })
@@ -801,11 +826,12 @@ test('an outdoor Hidden Gem can be moderated without inventing an indoor route',
       .toMatchObject({
         status: 'approved',
         location_id: null,
-        proposed_location_context: 'campus_outdoor',
+        proposed_location_context: 'other',
       });
 
     await page.goto('/gems');
     const publicCard = page.locator('article').filter({ hasText: title });
+    await expect(publicCard).toContainText('Centrum Leeuwarden');
     await expect(publicCard).toContainText('Buiten de indoor routekaart');
     await expect(publicCard).toContainText(
       'Route via CampusKompas is voor deze plek nog niet beschikbaar.',
@@ -1128,6 +1154,7 @@ test('admin rejects a wrong-floor endpoint and validates a real endpoint', async
 }) => {
   test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
   const id = 'qa-location-' + Date.now();
+  const nodeId = 'qa-node-' + Date.now();
   await page.goto('/admin/locations');
   await page
     .getByLabel('E-mail', { exact: true })
@@ -1196,10 +1223,50 @@ test('admin rejects a wrong-floor endpoint and validates a real endpoint', async
       routing_status: 'direct',
       endpoint_source: 'manual',
       status: 'approved',
-      verification_status: 'verified',
+      verification_status: 'unverified',
+    });
+    const node = {
+      id: nodeId,
+      building_id: 'R8',
+      floor_id: 'R8-0',
+      x: 210,
+      y: 210,
+      map_x: 30,
+      map_y: 30,
+      node_type: 'waypoint',
+      label: { nl: 'QA fysiek onbekend', en: 'QA physical unknown' },
+      accessible: false,
+      accessibility_status: 'unverified',
+      verification_status: 'needs_review',
+    };
+    expect(
+      (
+        await page.request.post('/api/admin/route_nodes', { data: node })
+      ).status(),
+    ).toBe(200);
+    expect(
+      (
+        await page.request.post('/api/admin/route_nodes', {
+          data: {
+            ...node,
+            label: { nl: 'QA naam gewijzigd', en: 'QA name changed' },
+          },
+        })
+      ).status(),
+    ).toBe(200);
+    const savedNode = await serviceDb()
+      .from('route_nodes')
+      .select('accessible,accessibility_status,verification_status')
+      .eq('id', nodeId)
+      .single();
+    expect(savedNode.data).toMatchObject({
+      accessible: false,
+      accessibility_status: 'unverified',
+      verification_status: 'needs_review',
     });
   } finally {
     await serviceDb().from('locations').delete().eq('id', id);
+    await serviceDb().from('route_nodes').delete().eq('id', nodeId);
   }
 });
 test('admin can edit data, produce QR and inspect maps; landing screenshot', async ({

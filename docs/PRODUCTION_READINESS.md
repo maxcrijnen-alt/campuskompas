@@ -1,6 +1,6 @@
 # CampusKompas production readiness
 
-Last verified: 2026-09-12
+Last verified: 2026-09-16
 
 CampusKompas is softwarematig productierijp voor de huidige R8/R10-dataset. De applicatie maakt fysieke onbekendheden zichtbaar; zij claimt geen gecertificeerde route of toegankelijkheid. Onderstaande stappen zijn het praktische beheer- en herstelrunbook.
 
@@ -51,7 +51,7 @@ Voor een nieuw project:
 
 De provenance-migrations ondersteunen `official_web`, `physical_signage`, `staff_confirmation` en `manual_admin`. Een officiële webbron vereist HTTPS. Een opgeslagen Hours Admin-wijziging wordt bevestigd door de ingelogde beheerder en krijgt automatisch `verified` met de huidige datum; `manual_admin` blijft zichtbaar als de werkelijke herkomst.
 
-De generieke adminopslag bevestigt automatisch bronnen, verdiepingen, locaties, routenodes en routeverbindingen. Bij routenodes en routeverbindingen wordt ook de door de beheerder ingestelde toegankelijkheidsstatus bevestigd. Hidden Gems behouden hun eigen goedkeurings- en locatiereviewworkflow.
+De generieke adminopslag bewaart de ingestelde verificatiestatus. Een gewone wijziging aan bijvoorbeeld een naam of omschrijving bevestigt geen fysieke, topologische of accessibility-eigenschap. Nieuwe locaties, verdiepingen, routenodes en routeverbindingen starten als `unverified`; een beheerder moet verificatie bewust en expliciet wijzigen. Hidden Gems behouden hun eigen goedkeurings- en locatiereviewworkflow.
 
 ## Verificatiecommando's
 
@@ -100,7 +100,7 @@ Gebruik `manual_admin` wanneer jij als beheerder de bron bent en beschrijf concr
 
 ## Hidden Gems modereren
 
-Open `/admin/gems`, controleer inhoud, foto en locatiemodus, en keur daarna goed of af. Een canonical locatie mag routeacties krijgen. Een `r8`/`r10`-voorstel blijft routevrij totdat een beheerder het aan één gevalideerde locatie koppelt. `campus_outdoor` en `other` mogen gepubliceerd worden zonder fictief gebouw, verdieping, node of route.
+Open `/admin/gems`, controleer inhoud, foto en locatiemodus, en keur daarna goed of af. Een canonical locatie mag routeacties krijgen. Het publieke formulier onderscheidt een bestaande locatie, een nieuwe plek in R8 of R10, buiten op de campus en buiten de campus/in de stad. Een `r8`/`r10`-voorstel blijft routevrij totdat een beheerder het aan één gevalideerde locatie koppelt. `campus_outdoor` en `other` mogen gepubliceerd worden zonder fictief gebouw, verdieping, node of route.
 
 BRÛZE gebruikt dezelfde generieke architectuur. De huidige Gem blijft approved content met `needs_review`-locatie en urencontext; er is geen route zolang het exacte kaartpunt niet is bevestigd.
 
@@ -110,8 +110,17 @@ BRÛZE gebruikt dezelfde generieke architectuur. De huidige Gem blijft approved 
 - Voeg graphwijzigingen alleen via een migration of reproduceerbaar importscript toe.
 - Controleer na iedere wijziging componenten, 606-location coverage en kritieke pairs.
 - Markeer accessibility alleen verified na fysieke controle.
+- De actieve route gebruikt de bestaande `map_path` als rustige paars-blauwe stippellijn zonder herhaalde pijlmarkers; START, BESTEMMING en overgangsinstructies blijven richting geven.
 - Binnen hetzelfde gebouw gebruikt wheelchair-routing uitsluitend een echte liftedge voor floor changes; tussen gebouwen uitsluitend een outdoor-edge.
 - Ontbrekende R10-topologie blijft een geverifieerde beperking en mag niet worden ingevuld op basis van aannames.
+
+## Post-launch UX en bronnencontrole
+
+- Informatieve `i`-markers houden een bruikbaar 44 px klikvlak, terwijl de zichtbare cirkel bij inzoomen kleiner wordt. Bij selectie blijft hetzelfde `i` gemarkeerd en wordt het op mobiel boven het detailpaneel gekaderd; er verschijnt geen tweede paarse locatiepin.
+- `/study-info` biedt acht onderhoudbare, doorzoekbare onderwerpen met uitsluitend officiële NHL Stenden-links: Student Info, studiestart, OER, rechten en plichten, examencommissie, College van Beroep voor de Examens, onderwijscatalogus en Campus Tour. Examencommissie en beroepscollege worden expliciet onderscheiden.
+- Eerstejaars bevat een Nederlands/Engels Campus Tour-item met een externe link. De oude visuele QR-tip “Scan. Zoek. Op weg.” wordt niet meer gerenderd; QR-deep links en route-originondersteuning blijven bestaan.
+- De officiële bronnen zijn op 2026-09-16 opnieuw gecontroleerd. R8, R10, Bibliotheek en Student Info zijn inhoudelijk ongewijzigd; de bibliotheekuitzonderingen voor 12–16 oktober 2026 blijven intact. De cateringpagina publiceert nog steeds geen betrouwbare weekroosters voor Central Brew, Café IF, Canteen, Brandstof, Espresso Bar of Food Court.
+- BRÛZE was na een admin-save ten onrechte als officieel ma–vr 08:00–15:00 geverifieerd. Migration `20260916142830_post_launch_bruze_hours_review.sql` herstelt het source-backed `needs_review`-record zonder weekschema of Open/Gesloten-claim; de bron noemt alleen 09:00–18:00 zonder weekdagen. Het afzonderlijke Central Brew-record met `manual_admin`-provenance blijft behouden.
 
 ## Deployment
 

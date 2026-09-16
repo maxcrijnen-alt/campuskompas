@@ -1,6 +1,6 @@
 # CampusKompas routing status
 
-Last updated: 2026-09-12
+Last updated: 2026-09-16
 
 ## Completed phases
 
@@ -11,7 +11,7 @@ Last updated: 2026-09-12
 - Stable location IDs remain canonical for shared URLs; legacy loc-* links, QR links, and valid room-code links remain compatible.
 - Room search now keeps meaningful code structure, supports punctuation/spacing variants and building context, and never fuzzy-matches room-like input to a different code.
 - The From/To swap action updates both state and canonical URL parameters.
-- The primary map now renders routes per floor on the official plans with a solid corridor line, direction arrows, START/CONTINUE/TRANSITION/DESTINATION markers, automatic segment framing, human instructions, a complete route overview, and a conservative whole-minute walking-time estimate.
+- The primary map now renders routes per floor on the official plans with a calm dotted corridor line, no repeated direction arrows, START/CONTINUE/TRANSITION/DESTINATION markers, automatic segment framing, human instructions, a complete route overview, and a conservative whole-minute walking-time estimate.
 - Multi-floor and inter-building routes are split into explicit floor and transition stages. Same-floor routes remain one stage.
 - Routes are drawn only from stored `map_path` geometry. A route with missing corridor geometry gets an actionable no-route state instead of a straight-line shortcut.
 - `?debugRouting=1` exposes endpoint, component, node, edge, floor, and segment details in development only.
@@ -105,7 +105,7 @@ Last updated: 2026-09-12
 - Hidden Gem canonical, proposed R8/R10, campus-outdoor, and other-external modes pass submission and moderation checks. External proposals receive no fabricated route endpoint. BRÛZE remains an approved generic Gem with a `needs_review` external location proposal and no route action.
 - Opening-hours production now contains 6 records: 5 verified location schedules and 1 needs-review BRÛZE context. Five use `official_web` provenance; the administrator-managed Central Brew schedule uses `manual_admin`, is verified by the owner, and remains visibly attributed to the administrator.
 - Hours Admin now treats every saved schedule change as verified by the provisioned administrator, refreshes the verification date, and shows `manual_admin` publicly as “Bevestigd door beheerder” rather than as an official web source.
-- Generic admin saves now force general verification for sources, floors, locations, route nodes, and route edges. Route-node and route-edge saves also confirm the selected accessibility state because the provisioned administrator is the designated expert; Hidden Gems retain their separate moderation statuses.
+- Generic admin saves preserve general and accessibility verification fields. A label or other ordinary edit cannot silently verify physical or topological facts; new physical records default to `unverified`, and verification requires an explicit status change. Hidden Gems retain their separate moderation statuses.
 - The owner email remains provisioned as an administrator. Public registration and direct public mutations remain blocked. Forgot-password responses stay neutral and rate-limited; invalid tokens and weak passwords fail; a valid admin token can update the password and log in. The test restores the original test credential.
 - Supabase advisors were reviewed rather than optimized by count. Three no-policy findings are intentional deny-all/server-only tables. Thirteen overlapping authenticated SELECT-policy notices preserve public-read plus admin behavior and use cached admin checks. Nine unused-index notices are retained because the database is young and the indexes cover foreign keys or expected operational queries.
 - Leaked Password Protection remains disabled and cannot be changed through the available integration. Manual project setting required: Auth → Email provider → Password security → Prevent use of leaked passwords (available on eligible Supabase plans).
@@ -114,9 +114,19 @@ Last updated: 2026-09-12
 - Architecture, security, data-source, setup, deployment, migration, admin, recovery, hours, Hidden Gem, accessibility, and remaining-physical-work documentation is current in `README.md`, `docs/ARCHITECTURE.md`, `docs/SECURITY.md`, `docs/DATA_SOURCES.md`, and `docs/PRODUCTION_READINESS.md`.
 - MASTER Definition of Done: endpoint/search/routing/integrity/auth/hours/Hidden Gem/deployment-readiness software requirements pass. Accessibility confirmation and exact unverified real-world positions/hours pass with a verified limitation because the UI reports them as unverified and makes no route or schedule claim.
 
+## Post-launch UX, Study Info and map polish
+
+- Active route polylines still use only stored `map_path` geometry and now render as round paars-blauwe dots/dashes with a non-scaling stroke. Repeated SVG arrow markers were removed; start, destination, floor stages and transition instructions remain unchanged.
+- Information hotspots have a constant 44 px interaction target and a zoom-aware visible marker (30 px at the base view, shrinking to a 15 px floor). Selecting an official hotspot highlights that same `i`; mobile framing uses the visible map area above the details sheet, and no duplicate selected pin is created.
+- Study Info is a fourth main-navigation destination with eight data-driven official-source cards, NL/EN search, normalization, deterministic ranking and a Student Info empty state. `examencommissie` ranks the Examencommissie card before OER and the College van Beroep.
+- First-year now links to the official Campus Tour and accurately describes accessible routing with unknown candidates. The published “Scan. Zoek. Op weg.” tip is no longer rendered; QR functionality and deep links are untouched.
+- Hidden Gem submission exposes five plain-language location choices. The `other` path accepts a city area and free location description, remains building/floor/node-free, supports moderation and publishes without a fabricated indoor route.
+- Primary sources were rechecked on 2026-09-16. R8, R10, Bibliotheek, its October exceptions and Student Info remain current. No official exact schedules were found for the named catering/service facilities. BRÛZE had acquired an unsupported verified weekday schedule; migration `20260916142830_post_launch_bruze_hours_review.sql` restores `needs_review`, an empty weekly schedule and bilingual source context. Current hours metrics are 5 verified, 1 needs-review, 0 orphan records and 0 critical issues.
+- Search and graph data are unchanged: 606/606 From, 606/606 To, 606 direct endpoints, 514 nodes, 535 edges, one normal-routing component, 48/48 sampled routes, 7/7 critical pairs and 9/9 route-experience pairs.
+
 ## Verification
 
-- Phase 5.6 hours, UI rendering, accessibility, normalization, routing, validation, reset, and experience unit/integration suite: pass, 108/108, including fixed-clock Europe/Amsterdam, exception coverage, and rejection of invalid cross-building lift edges.
+- Full unit/integration suite: pass, 118 tests; 1 opt-in live-Supabase test skipped by the default unit command. Coverage includes post-launch Study Info ranking, admin verification preservation, fixed-clock Europe/Amsterdam hours, exception handling, normalization, routing, validation, reset, experience rendering, and rejection of invalid cross-building lift edges.
 - Phase 4 required-pair experience audit: pass, 9/9 routes and 0 critical issues.
 - pnpm search:audit: pass, 606/606 From and To, 0 critical issues.
 - pnpm routing:audit: pass, 0 critical issues.
@@ -125,9 +135,9 @@ Last updated: 2026-09-12
 - Route browser acceptance: pass, 5/5 targeted checks on desktop and mobile.
 - Official-plan browser verification: pass, 8/8 floor images load at 1489 × 1489 and fit at 320 px.
 - pnpm seed:check: pass, 183 records validated.
-- pnpm database:audit: pass, 0 integrity failures across 2 buildings, 8 floors, 24 categories, 4 sources, 5 hours records, 514 nodes, 535 edges, 606 locations, 576 rooms, and the approved Hidden Gem.
+- pnpm database:audit: pass, 0 integrity failures across 2 buildings, 8 floors, 24 categories, 4 sources, 6 hours records, 514 nodes, 535 edges, 606 locations, 576 rooms, and 5 Hidden Gems.
 - pnpm hours:audit: pass, 13 relevant facilities, 5 verified linked locations, 1 needs-review Gem schedule, and 0 critical issues.
-- pnpm test:e2e: pass, 25/25 against the real Supabase project, including admin, a valid-token password update/login/restore, the full Central Brew no-SQL hours workflow, Storage, moderation, deduplicated likes, proposed indoor and outdoor Gems, proposal-to-canonical linking, wrong-floor endpoint rejection, structured hours editing, BRÛZE, 320/375/390 px mobile layouts, desktop, official maps, opening-hour exceptions, and wheelchair behavior. Post-run QA cleanup counts are 0.
+- pnpm test:e2e: pass, 29 tests with 1 intentional operational-data skip (30 total) against the real Supabase project. Coverage includes admin verification preservation, a valid-token password update/login/restore, temporary no-SQL hours editing, Storage, moderation, deduplicated likes, proposed indoor and outside-campus Gems, proposal-to-canonical linking, wrong-floor endpoint rejection, BRÛZE, Study Info, Campus Tour, dotted routes without arrows, zoom-stable information markers, selected-marker visibility, 320/375/390 px mobile layouts, desktop, official maps, opening-hour exceptions, and wheelchair behavior. The skipped Central Brew mutation deliberately preserves its current owner-entered schedule; the equivalent temporary-record flow passed. Post-run QA cleanup counts are 0.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.

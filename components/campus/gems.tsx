@@ -453,10 +453,9 @@ function GemForm({
   connected: boolean;
   onDone: () => void;
 }) {
-  const [mode, setMode] = useState<'existing' | 'proposed'>('existing'),
-    [proposedContext, setProposedContext] =
-      useState<ProposedLocationContext>('r8'),
-    [building, setBuilding] = useState('R8'),
+  const [locationChoice, setLocationChoice] = useState<
+      'existing' | ProposedLocationContext
+    >('existing'),
     [floor, setFloor] = useState(''),
     [location, setLocation] = useState<CampusData['locations'][number] | null>(
       null,
@@ -467,6 +466,10 @@ function GemForm({
     [busy, setBusy] = useState(false),
     [showMap, setShowMap] = useState(false),
     en = locale === 'en';
+  const mode = locationChoice === 'existing' ? 'existing' : 'proposed';
+  const proposedContext = locationChoice === 'existing' ? null : locationChoice;
+  const building =
+    proposedContext === 'r8' ? 'R8' : proposedContext === 'r10' ? 'R10' : '';
   const currentFloor = data.floors.find((f) => f.id === location?.floor_id);
   async function submit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -476,7 +479,7 @@ function GemForm({
     form.set('location_mode', mode);
     form.set('location_id', mode === 'existing' ? (location?.id ?? '') : '');
     if (mode === 'proposed') {
-      form.set('proposed_location_context', proposedContext);
+      form.set('proposed_location_context', proposedContext ?? '');
       form.set('proposed_building_id', building);
       form.set('proposed_floor_id', floor);
     }
@@ -561,29 +564,40 @@ function GemForm({
       />
       <fieldset className="location-mode">
         <legend>{en ? 'Where is it?' : 'Waar is de plek?'}</legend>
-        <label>
-          <input
-            type="radio"
-            checked={mode === 'existing'}
-            onChange={() => setMode('existing')}
-          />{' '}
-          {en
-            ? 'Choose a known campus location'
-            : 'Kies een bekende campuslocatie'}
-        </label>
-        <label>
-          <input
-            type="radio"
-            checked={mode === 'proposed'}
-            onChange={() => {
-              setMode('proposed');
-              setProposedContext('r8');
-              setBuilding('R8');
-              setFloor('');
-            }}
-          />{' '}
-          {en ? 'Propose a new place' : 'Stel een nieuwe plek voor'}
-        </label>
+        {(
+          [
+            [
+              'existing',
+              en
+                ? 'Existing location at NHL Stenden'
+                : 'Bestaande locatie in NHL Stenden',
+            ],
+            ['r8', en ? 'New place in R8' : 'Nieuwe plek in R8'],
+            ['r10', en ? 'New place in R10' : 'Nieuwe plek in R10'],
+            [
+              'campus_outdoor',
+              en ? 'Outside on campus' : 'Buiten op de campus',
+            ],
+            [
+              'other',
+              en
+                ? 'Outside campus / in the city'
+                : 'Buiten de campus / in de stad',
+            ],
+          ] as const
+        ).map(([value, label]) => (
+          <label key={value}>
+            <input
+              type="radio"
+              checked={locationChoice === value}
+              onChange={() => {
+                setLocationChoice(value);
+                setFloor('');
+              }}
+            />{' '}
+            {label}
+          </label>
+        ))}
       </fieldset>
       {mode === 'existing' ? (
         <>
@@ -624,31 +638,6 @@ function GemForm({
       ) : (
         <div className="proposed-location-fields">
           <label className="field-label">
-            {en ? 'Campus area' : 'Gebied op de campus'}
-            <select
-              className="field-input"
-              name="proposed_location_context"
-              value={proposedContext}
-              onChange={(event) => {
-                const context = event.target.value as ProposedLocationContext;
-                setProposedContext(context);
-                setBuilding(
-                  context === 'r8' ? 'R8' : context === 'r10' ? 'R10' : '',
-                );
-                setFloor('');
-              }}
-            >
-              <option value="r8">Rengerslaan 8</option>
-              <option value="r10">Rengerslaan 10</option>
-              <option value="campus_outdoor">
-                {en ? 'Outside on campus' : 'Buiten op campus'}
-              </option>
-              <option value="other">
-                {en ? 'Other location' : 'Andere locatie'}
-              </option>
-            </select>
-          </label>
-          <label className="field-label">
             {en ? 'Place name' : 'Naam van de plek'}
             <input
               className="field-input"
@@ -688,13 +677,28 @@ function GemForm({
             </div>
           )}
           <label className="field-label">
-            {en
-              ? 'Room, zone or nearby landmark (if known)'
-              : 'Lokaal, zone of herkenningspunt (indien bekend)'}
+            {proposedContext === 'other'
+              ? en
+                ? 'Area or location'
+                : 'Locatie of gebied'
+              : proposedContext === 'campus_outdoor'
+                ? en
+                  ? 'Place or nearby landmark on campus'
+                  : 'Plek of herkenningspunt op de campus'
+                : en
+                  ? 'Room, zone or nearby landmark (if known)'
+                  : 'Lokaal, zone of herkenningspunt (indien bekend)'}
             <input
               className="field-input"
               name="proposed_room_zone"
               maxLength={120}
+              placeholder={
+                proposedContext === 'other'
+                  ? en
+                    ? 'For example: Leeuwarden city centre'
+                    : 'Bijvoorbeeld: Centrum Leeuwarden'
+                  : undefined
+              }
             />
           </label>
           <label className="field-label">

@@ -14,6 +14,7 @@ import { LocationPanel } from './details';
 import { RoutePanel } from './route-panel';
 import { GemsPage } from './gems';
 import { TipsPage } from './tips';
+import { StudyInfoPage } from './study-info';
 import { track } from '@/lib/campus/analytics';
 import { defaultCampusFloorId } from '@/lib/campus/default-view';
 
@@ -28,7 +29,7 @@ export function CampusApp({
   data: CampusData;
   connected: boolean;
   unavailable: boolean;
-  view?: 'map' | 'gems' | 'tips';
+  view?: 'map' | 'gems' | 'tips' | 'study-info';
   initialTarget?: string;
   gemSlug?: string;
 }) {
@@ -156,6 +157,7 @@ export function CampusApp({
     <>
       {[
         ['map', en ? 'Map' : 'Kaart', 'map'],
+        ['study-info', en ? 'Study info' : 'Studie-info', 'info'],
         ['gems', 'Hidden Gems', 'sparkles'],
         ['tips', en ? 'First-year tips' : 'Eerstejaars Tips', 'book'],
       ].map(([id, label, icon]) => (
@@ -485,8 +487,10 @@ export function CampusApp({
             slug={gemSlug}
             onToast={setToast}
           />
-        ) : (
+        ) : view === 'tips' ? (
           <TipsPage data={data} locale={locale} />
+        ) : (
+          <StudyInfoPage locale={locale} />
         )}
         <footer className="page-footer">
           <span>
@@ -494,7 +498,7 @@ export function CampusApp({
             {en ? 'Independent campus concept' : 'Onafhankelijk campusconcept'}
           </span>
           <span>
-            {en ? 'Sources checked' : 'Bronnen gecontroleerd'} 10.09.2026
+            {en ? 'Sources checked' : 'Bronnen gecontroleerd'} 16.09.2026
           </span>
           <Link href="/admin">{en ? 'Administration' : 'Beheer'}</Link>
         </footer>

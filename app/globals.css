@@ -615,6 +615,7 @@ button:active {
 .map-controls button {
   background: white;
   border: 0;
+  outline: 0;
   padding: 11px;
   display: grid;
   place-items: center;
@@ -1597,45 +1598,67 @@ button:active {
   pointer-events: none;
   z-index: 2;
 }
-.official-hotspot {
+.official-hotspot-anchor {
   position: absolute;
+  width: 0;
+  height: 0;
+  z-index: 4;
+}
+.official-hotspot-anchor.selected {
+  z-index: 8;
+}
+.official-hotspot-scale {
+  width: 0;
+  height: 0;
+  transform-origin: 0 0;
+}
+.official-hotspot-anchor .official-hotspot {
+  position: absolute;
+  left: 0;
+  top: 0;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  min-height: 30px;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  z-index: 1;
+}
+.hotspot-visual {
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
   background: #fff;
   color: #155c48;
   border: 2px solid #155c48;
-  display: grid;
-  place-items: center;
-  font-weight: 800;
-  z-index: 4;
   box-shadow: 0 2px 4px #173c2530;
+  font-weight: 800;
+  transition:
+    width 100ms linear,
+    height 100ms linear,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
 }
-.official-hotspot::before {
-  content: '';
-  position: absolute;
-  inset: -7px;
-  border-radius: 50%;
-}
-.official-hotspot.room-pin {
-  width: 16px;
-  height: 16px;
-  min-height: 16px;
+.official-hotspot-anchor .official-hotspot.room-pin .hotspot-visual {
   font-size: 20px;
-  background: #fff;
 }
-.official-hotspot.selected {
-  width: 36px;
-  height: 36px;
-  min-height: 36px;
+.official-hotspot-anchor .official-hotspot.selected .hotspot-visual {
   background: #155c48;
   color: white;
-  z-index: 8;
-  box-shadow: 0 0 0 5px #d9ef7580;
+  box-shadow:
+    0 0 0 5px #d9ef7580,
+    0 2px 7px #173c2550;
 }
-.official-hotspot:active {
+.official-hotspot-anchor .official-hotspot:focus-visible {
+  outline: 3px solid #3159d1;
+  outline-offset: 1px;
+}
+.official-hotspot-anchor .official-hotspot:active {
   transform: translate(-50%, -50%);
 }
 .selected-map-label {
@@ -1879,9 +1902,111 @@ summary {
 .route-path-active {
   stroke: #075f4a;
   stroke-width: 4px;
+  stroke-dasharray: 1 10;
 }
-.route-arrow {
-  fill: #075f4a;
+
+.study-info-page {
+  max-width: 1180px;
+}
+.study-info-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 58px;
+  padding: 0 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  color: var(--blue);
+}
+.study-info-search:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgb(91 63 211 / 14%);
+}
+.study-info-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 16px;
+}
+.study-result-count {
+  margin: 10px 2px 18px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.study-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+.study-info-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--blue);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+.study-info-card h2 {
+  margin: 13px 0 8px;
+  font-size: 22px;
+  line-height: 1.2;
+}
+.study-info-card p {
+  flex: 1;
+  margin: 0 0 18px;
+  color: var(--muted);
+}
+.study-info-card .text-link,
+.study-info-empty .text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+}
+.study-info-card small {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+}
+.study-category {
+  color: #432dad;
+  background: #ece8ff;
+  border-color: #d2cafa;
+}
+.study-info-empty {
+  padding: 34px 20px;
+  text-align: center;
+}
+.study-info-empty .text-link {
+  margin: 12px auto 0;
+}
+
+@media (max-width: 700px) {
+  .bottom-nav .nav-link {
+    min-width: 0;
+    flex: 1;
+    padding-inline: 3px;
+    font-size: 10px;
+    text-align: center;
+  }
+  .study-info-grid {
+    grid-template-columns: 1fr;
+  }
+  .study-info-card {
+    padding: 18px;
+  }
+  .study-info-card h2 {
+    font-size: 20px;
+  }
 }
 .route-focus-point {
   position: absolute;
@@ -2637,9 +2762,6 @@ summary {
 .route-path-active {
   stroke: var(--route);
 }
-.route-arrow {
-  fill: var(--route);
-}
 .route-start > span,
 .route-start > b {
   background: var(--route-start);
@@ -3118,25 +3240,22 @@ body {
   background: var(--primary);
   border-color: var(--primary);
 }
-.official-hotspot,
-.official-hotspot.room-pin {
+.official-hotspot .hotspot-visual,
+.official-hotspot.room-pin .hotspot-visual {
   color: var(--primary);
   border-color: var(--primary);
 }
-.official-hotspot.selected,
+.official-hotspot.selected .hotspot-visual,
 .selected-map-label {
   color: white;
   background: var(--primary);
 }
-.official-hotspot.selected {
+.official-hotspot.selected .hotspot-visual {
   box-shadow: 0 0 0 5px rgb(217 70 145 / 24%);
 }
 .route-path-active {
   stroke: var(--route);
   stroke-width: 5px;
-}
-.route-arrow {
-  fill: var(--route);
 }
 .route-corridor-start {
   color: var(--route);

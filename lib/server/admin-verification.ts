@@ -1,30 +1,13 @@
 import type { AdminTable } from '@/lib/campus/validation';
 
-const verifiedTables = new Set<AdminTable>([
-  'source_records',
-  'floors',
-  'locations',
-  'route_nodes',
-  'route_edges',
-]);
-
-const accessibilityTables = new Set<AdminTable>(['route_nodes', 'route_edges']);
-
-export function confirmAdminRecord(
-  table: AdminTable,
+/**
+ * Generic saves preserve verification fields exactly as the administrator
+ * submitted them. Physical, topological and accessibility facts may only be
+ * marked verified through an explicit status change in the record editor.
+ */
+export function preserveAdminVerification(
+  _table: AdminTable,
   record: Record<string, unknown>,
-  verifiedAt = new Date().toLocaleDateString('sv-SE', {
-    timeZone: 'Europe/Amsterdam',
-  }),
 ) {
-  if (!verifiedTables.has(table)) return record;
-
-  return {
-    ...record,
-    verification_status: 'verified',
-    ...(accessibilityTables.has(table)
-      ? { accessibility_status: 'verified' }
-      : {}),
-    ...(table === 'source_records' ? { verified_at: verifiedAt } : {}),
-  };
+  return record;
 }

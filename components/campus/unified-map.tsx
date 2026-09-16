@@ -5,7 +5,9 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   TransformWrapper,
   TransformComponent,
+  KeepScale,
   useControls,
+  useTransformComponent,
 } from 'react-zoom-pan-pinch';
 import { Plus, Minus, Maximize, Info, MapPin } from 'lucide-react';
 import {
@@ -37,8 +39,30 @@ function MapControls({
           animationTime: 350,
           offsetY: 8,
         });
-      else if (selected)
-        void zoomToElement('original-marker-' + selected, 2.2, 250);
+      else if (selected) {
+        const mobile = window.matchMedia('(max-width: 700px)').matches;
+        const canvas = document
+          .querySelector('.official-canvas')
+          ?.getBoundingClientRect();
+        const panel = document
+          .querySelector('.map-page.has-selection .side-stack')
+          ?.getBoundingClientRect();
+        const visibleBottom =
+          mobile && canvas && panel
+            ? Math.min(canvas.bottom, panel.top)
+            : undefined;
+        const offsetY =
+          mobile && canvas && visibleBottom !== undefined
+            ? canvas.top +
+              Math.max(44, (visibleBottom - canvas.top) / 2) -
+              (canvas.top + canvas.height / 2)
+            : 0;
+        void zoomToElement('original-marker-' + selected, {
+          scale: 2.2,
+          animationTime: 250,
+          offsetY,
+        });
+      }
     }, 40);
     return () => window.clearTimeout(timer);
   }, [focusIds, selected, zoomToElement]);
@@ -147,6 +171,57 @@ const markerLabel = (
           : 'CONTINUE'
         : 'START';
 
+function MapHotspot({
+  location,
+  locale,
+  selected,
+  onSelect,
+}: {
+  location: Location;
+  locale: Locale;
+  selected: boolean;
+  onSelect: (location: Location) => void;
+}) {
+  const scale = useTransformComponent(({ state }) => state.scale);
+  const isRoom = location.category_id === 'room';
+  const visualSize = isRoom
+    ? Math.max(10, Math.min(16, 16 / Math.pow(scale, 0.22)))
+    : Math.max(15, Math.min(30, 30 / Math.pow(scale, 0.28)));
+  const en = locale === 'en';
+
+  return (
+    <div
+      id={'original-marker-' + location.id}
+      className={`official-hotspot-anchor${selected ? ' selected' : ''}`}
+      style={{ left: location.map_x + '%', top: location.map_y + '%' }}
+    >
+      <KeepScale className="official-hotspot-scale">
+        <button
+          className={`official-hotspot ${selected ? 'selected ' : ''}${isRoom ? 'room-pin' : 'information-hotspot'}`}
+          aria-label={(en ? 'Select ' : 'Selecteer ') + location.name[locale]}
+          aria-pressed={selected}
+          title={location.name[locale]}
+          onClick={() => onSelect(location)}
+        >
+          <span
+            className="hotspot-visual"
+            data-testid={`hotspot-visual-${location.id}`}
+            style={{ width: visualSize, height: visualSize }}
+            aria-hidden="true"
+          >
+            {isRoom ? '·' : 'i'}
+          </span>
+          {selected && isRoom && (
+            <span className="selected-map-label">
+              {location.room_code || location.name[locale]}
+            </span>
+          )}
+        </button>
+      </KeepScale>
+    </div>
+  );
+}
+
 export function UnifiedMap({
   floor,
   locale,
@@ -205,7 +280,6 @@ export function UnifiedMap({
     selected?.floor_id === floor.id
       ? selected
       : null;
-  const arrowId = `route-arrow-${floor.id.replace(/[^a-z0-9]/gi, '-')}`;
   const focusPoints = routeActive
     ? [
         ...(leg?.mapSegments.flatMap((segment) => segment.points) ?? []),
@@ -312,19 +386,6 @@ export function UnifiedMap({
                     en ? 'Route on this floor' : 'Route op deze verdieping'
                   }
                 >
-                  <defs>
-                    <marker
-                      id={arrowId}
-                      markerWidth="4"
-                      markerHeight="4"
-                      refX="3"
-                      refY="2"
-                      orient="auto"
-                      markerUnits="strokeWidth"
-                    >
-                      <path d="M0,0 L0,4 L4,2 z" className="route-arrow" />
-                    </marker>
-                  </defs>
                   {leg!.mapSegments.map((segment) => {
                     const points = segment.points
                       .map((point) => point.join(','))
@@ -338,7 +399,6 @@ export function UnifiedMap({
                         <polyline
                           points={points}
                           className="route-path-active"
-                          markerEnd={`url(#${arrowId})`}
                         />
                       </g>
                     );
@@ -346,34 +406,13 @@ export function UnifiedMap({
                 </svg>
               )}
               {places.map((location) => (
-                <button
+                <MapHotspot
                   key={location.id}
-                  id={'original-marker-' + location.id}
-                  className={`official-hotspot ${selected?.id === location.id ? 'selected ' : ''}${location.category_id === 'room' ? 'room-pin' : ''}`}
-                  style={{
-                    left: location.map_x + '%',
-                    top: location.map_y + '%',
-                  }}
-                  aria-label={
-                    (en ? 'Select ' : 'Selecteer ') + location.name[locale]
-                  }
-                  aria-pressed={selected?.id === location.id}
-                  title={location.name[locale]}
-                  onClick={() => onSelect(location)}
-                >
-                  {selected?.id === location.id ? (
-                    <MapPin size={20} />
-                  ) : location.category_id === 'room' ? (
-                    '·'
-                  ) : (
-                    'i'
-                  )}
-                  {selected?.id === location.id && (
-                    <span className="selected-map-label">
-                      {location.room_code || location.name[locale]}
-                    </span>
-                  )}
-                </button>
+                  location={location}
+                  locale={locale}
+                  selected={selected?.id === location.id}
+                  onSelect={onSelect}
+                />
               ))}
               {routeActive &&
                 focusPoints.map(([x, y], index) => (
