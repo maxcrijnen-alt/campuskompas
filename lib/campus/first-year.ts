@@ -636,7 +636,7 @@ export const firstYearEvents: FirstYearEvent[] = [
     },
     sourceUrl: 'https://www.neushoorn.nl/events/pizza-party',
     sourceLabel: { nl: 'Neushoorn', en: 'Neushoorn' },
-    status: 'cancelled',
+    status: 'scheduled',
   },
   {
     id: 'museumnacht-frl-2026',

@@ -123,10 +123,11 @@ describe('First-year information', () => {
 });
 
 describe('First-year events', () => {
-  it('shows nine verified active events in chronological order on implementation day', () => {
+  it('shows ten verified active events in chronological order on implementation day', () => {
     const events = getVisibleFirstYearEvents(implementationDate);
-    expect(events).toHaveLength(9);
+    expect(events).toHaveLength(10);
     expect(events.map((event) => event.id)).toEqual([
+      'friesland-pop-pizza-party-2026',
       'museumnacht-frl-2026',
       'let-op-hier-volgt-een-mening-2026',
       'weekend-van-de-wetenschap-leeuwarden-2026',
@@ -140,20 +141,54 @@ describe('First-year events', () => {
     expect(new Set(events.map((event) => event.sourceUrl)).size).toBe(
       events.length,
     );
+    expect(new Set(firstYearEvents.map((event) => event.id)).size).toBe(
+      firstYearEvents.length,
+    );
+    expect(new Set(firstYearEvents.map((event) => event.sourceUrl)).size).toBe(
+      firstYearEvents.length,
+    );
   });
 
-  it('never exposes either cancelled Neushoorn event as active', () => {
-    const cancelled = firstYearEvents
-      .filter((event) => event.status === 'cancelled')
-      .map((event) => event.id);
+  it('keeps Pizza Party scheduled with its verified date and time until it expires', () => {
+    const pizzaParty = firstYearEvents.find(
+      (event) => event.id === 'friesland-pop-pizza-party-2026',
+    )!;
+
+    expect(pizzaParty).toMatchObject({
+      status: 'scheduled',
+      startDate: '2026-09-23',
+      startTime: '16:00',
+      location: {
+        nl: 'Neushoorn Café, Leeuwarden',
+        en: 'Neushoorn Café, Leeuwarden',
+      },
+      sourceUrl: 'https://www.neushoorn.nl/events/pizza-party',
+    });
+    expect(getFirstYearEventState(pizzaParty, implementationDate)).toBe(
+      'upcoming',
+    );
+    expect(
+      getVisibleFirstYearEvents(implementationDate).map((event) => event.id),
+    ).toContain('friesland-pop-pizza-party-2026');
+    expect(
+      getVisibleFirstYearEvents(new Date('2026-09-24T10:00:00Z')).map(
+        (event) => event.id,
+      ),
+    ).not.toContain('friesland-pop-pizza-party-2026');
+  });
+
+  it('keeps The Grave Rave cancelled and out of the active list', () => {
+    const graveRave = firstYearEvents.find(
+      (event) => event.id === 'the-grave-rave-2026',
+    )!;
     const visible = getVisibleFirstYearEvents(implementationDate).map(
       (event) => event.id,
     );
-    expect(cancelled).toEqual([
-      'friesland-pop-pizza-party-2026',
-      'the-grave-rave-2026',
-    ]);
-    expect(visible).not.toContain('friesland-pop-pizza-party-2026');
+
+    expect(graveRave.status).toBe('cancelled');
+    expect(getFirstYearEventState(graveRave, implementationDate)).toBe(
+      'cancelled',
+    );
     expect(visible).not.toContain('the-grave-rave-2026');
   });
 
@@ -202,7 +237,7 @@ describe('First-year events', () => {
   it('includes the active event section when searching for events', () => {
     expect(
       getVisibleFirstYearEvents(implementationDate, 'evenement', 'nl'),
-    ).toHaveLength(9);
+    ).toHaveLength(10);
     expect(
       getVisibleFirstYearEvents(implementationDate, 'film', 'nl').map(
         (event) => event.id,

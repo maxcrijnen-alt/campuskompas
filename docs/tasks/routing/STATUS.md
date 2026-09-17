@@ -121,7 +121,7 @@ Last updated: 2026-09-17
 - First-year is the single study-information destination. Main navigation is Map, Hidden Gems and First-year; `/over-de-studie` and `/study-info` permanently redirect to `/tips` for compatibility.
 - Eleven data-driven information cards cover NHL Stenden, DBE, OER, Examencommissie, facilities, PPO/portfolio, Leisure, events and the student's future. Five compact section filters, NL/EN content, full-text search and expandable cards keep the page usable on mobile. New static content requires one data object and no route, database or migration.
 - PPO remains labelled as project terminology because the current full-time programme page confirms practice assignments and reflection but not the PPO abbreviation or portfolio wording. Source provenance stays separate for NHL Stenden, Utrecht University, World Leisure, professional literature and Studiekeuze123.
-- Nine verified upcoming Leeuwarden events are stored in a typed dataset and filtered against `Europe/Amsterdam`; expired and cancelled entries do not render and source URLs are deduplicated. Source recheck on 2026-09-17 found both The Grave Rave and Friesland Pop Pizza Party cancelled, so neither is active.
+- Ten verified upcoming Leeuwarden events are stored in a typed dataset and filtered against `Europe/Amsterdam`; expired and cancelled entries do not render and source URLs are deduplicated. Friesland Pop Pizza Party is scheduled for 23 September 2026 at 16:00; The Grave Rave remains cancelled and does not render as active.
 - The nine existing First-year tips remain, including the official Campus Tour link and the accurate accessible-routing limitation. The published “Scan. Zoek. Op weg.” tip is not rendered; QR functionality and deep links are untouched.
 - Hidden Gem submission exposes five plain-language location choices. The `other` path accepts a city area and free location description, remains building/floor/node-free, supports moderation and publishes without a fabricated indoor route.
 - Primary sources were rechecked on 2026-09-16. R8, R10, Bibliotheek, its October exceptions and Student Info remain current. No official exact schedules were found for the named catering/service facilities. BRÛZE had acquired an unsupported verified weekday schedule; migration `20260916142830_post_launch_bruze_hours_review.sql` restores `needs_review`, an empty weekly schedule and bilingual source context. Current hours metrics are 5 verified, 1 needs-review, 0 orphan records and 0 critical issues.
@@ -129,7 +129,7 @@ Last updated: 2026-09-17
 
 ## Verification
 
-- Full unit/integration suite: pass, 129/129 tests. Coverage includes the First-year content dataset, search, source links, Amsterdam-date event expiry and cancellation handling, admin verification preservation, fixed-clock Europe/Amsterdam hours, exception handling, normalization, routing, validation, reset, experience rendering, and rejection of invalid cross-building lift edges.
+- Full unit/integration suite: pass, 130/130 tests. Coverage includes the First-year content dataset, Pizza Party scheduling regression, search, source links, Amsterdam-date event expiry and cancellation handling, admin verification preservation, fixed-clock Europe/Amsterdam hours, exception handling, normalization, routing, validation, reset, experience rendering, and rejection of invalid cross-building lift edges.
 - Phase 4 required-pair experience audit: pass, 9/9 routes and 0 critical issues.
 - pnpm search:audit: pass, 606/606 From and To, 0 critical issues.
 - pnpm routing:audit: pass, 0 critical issues.
@@ -140,7 +140,7 @@ Last updated: 2026-09-17
 - pnpm seed:check: pass, 183 records validated.
 - pnpm database:audit: pass, 0 integrity failures across 2 buildings, 8 floors, 24 categories, 4 sources, 6 hours records, 514 nodes, 535 edges, 606 locations, 576 rooms, and 5 Hidden Gems.
 - pnpm hours:audit: pass, 13 relevant facilities, 5 verified linked locations, 1 needs-review Gem schedule, and 0 critical issues.
-- pnpm test:e2e: pass, 31 tests with 1 intentional operational-data skip (32 total) against the real Supabase project. Four First-year browser tests cover the three-item navigation, permanent redirects, 11 information cards, 9 retained tips, nine active date-sorted events, both cancellations, source links, search, NL/EN and 320/375/390/1440 px layouts. Event expiry is covered deterministically in the unit suite with an Amsterdam-date boundary. The skipped Central Brew mutation deliberately preserves its current owner-entered schedule; the equivalent temporary-record flow passed. Post-run QA cleanup counts are 0.
+- pnpm test:e2e: pass, 31 tests with 1 intentional operational-data skip (32 total) against the real Supabase project. Four First-year browser tests cover the three-item navigation, permanent redirects, 11 information cards, 9 retained tips, ten active date-sorted events, The Grave Rave cancellation, source links, search, NL/EN and 320/375/390/1440 px layouts. Event expiry is covered deterministically in the unit suite with an Amsterdam-date boundary. The skipped Central Brew mutation deliberately preserves its current owner-entered schedule; the equivalent temporary-record flow passed. Post-run QA cleanup counts are 0.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.

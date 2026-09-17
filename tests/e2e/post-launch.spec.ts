@@ -6,6 +6,7 @@ const navLabels = {
 };
 
 const activeEventIds = [
+  'friesland-pop-pizza-party-2026',
   'museumnacht-frl-2026',
   'let-op-hier-volgt-een-mening-2026',
   'weekend-van-de-wetenschap-leeuwarden-2026',
@@ -143,7 +144,7 @@ test('First-year shows all sections, cards, sources, search and existing tips', 
   await expect(
     page.getByRole('heading', { name: 'Wat zijn evenementen?' }),
   ).toBeVisible();
-  await expect(page.locator('[data-event-id]')).toHaveCount(9);
+  await expect(page.locator('[data-event-id]')).toHaveCount(10);
 
   await search.clear();
   await page.getByRole('button', { name: 'Handige eerstejaars-tips' }).click();
@@ -162,7 +163,7 @@ test('nearby events are chronological, unique and exclude all cancellations', as
   await page.getByRole('button', { name: 'Evenementen in de buurt' }).click();
 
   const eventCards = page.locator('[data-event-id]');
-  await expect(eventCards).toHaveCount(9);
+  await expect(eventCards).toHaveCount(10);
   expect(
     await eventCards.evaluateAll((cards) =>
       cards.map((card) => card.getAttribute('data-event-id')),
@@ -171,14 +172,22 @@ test('nearby events are chronological, unique and exclude all cancellations', as
   await expect(page.getByText('The Grave Rave', { exact: true })).toHaveCount(
     0,
   );
-  await expect(
-    page.getByText('Friesland Pop Pizza Party', { exact: true }),
-  ).toHaveCount(0);
+  const pizzaParty = page.locator(
+    '[data-event-id="friesland-pop-pizza-party-2026"]',
+  );
+  await expect(pizzaParty).toHaveAttribute('data-event-state', 'upcoming');
+  await expect(pizzaParty).toContainText('23 september 2026');
+  await expect(pizzaParty).toContainText('16:00');
+  await expect(pizzaParty).toContainText('Neushoorn Café, Leeuwarden');
+  await expect(pizzaParty.getByRole('link')).toHaveAttribute(
+    'href',
+    'https://www.neushoorn.nl/events/pizza-party',
+  );
 
   const urls = await eventCards
     .locator('a')
     .evaluateAll((links) => links.map((link) => link.getAttribute('href')));
-  expect(new Set(urls).size).toBe(9);
+  expect(new Set(urls).size).toBe(10);
   await expect(
     page.getByRole('link', { name: /Bekijk evenement · Fries Museum/ }),
   ).toHaveAttribute(
