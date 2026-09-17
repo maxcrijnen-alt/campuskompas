@@ -1,6 +1,6 @@
 # CampusKompas production readiness
 
-Last verified: 2026-09-16
+Last verified: 2026-09-17
 
 CampusKompas is softwarematig productierijp voor de huidige R8/R10-dataset. De applicatie maakt fysieke onbekendheden zichtbaar; zij claimt geen gecertificeerde route of toegankelijkheid. Onderstaande stappen zijn het praktische beheer- en herstelrunbook.
 
@@ -117,7 +117,8 @@ BRÛZE gebruikt dezelfde generieke architectuur. De huidige Gem blijft approved 
 ## Post-launch UX en bronnencontrole
 
 - Informatieve `i`-markers houden een bruikbaar 44 px klikvlak, terwijl de zichtbare cirkel bij inzoomen kleiner wordt. Bij selectie blijft hetzelfde `i` gemarkeerd en wordt het op mobiel boven het detailpaneel gekaderd; er verschijnt geen tweede paarse locatiepin.
-- `/study-info` biedt acht onderhoudbare, doorzoekbare onderwerpen met uitsluitend officiële NHL Stenden-links: Student Info, studiestart, OER, rechten en plichten, examencommissie, College van Beroep voor de Examens, onderwijscatalogus en Campus Tour. Examencommissie en beroepscollege worden expliciet onderscheiden.
+- `/over-de-studie` staat tussen Kaart en Hidden Gems en gebruikt dezelfde cardstijl als Eerstejaars. Zeven data-driven cards zijn verdeeld over NHL Stenden, Onderwijs en Leisure & Events; zoeken werkt op titel, inhoud, keywords en categorie. De oude `/study-info`-URL redirect permanent naar de nieuwe route.
+- De volledige aangeleverde projecttekst is verwerkt voor NHL Stenden, OER, Examencommissie en Studiefaciliteiten. Voor Examencommissie ontbreekt nog het afgekapt vervolg; voor de drie Leisure/Events-cards zijn alleen de aangeleverde kernpunten beschikbaar. Die punten worden zonder inhoudelijke aanvulling getoond en kunnen later in hetzelfde data-object worden vervangen of uitgebreid. Lange content gebruikt automatisch een compacte preview met `Lees meer`.
 - Eerstejaars bevat een Nederlands/Engels Campus Tour-item met een externe link. De oude visuele QR-tip “Scan. Zoek. Op weg.” wordt niet meer gerenderd; QR-deep links en route-originondersteuning blijven bestaan.
 - De officiële bronnen zijn op 2026-09-16 opnieuw gecontroleerd. R8, R10, Bibliotheek en Student Info zijn inhoudelijk ongewijzigd; de bibliotheekuitzonderingen voor 12–16 oktober 2026 blijven intact. De cateringpagina publiceert nog steeds geen betrouwbare weekroosters voor Central Brew, Café IF, Canteen, Brandstof, Espresso Bar of Food Court.
 - BRÛZE was na een admin-save ten onrechte als officieel ma–vr 08:00–15:00 geverifieerd. Migration `20260916142830_post_launch_bruze_hours_review.sql` herstelt het source-backed `needs_review`-record zonder weekschema of Open/Gesloten-claim; de bron noemt alleen 09:00–18:00 zonder weekdagen. Het afzonderlijke Central Brew-record met `manual_admin`-provenance blijft behouden.

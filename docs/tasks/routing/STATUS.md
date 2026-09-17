@@ -1,6 +1,6 @@
 # CampusKompas routing status
 
-Last updated: 2026-09-16
+Last updated: 2026-09-17
 
 ## Completed phases
 
@@ -114,11 +114,12 @@ Last updated: 2026-09-16
 - Architecture, security, data-source, setup, deployment, migration, admin, recovery, hours, Hidden Gem, accessibility, and remaining-physical-work documentation is current in `README.md`, `docs/ARCHITECTURE.md`, `docs/SECURITY.md`, `docs/DATA_SOURCES.md`, and `docs/PRODUCTION_READINESS.md`.
 - MASTER Definition of Done: endpoint/search/routing/integrity/auth/hours/Hidden Gem/deployment-readiness software requirements pass. Accessibility confirmation and exact unverified real-world positions/hours pass with a verified limitation because the UI reports them as unverified and makes no route or schedule claim.
 
-## Post-launch UX, Study Info and map polish
+## Post-launch UX, Over de studie and map polish
 
 - Active route polylines still use only stored `map_path` geometry and now render as round paars-blauwe dots/dashes with a non-scaling stroke. Repeated SVG arrow markers were removed; start, destination, floor stages and transition instructions remain unchanged.
 - Information hotspots have a constant 44 px interaction target and a zoom-aware visible marker (30 px at the base view, shrinking to a 15 px floor). Selecting an official hotspot highlights that same `i`; mobile framing uses the visible map area above the details sheet, and no duplicate selected pin is created.
-- Study Info is a fourth main-navigation destination with eight data-driven official-source cards, NL/EN search, normalization, deterministic ranking and a Student Info empty state. `examencommissie` ranks the Examencommissie card before OER and the College van Beroep.
+- Over de studie is the fourth main-navigation destination, exactly between Map and Hidden Gems, with the same responsive card language as First-year. Seven data-driven project-content cards use three compact category filters, NL/EN labels, full-text search and expandable content. `/study-info` redirects permanently to `/over-de-studie`.
+- The complete supplied text is preserved for NHL Stenden, OER, Examencommissie and Studiefaciliteiten. Examencommissie still awaits the truncated continuation; the three Leisure/Events cards expose only the received outline points and cited sources, without invented prose. A later topic requires one new data object and no new component, route, CSS variant or migration.
 - First-year now links to the official Campus Tour and accurately describes accessible routing with unknown candidates. The published “Scan. Zoek. Op weg.” tip is no longer rendered; QR functionality and deep links are untouched.
 - Hidden Gem submission exposes five plain-language location choices. The `other` path accepts a city area and free location description, remains building/floor/node-free, supports moderation and publishes without a fabricated indoor route.
 - Primary sources were rechecked on 2026-09-16. R8, R10, Bibliotheek, its October exceptions and Student Info remain current. No official exact schedules were found for the named catering/service facilities. BRÛZE had acquired an unsupported verified weekday schedule; migration `20260916142830_post_launch_bruze_hours_review.sql` restores `needs_review`, an empty weekly schedule and bilingual source context. Current hours metrics are 5 verified, 1 needs-review, 0 orphan records and 0 critical issues.
@@ -126,7 +127,7 @@ Last updated: 2026-09-16
 
 ## Verification
 
-- Full unit/integration suite: pass, 118 tests; 1 opt-in live-Supabase test skipped by the default unit command. Coverage includes post-launch Study Info ranking, admin verification preservation, fixed-clock Europe/Amsterdam hours, exception handling, normalization, routing, validation, reset, experience rendering, and rejection of invalid cross-building lift edges.
+- Full unit/integration suite: pass, 125 tests; 1 opt-in live-Supabase test skipped by the default unit command. Coverage includes post-launch study-content fidelity, filtering and ranking, admin verification preservation, fixed-clock Europe/Amsterdam hours, exception handling, normalization, routing, validation, reset, experience rendering, and rejection of invalid cross-building lift edges.
 - Phase 4 required-pair experience audit: pass, 9/9 routes and 0 critical issues.
 - pnpm search:audit: pass, 606/606 From and To, 0 critical issues.
 - pnpm routing:audit: pass, 0 critical issues.
@@ -137,7 +138,7 @@ Last updated: 2026-09-16
 - pnpm seed:check: pass, 183 records validated.
 - pnpm database:audit: pass, 0 integrity failures across 2 buildings, 8 floors, 24 categories, 4 sources, 6 hours records, 514 nodes, 535 edges, 606 locations, 576 rooms, and 5 Hidden Gems.
 - pnpm hours:audit: pass, 13 relevant facilities, 5 verified linked locations, 1 needs-review Gem schedule, and 0 critical issues.
-- pnpm test:e2e: pass, 29 tests with 1 intentional operational-data skip (30 total) against the real Supabase project. Coverage includes admin verification preservation, a valid-token password update/login/restore, temporary no-SQL hours editing, Storage, moderation, deduplicated likes, proposed indoor and outside-campus Gems, proposal-to-canonical linking, wrong-floor endpoint rejection, BRÛZE, Study Info, Campus Tour, dotted routes without arrows, zoom-stable information markers, selected-marker visibility, 320/375/390 px mobile layouts, desktop, official maps, opening-hour exceptions, and wheelchair behavior. The skipped Central Brew mutation deliberately preserves its current owner-entered schedule; the equivalent temporary-record flow passed. Post-run QA cleanup counts are 0.
+- pnpm test:e2e: pass, 30 tests with 1 intentional operational-data skip (31 total) against the real Supabase project. Coverage includes admin verification preservation, a valid-token password update/login/restore, temporary no-SQL hours editing, Storage, moderation, deduplicated likes, proposed indoor and outside-campus Gems, proposal-to-canonical linking, wrong-floor endpoint rejection, BRÛZE, Over de studie navigation/content/search/filter/source/expand behavior, Campus Tour, dotted routes without arrows, zoom-stable information markers, selected-marker visibility, 320/375/390 px mobile layouts, desktop, official maps, opening-hour exceptions, and wheelchair behavior. The skipped Central Brew mutation deliberately preserves its current owner-entered schedule; the equivalent temporary-record flow passed. Post-run QA cleanup counts are 0.
 - pnpm lint: pass.
 - pnpm typecheck: pass.
 - pnpm build: pass.

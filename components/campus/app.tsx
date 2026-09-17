@@ -14,7 +14,7 @@ import { LocationPanel } from './details';
 import { RoutePanel } from './route-panel';
 import { GemsPage } from './gems';
 import { TipsPage } from './tips';
-import { StudyInfoPage } from './study-info';
+import { AboutStudyPage } from './about-study';
 import { track } from '@/lib/campus/analytics';
 import { defaultCampusFloorId } from '@/lib/campus/default-view';
 
@@ -29,7 +29,7 @@ export function CampusApp({
   data: CampusData;
   connected: boolean;
   unavailable: boolean;
-  view?: 'map' | 'gems' | 'tips' | 'study-info';
+  view?: 'map' | 'gems' | 'tips' | 'about-study';
   initialTarget?: string;
   gemSlug?: string;
 }) {
@@ -156,19 +156,24 @@ export function CampusApp({
   const nav = (
     <>
       {[
-        ['map', en ? 'Map' : 'Kaart', 'map'],
-        ['study-info', en ? 'Study info' : 'Studie-info', 'info'],
-        ['gems', 'Hidden Gems', 'sparkles'],
-        ['tips', en ? 'First-year tips' : 'Eerstejaars Tips', 'book'],
-      ].map(([id, label, icon]) => (
+        ['map', '/map', en ? 'Map' : 'Kaart', 'map'],
+        [
+          'about-study',
+          '/over-de-studie',
+          en ? 'About the study' : 'Over de studie',
+          'info',
+        ],
+        ['gems', '/gems', 'Hidden Gems', 'sparkles'],
+        ['tips', '/tips', en ? 'First-year' : 'Eerstejaars', 'book'],
+      ].map(([id, href, label, icon]) => (
         <Link
           key={id}
           className={'nav-link ' + (view === id ? 'active' : '')}
           aria-current={view === id ? 'page' : undefined}
-          href={'/' + id}
+          href={href}
         >
           <Icon name={icon} />
-          {label}
+          <span className="nav-label">{label}</span>
         </Link>
       ))}
     </>
@@ -490,7 +495,7 @@ export function CampusApp({
         ) : view === 'tips' ? (
           <TipsPage data={data} locale={locale} />
         ) : (
-          <StudyInfoPage locale={locale} />
+          <AboutStudyPage locale={locale} />
         )}
         <footer className="page-footer">
           <span>
