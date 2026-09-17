@@ -14,7 +14,6 @@ import { LocationPanel } from './details';
 import { RoutePanel } from './route-panel';
 import { GemsPage } from './gems';
 import { TipsPage } from './tips';
-import { AboutStudyPage } from './about-study';
 import { track } from '@/lib/campus/analytics';
 import { defaultCampusFloorId } from '@/lib/campus/default-view';
 
@@ -25,13 +24,15 @@ export function CampusApp({
   view = 'map',
   initialTarget,
   gemSlug,
+  firstYearToday,
 }: {
   data: CampusData;
   connected: boolean;
   unavailable: boolean;
-  view?: 'map' | 'gems' | 'tips' | 'about-study';
+  view?: 'map' | 'gems' | 'tips';
   initialTarget?: string;
   gemSlug?: string;
+  firstYearToday?: string;
 }) {
   const [locale, setLocale] = useState<Locale>('nl'),
     [floorId, setFloor] = useState(() => defaultCampusFloorId(data)),
@@ -157,12 +158,6 @@ export function CampusApp({
     <>
       {[
         ['map', '/map', en ? 'Map' : 'Kaart', 'map'],
-        [
-          'about-study',
-          '/over-de-studie',
-          en ? 'About the study' : 'Over de studie',
-          'info',
-        ],
         ['gems', '/gems', 'Hidden Gems', 'sparkles'],
         ['tips', '/tips', en ? 'First-year' : 'Eerstejaars', 'book'],
       ].map(([id, href, label, icon]) => (
@@ -492,10 +487,12 @@ export function CampusApp({
             slug={gemSlug}
             onToast={setToast}
           />
-        ) : view === 'tips' ? (
-          <TipsPage data={data} locale={locale} />
         ) : (
-          <AboutStudyPage locale={locale} />
+          <TipsPage
+            data={data}
+            locale={locale}
+            today={firstYearToday ?? '1970-01-01'}
+          />
         )}
         <footer className="page-footer">
           <span>
@@ -503,7 +500,7 @@ export function CampusApp({
             {en ? 'Independent campus concept' : 'Onafhankelijk campusconcept'}
           </span>
           <span>
-            {en ? 'Sources checked' : 'Bronnen gecontroleerd'} 16.09.2026
+            {en ? 'Sources checked' : 'Bronnen gecontroleerd'} 17.09.2026
           </span>
           <Link href="/admin">{en ? 'Administration' : 'Beheer'}</Link>
         </footer>

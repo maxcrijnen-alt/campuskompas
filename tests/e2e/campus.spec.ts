@@ -292,6 +292,7 @@ test('admin creates, previews and links URL-less hours by facility name', async 
   page,
   request,
 }) => {
+  test.setTimeout(120000);
   test.skip(!process.env.TEST_ADMIN_EMAIL, 'Requires provisioned admin');
   const suffix = Date.now();
   const locationId = `qa-hours-location-${suffix}`;

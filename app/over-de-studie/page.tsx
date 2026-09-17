@@ -1,8 +1,5 @@
-import { CampusApp } from '@/components/campus/app';
-import { getCampus } from '@/lib/server/data';
+import { permanentRedirect } from 'next/navigation';
 
-export const dynamic = 'force-dynamic';
-
-export default async function Page() {
-  return <CampusApp {...await getCampus()} view="about-study" />;
+export default function Page() {
+  permanentRedirect('/tips');
 }
